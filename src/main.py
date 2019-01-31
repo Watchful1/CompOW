@@ -38,34 +38,9 @@ if LOG_FILENAME is not None:
 
 
 def main():
-	log.info("Running")
-
-	once = False
-	debug = False
-	user = None
-	if len(sys.argv) >= 2:
-		user = sys.argv[1]
-		for arg in sys.argv:
-			if arg == 'once':
-				once = True
-			elif arg == 'debug':
-				debug = True
-	else:
-		log.error("No user specified, aborting")
-		sys.exit(0)
-
-	if not reddit.init(user):
-		sys.exit(0)
-
-	events = file_utils.load_state()
-
-	globals.debug_time = datetime.utcnow()
-
-	current_time = globals.debug_time
-
-	overggparser.get_upcoming_matches(events)
+	overggparser.get_upcoming_events(events)
 	for event in events:
-		if current_time < event.start < current_time + timedelta(minutes=30) and event.thread is None:
+		if current_time + timedelta(minutes=15) >= event.start and event.thread is None:
 			log.info(f"Posting event: {event}")
 			overggparser.populate_event(event)
 
@@ -102,6 +77,31 @@ def main():
 
 
 if __name__ == "__main__":
+	log.info("Starting")
+
+	once = False
+	debug = False
+	user = None
+	if len(sys.argv) >= 2:
+		user = sys.argv[1]
+		for arg in sys.argv:
+			if arg == 'once':
+				once = True
+			elif arg == 'debug':
+				debug = True
+	else:
+		log.error("No user specified, aborting")
+		sys.exit(0)
+
+	if not reddit.init(user):
+		sys.exit(0)
+
+	events = file_utils.load_state()
+
+	globals.debug_time = datetime.utcnow()
+
+	current_time = globals.debug_time
+
 	main()
 
 
@@ -115,4 +115,5 @@ if __name__ == "__main__":
 # only post from whitelisted tournaments
 # post match threads for OWL
 # order/whitelist/flag streams
+# approve post
 

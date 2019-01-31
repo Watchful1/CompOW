@@ -120,32 +120,13 @@ def merge_fields_into_match(fields, match):
 
 
 def populate_event(event):
-	all_complete = True
-	any_in_progress = False
 	for match in event.matches:
 		fields = parse_match(match.url)
 		merge_fields_into_match(fields, match)
-
-		if match.dirty:
-			event.dirty = True
-
-		if match.state == classes.GameState.IN_PROGRESS:
-			any_in_progress = True
-		if match.state != classes.GameState.COMPLETE:
-			all_complete = False
-		for stream in match.streams:
-			if stream not in event.streams:
-				event.streams.append(stream)
-		if event.stage is None:
-			event.stage = match.stage
-
-	if all_complete:
-		merge_field(event, "state", classes.GameState.COMPLETE)
-	elif any_in_progress:
-		merge_field(event, "state", classes.GameState.IN_PROGRESS)
+		event.add_match_to_stage(match)
 
 
-def get_upcoming_matches(events):
+def get_upcoming_events(events):
 	try:
 		data = requests.get(globals.OVER_GG_API).json()
 	except Exception as err:
@@ -159,49 +140,22 @@ def get_upcoming_matches(events):
 		match = classes.Match(
 			id=match_table['id'],
 			start=datetime.utcfromtimestamp(int(match_table['timestamp'])),
+			url=match_table['match_link'],
 			home=classes.Team(match_table['teams'][0]['name'], match_table['teams'][0]['country']),
-			away=classes.Team(match_table['teams'][1]['name'], match_table['teams'][1]['country']),
-			url=match_table['match_link']
+			away=classes.Team(match_table['teams'][1]['name'], match_table['teams'][1]['country'])
 		)
-
-		# log.debug(f"Parsing match: {match_table['id']} : {str(match.start)}")
 
 		fits_event = False
 		for event in events:
-			if event.match_fits(match):
-				for event_match in event.matches:
-					if event_match.id == match.id:
-						fits_event = True
+			if event.match_fits(match.start, match_table['event_name']):
+				event.add_match(match)
+				fits_event = True
+				break
 
-						if event_match.start != match.start:
-							log.debug(f"Updating match in event: {match.id} from {event_match.start} to {match.start}")
-							event_match.start = match.start
-							event_match.dirty = True
-							if match.start < event.start:
-								event.start = match.start
-							elif match.start > event.last:
-								event.last = match.start
-
-						merge_field(event_match, "home", match.home)
-						merge_field(event_match, "away", match.away)
-
-						if event_match.dirty:
-							log.debug("Dirty in event loading")
-							event.dirty = True
-						break
-
-				if fits_event:
-					break
-				else:
-					log.debug(f"Adding match to event: {match.id}")
-					event.add_match(match)
-					fits_event = True
-					break
-		if not fits_event and current_time < match.start < current_time + timedelta(hours=1):
-			log.debug(f"Found new upcoming match: {match.id} : {str(match.start)}")
+		if not fits_event and current_time + timedelta(hours=1) > match.start:
+			log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
 			event = classes.Event(
-				match=match,
-				competition=match_table['event_name'],
-				stage=None
+				competition=match_table['event_name']
 			)
+			event.add_match(match)
 			events.append(event)

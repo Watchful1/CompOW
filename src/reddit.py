@@ -38,6 +38,7 @@ def init(user):
 
 
 def submit_self_post(subreddit, title, text):
+	return ""
 	try:
 		thread = reddit.subreddit(subreddit).submit(title=title, selftext=text)
 		log.debug(f"Posted thread to r/{subreddit} - {thread.id}")
@@ -49,6 +50,7 @@ def submit_self_post(subreddit, title, text):
 
 
 def edit_thread(thread_id, text):
+	return True
 	try:
 		submission = reddit.submission(id=thread_id)
 		submission.edit(text)
@@ -63,7 +65,7 @@ def edit_thread(thread_id, text):
 def get_bottom_sticky(subreddit):
 	try:
 		submissions_list = list(reddit.subreddit(subreddit).hot(limit=2))
-		second_submission = submissions_list[1].title
+		second_submission = submissions_list[1]
 		log.debug(f"Found bottom sticky in r/{subreddit} - {second_submission.id}")
 		return second_submission.id
 	except Exception as err:
