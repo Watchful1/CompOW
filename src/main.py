@@ -1,7 +1,7 @@
 import logging.handlers
 import os
-import pickle
 import sys
+import time
 from datetime import datetime
 from datetime import timedelta
 
@@ -9,7 +9,8 @@ import globals
 import overggparser
 import string_utils
 import classes
-import reddit
+import sticky_class
+import reddit_class
 import file_utils
 
 LOG_LEVEL = logging.DEBUG
@@ -37,23 +38,22 @@ if LOG_FILENAME is not None:
 	log.addHandler(log_fileHandler)
 
 
-def main():
+def main(events, reddit, sticky):
+	globals.debug_time = datetime.utcnow()
+	current_time = globals.debug_time
+
 	overggparser.get_upcoming_events(events)
 	for event in events:
 		if current_time + timedelta(minutes=15) >= event.start and event.thread is None:
 			log.info(f"Posting event: {event}")
 			overggparser.populate_event(event)
 
-			old_sticky = reddit.get_bottom_sticky(globals.SUBREDDIT)
-
 			thread_id = reddit.submit_self_post(
 				globals.SUBREDDIT,
 				string_utils.render_reddit_title(event),
 				string_utils.render_reddit(event)
 			)
-			sticky_successful = reddit.sticky_thread(thread_id)
-			if sticky_successful:
-				event.previous_sticky = old_sticky
+			sticky.sticky_second(thread_id, event.competition, event.start)
 
 			reddit.spoiler_thread(thread_id)
 			reddit.set_suggested_sort(thread_id, "new")
@@ -73,7 +73,7 @@ def main():
 				)
 				event.clean()
 
-	file_utils.save_state(events)
+	file_utils.save_state(events, sticky.saved_stickies)
 
 
 if __name__ == "__main__":
@@ -93,16 +93,17 @@ if __name__ == "__main__":
 		log.error("No user specified, aborting")
 		sys.exit(0)
 
-	if not reddit.init(user):
-		sys.exit(0)
+	reddit = reddit_class.Reddit(user)
+	events, stickies = file_utils.load_state()
+	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, stickies)
 
-	events = file_utils.load_state()
+	while True:
+		main(events, reddit, sticky)
 
-	globals.debug_time = datetime.utcnow()
+		if once:
+			break
 
-	current_time = globals.debug_time
-
-	main()
+		time.sleep(60*3)
 
 
 # flair: Match Thread
