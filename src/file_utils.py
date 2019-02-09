@@ -22,6 +22,6 @@ def load_state(reset=False):
 	if 'events' not in state:
 		state['events'] = []
 	if 'stickies' not in state:
-		state['stickies'] = {'current': [None] * 2, 'saved': [None] * 2}
+		state['stickies'] = {'current': [None] * 2, 'saved': []}
 
 	return state['events'], state['stickies']

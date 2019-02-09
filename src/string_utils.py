@@ -1,22 +1,9 @@
 import classes
 import mappings
-from urllib.parse import urlparse
 
 
-def extract_url_name(url):
-	try:
-		parsed_url = urlparse(url)
-	except Exception as err:
-		return url
-
-	if "twitch.tv" in parsed_url.netloc.lower():
-		last_slash = url.rfind("/", 0, len(url) - 1)
-		if url[-1] == '/':
-			return url[last_slash + 1:-1]
-		else:
-			return url[last_slash + 1:]
-	else:
-		return parsed_url.netloc
+def render_reddit_stage(stage):
+	bldr = []
 
 
 def render_reddit(event):

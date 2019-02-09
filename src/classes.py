@@ -2,6 +2,7 @@ from enum import Enum
 from datetime import timedelta
 import logging
 import bisect
+from urllib.parse import urlparse
 
 
 log = logging.getLogger("bot")
@@ -12,6 +13,42 @@ class GameState(Enum):
 	IN_PROGRESS = 2
 	COMPLETE = 3
 	UNKNOWN = 4
+
+
+class Competition:
+	def __init__(self, name, post_discord=False, split_stages=False, discord_role=None):
+		self.name = name
+		self.post_discord = post_discord
+		self.split_stages = split_stages
+		self.discord_role = discord_role
+
+
+def extract_url_name(url):
+	try:
+		parsed_url = urlparse(url)
+	except Exception as err:
+		return url
+
+	if "twitch.tv" in parsed_url.netloc.lower():
+		last_slash = url.rfind("/", 0, len(url) - 1)
+		if url[-1] == '/':
+			return url[last_slash + 1:-1]
+		else:
+			return url[last_slash + 1:]
+	else:
+		return parsed_url.netloc
+
+
+class Stream:
+	def __init__(self, url, name=None):
+		self.url = url
+		if name is None:
+			self.name = extract_url_name(url)
+		else:
+			self.name = name
+
+	def __eq__(self, other):
+		return self.url == other.url
 
 
 class Team:

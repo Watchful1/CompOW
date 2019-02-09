@@ -1,3 +1,5 @@
+import classes
+
 mappings = {
 	'stream': {
 		"twitch": "Twitch",
@@ -5,19 +7,20 @@ mappings = {
 	},
 	'flair': {
 		"twitch": ""
-	},
-	'competition': [
-		[
-			"Overwatch League Season 2",
-		],
-		[
-			"Overwatch Contenders 2019 Season 1 Trials",
-		],
-		[
-			"Assembly Winter 2019",
-		],
-	]
+	}
 }
+
+competitions = [
+	classes.Competition(
+		name="Overwatch League Season 2",
+		post_discord=True,
+		split_stages=True,
+		discord_role="OWL-Notify"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1 Trials"
+	),
+]
 
 
 def get_or_default(cat, key):
@@ -35,13 +38,12 @@ def get_flair(key):
 	return f"[](#{value})"
 
 
-def competition_ranking(competition):
-	if competition is None:
+def competition_ranking(competition_name):
+	if competition_name is None:
 		return None
-	for i, competition_group in enumerate(mappings['competition']):
-		for competition_name in competition_group:
-			if competition_name in competition:
-				return i
+	for i, competition in enumerate(competitions):
+		if competition_name in competition.name:
+			return i
 	return None
 
 

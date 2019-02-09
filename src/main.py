@@ -45,7 +45,7 @@ def main(events, reddit, sticky):
 	overggparser.get_upcoming_events(events)
 	for event in events:
 		if current_time + timedelta(minutes=15) >= event.start and event.thread is None:
-			log.info(f"Posting event: {event}")
+			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
 			thread_id = reddit.submit_self_post(
@@ -73,7 +73,7 @@ def main(events, reddit, sticky):
 				)
 				event.clean()
 
-	file_utils.save_state(events, sticky.saved_stickies)
+	file_utils.save_state(events, sticky.get_save())
 
 
 if __name__ == "__main__":

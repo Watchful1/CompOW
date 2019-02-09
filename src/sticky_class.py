@@ -59,6 +59,7 @@ class StickyManager:
 			if not found:
 				result_stickies.append(Sticky(sticky))
 		self.current_stickies = result_stickies
+		log.debug(f"Updated current stickies to: {result_stickies[0]}, {result_stickies[1]}")
 
 	def sticky_second(self, thread_id, competition, start):
 		self.update_current_stickies()
@@ -68,17 +69,18 @@ class StickyManager:
 		else:
 			new_sticky = Sticky(thread_id, competition, start)
 			if second_sticky < new_sticky:
-				bisect.insort(self.saved_stickies[1], second_sticky)
+				bisect.insort(self.saved_stickies, second_sticky)
 				self.reddit.sticky_thread(thread_id)
 			else:
-				bisect.insort(self.saved_stickies[1], new_sticky)
+				log.info("Saving for later sticky")
+				bisect.insort(self.saved_stickies, new_sticky)
 
 	def unsticky(self, thread_id):
 		self.update_current_stickies()
-		for i, current_sticky in enumerate(self.current_stickies):
+		for current_sticky in self.current_stickies:
 			if current_sticky is not None and current_sticky.thread_id == thread_id:
 				self.reddit.unsticky_thread(thread_id)
-				if len(self.saved_stickies[i]) > 0:
-					re_sticky = self.saved_stickies[i].pop()
+				if len(self.saved_stickies) > 0:
+					re_sticky = self.saved_stickies.pop()
 					self.reddit.sticky_thread(re_sticky.thread_id)
 					break

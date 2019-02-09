@@ -38,11 +38,11 @@ def parse_match(match_url):
 		{'field': 'stream3', 'required': False,
 		 	'path': "//div[@class='match-streams']/div[4]/a/@href"},
 		{'field': 'stream_name1', 'required': True,
-		 	'path': "//div[@class='match-streams']/div/a/test()"},
+		 	'path': "//div[@class='match-streams']/div/a/text()"},
 		{'field': 'stream_name2', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[3]/a/test()"},
+		 	'path': "//div[@class='match-streams']/div[3]/a/text()"},
 		{'field': 'stream_name3', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[4]/a/test()"},
+		 	'path': "//div[@class='match-streams']/div[4]/a/text()"},
 		{'field': 'home_score', 'required': False,
 		 	'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
 		{'field': 'away_score', 'required': False,
@@ -86,11 +86,17 @@ def merge_fields_into_match(fields, match):
 	merge_field(match, "stage", fields['match_name'])
 	merge_field(match, "competition", fields['tournament'])
 
-	for stream in ['stream1', 'stream2', 'stream3']:
-		if stream in fields:
-			if fields[stream] not in match.streams:
-				match.streams.append(fields[stream])
-				log.debug(f"Streams dirty: {stream}")
+	for stream_num in ["1", "2", "3"]:
+		url_name = "stream"+stream_num
+		if url_name in fields:
+			matched = False
+			for match_stream in match.streams:
+				if fields[url_name] == match_stream.url:
+					matched = True
+
+			if not matched:
+				match.streams.append(classes.Stream(fields[fields[url_name]], fields["stream_name"+stream_num]))
+				log.debug(f"Streams dirty: {fields[url_name]}")
 				match.dirty = True
 
 	if 'state2' in fields and fields['state2'] == "final":
