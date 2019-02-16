@@ -14,7 +14,6 @@ competitions = [
 	classes.Competition(
 		name="Overwatch League 2019 Season",
 		post_discord=True,
-		split_stages=True,
 		discord_role="OWL-Notify",
 		post_match_threads=True
 	),

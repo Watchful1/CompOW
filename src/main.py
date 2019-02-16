@@ -44,32 +44,28 @@ def main(events, reddit, sticky):
 
 	overggparser.get_upcoming_events(events)
 	for event in events:
-		if current_time + timedelta(minutes=30) >= event.start and not event.has_thread():
+		if current_time + timedelta(minutes=30) >= event.start and event.thread is None:
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
-			if event.competition.split_stages:
-				log.info("Posting split stages for event")
-			else:
-				log.info("Posting combined stages for event")
 
-			thread_id = reddit.submit_self_post(
-				globals.SUBREDDIT,
-				string_utils.render_reddit_event_title(event),
-				string_utils.render_reddit_event(event)
-			)
-			sticky.sticky_second(thread_id, event.competition, event.start)
-
-			reddit.spoiler_thread(thread_id)
-			reddit.set_suggested_sort(thread_id, "new")
-
-			event.thread = thread_id
+			# thread_id = reddit.submit_self_post(
+			# 	globals.SUBREDDIT,
+			# 	string_utils.render_reddit_event_title(event),
+			# 	string_utils.render_reddit_event(event)
+			# )
+			# sticky.sticky_second(thread_id, event.competition, event.start)
+			#
+			# reddit.spoiler_thread(thread_id)
+			# reddit.set_suggested_sort(thread_id, "new")
+			#
+			# event.thread = thread_id
 			event.clean()
 
-		if event.has_thread():
+		if event.thread is not None:
 			log.info(f"Rechecking event: {event}")
 			overggparser.populate_event(event)
 
-			if event.dirty():
+			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")
 				reddit.edit_thread(
 					event.thread,

@@ -127,10 +127,10 @@ def merge_fields_into_match(fields, match):
 
 
 def populate_event(event):
-	for match_id, match in event.matches.items():
+	for match in event.matches_new:
 		fields = parse_match(match.url)
 		merge_fields_into_match(fields, match)
-		event.add_match_to_stage(match)
+		event.add_stage_name(match.stage)
 
 
 def get_upcoming_events(events):

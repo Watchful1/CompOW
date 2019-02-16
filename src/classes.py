@@ -16,10 +16,9 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self, name, post_discord=False, split_stages=False, discord_role=None, post_match_threads=False):
+	def __init__(self, name, post_discord=False, discord_role=None, post_match_threads=False):
 		self.name = name
 		self.post_discord = post_discord
-		self.split_stages = split_stages
 		self.discord_role = discord_role
 		self.post_match_threads = post_match_threads
 
@@ -95,6 +94,9 @@ class Match:
 	def __lt__(self, other):
 		return self.start < other.start
 
+	def __eq__(self, other):
+		return self.id == other.id
+
 
 class StageBak:
 	def __init__(self, stage):
@@ -138,31 +140,36 @@ class StageBak:
 
 class Event:
 	def __init__(self, competition):
+		self.competition = competition
+
 		self.start = None
 		self.last = None
-		self.competition = competition
 		self.thread = None
+		self.dirty = False
 
-		self.matches = {}
 		self.matches_new = []
-
 		self.stage_names = []
+		self.streams = []
 
 	def add_match(self, match):
-		if match.id in self.matches:
-			if self.matches[match.id].start != match.start:
-				log.info(f"Updating match start in event: {match.id} : {self.matches[match.id].start} : {match.start}")
-				self.matches[match.id].start = match.start
-				self.rebuild_start_last()
-			if self.matches[match.id].url != match.url:
-				log.warning(f"Url updated for match: {match.id}")
-			if self.matches[match.id].home != match.home:
-				log.warning(f"Home updated for match: {match.id} : {match.home}")
-			if self.matches[match.id].away != match.away:
-				log.warning(f"Away updated for match: {match.id} : {match.away}")
-		else:
+		found = False
+		for event_match in self.matches_new:
+			if event_match.id == match.id:
+				if event_match.start != match.start:
+					log.info(f"Updating match start in event: {match.id} : {event_match.start} : {match.start}")
+					event_match.start = match.start
+					self.rebuild_start_last()
+				if event_match.url != match.url:
+					log.warning(f"Url updated for match: {match.id}")
+				if event_match.home != match.home:
+					log.warning(f"Home updated for match: {match.id} : {match.home}")
+				if event_match.away != match.away:
+					log.warning(f"Away updated for match: {match.id} : {match.away}")
+				found = True
+				break
+		if not found:
 			log.info(f"Adding match to event: {match.id} : {match.home.name} vs {match.away.name}")
-			self.matches[match.id] = match
+			self.matches_new.append(match)
 			self.add_match_time(match.start)
 
 	def add_match_time(self, match_time):
@@ -174,10 +181,8 @@ class Event:
 	def rebuild_start_last(self):
 		self.start = None
 		self.last = None
-		for match_id, match in self.matches.items():
+		for match in self.matches_new:
 			self.add_match_time(match.start)
-		for stage in self.stages:
-			stage.rebuild_start_last()
 
 	def match_fits(self, start, competition):
 		if self.competition.name != competition:
@@ -185,36 +190,20 @@ class Event:
 		return self.start - timedelta(hours=3) < start < self.last + timedelta(hours=3)
 
 	def clean(self):
-		for stage in self.stages:
-			stage.clean()
+		self.dirty = False
+		for match in self.matches_new:
+			match.dirty = False
 
-	def add_match_to_stage(self, match):
-		fit_stage = False
-		for stage in self.stages:
-			if stage.stage == match.stage:
-				fit_stage = True
-				in_stage = False
-				for stage_match in stage.matches:
-					if stage_match.id == match.id:
-						in_stage = True
-						if match.dirty:
-							stage.dirty = True
-						break
-
-				if not in_stage:
-					stage.add_match(match)
-
-		if not fit_stage:
-			stage = Stage(match.stage)
-			stage.add_match(match)
-			self.stages.append(stage)
+	def add_stage_name(self, stage_name):
+		if stage_name not in self.stage_names:
+			self.stage_names.append(stage_name)
 
 	def game_state(self):
 		all_complete = True
-		for stage in self.stages:
-			if stage.state == GameState.IN_PROGRESS:
+		for match in self.matches_new:
+			if match.state == GameState.IN_PROGRESS:
 				return GameState.IN_PROGRESS
-			if stage.state != GameState.COMPLETE:
+			if match.state != GameState.COMPLETE:
 				all_complete = False
 
 		if all_complete:
@@ -222,34 +211,12 @@ class Event:
 		else:
 			return GameState.PENDING
 
-	def has_thread(self):
-		if self.thread is not None:
-			return True
-		for stage in self.stages:
-			if stage.thread is not None:
-				return True
-		return False
-
-	def stage_names(self):
+	def stages_name(self):
 		bldr = []
-		for stage in self.stages:
-			bldr.append(stage.stage)
+		for stage_name in self.stage_names:
+			bldr.append(stage_name)
 
 		return ' - '.join(bldr)
-
-	def streams(self):
-		streams = []
-		for stage in self.stages:
-			for stream in stage.streams:
-				if stream not in streams:
-					streams.append(stream)
-		return streams
-
-	def dirty(self):
-		for stage in self.stages:
-			if stage.dirty:
-				return True
-		return False
 
 	def __str__(self):
 		return f"{self.competition} : {self.start}"
