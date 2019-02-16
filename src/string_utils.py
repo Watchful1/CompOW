@@ -65,7 +65,7 @@ def render_reddit_event(event):
 	bldr.append(">>| |  |   |   |   |  | |   |\n")
 	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
 	bldr.append(">>|Time|Team 1||||Team 2||Match Page|\n")
-	for match in event.matches_new:
+	for match in event.matches:
 		bldr.append(">>|")
 
 		bldr.append("[")

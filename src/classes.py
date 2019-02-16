@@ -107,13 +107,13 @@ class Event:
 		self.thread = None
 		self.dirty = False
 
-		self.matches_new = []
+		self.matches = []
 		self.stage_names = []
 		self.streams = []
 
 	def add_match(self, match):
 		found = False
-		for event_match in self.matches_new:
+		for event_match in self.matches:
 			if event_match.id == match.id:
 				if event_match.start != match.start:
 					log.info(f"Updating match start in event: {match.id} : {event_match.start} : {match.start}")
@@ -129,7 +129,7 @@ class Event:
 				break
 		if not found:
 			log.info(f"Adding match to event: {match.id} : {match.home.name} vs {match.away.name}")
-			self.matches_new.append(match)
+			self.matches.append(match)
 			self.add_match_time(match.start)
 
 	def add_match_time(self, match_time):
@@ -141,7 +141,7 @@ class Event:
 	def rebuild_start_last(self):
 		self.start = None
 		self.last = None
-		for match in self.matches_new:
+		for match in self.matches:
 			self.add_match_time(match.start)
 
 	def merge_match(self, match):
@@ -160,12 +160,12 @@ class Event:
 
 	def clean(self):
 		self.dirty = False
-		for match in self.matches_new:
+		for match in self.matches:
 			match.dirty = False
 
 	def game_state(self):
 		all_complete = True
-		for match in self.matches_new:
+		for match in self.matches:
 			if match.state == GameState.IN_PROGRESS:
 				return GameState.IN_PROGRESS
 			if match.state != GameState.COMPLETE:

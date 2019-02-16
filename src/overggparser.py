@@ -127,7 +127,7 @@ def merge_fields_into_match(fields, match):
 
 
 def populate_event(event):
-	for match in event.matches_new:
+	for match in event.matches:
 		fields = parse_match(match.url)
 		merge_fields_into_match(fields, match)
 		event.merge_match(match)

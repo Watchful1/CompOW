@@ -49,7 +49,7 @@ def main(events, reddit, sticky):
 			overggparser.populate_event(event)
 
 			if event.competition.post_match_threads:
-				for match in event.matches_new:
+				for match in event.matches:
 					if match.state == classes.GameState.COMPLETE and match.post_thread is None:
 						log.info(f"Match complete, posting post match thread: {match}")
 
