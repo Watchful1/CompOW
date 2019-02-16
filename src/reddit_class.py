@@ -142,7 +142,18 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
+	def approve(self, thread_id):
+		try:
+			self.reddit.submission(thread_id).mod.approve()
+			log.debug(f"Approving thread: {thread_id}")
+			return None
+		except Exception as err:
+			log.warning(f"Unable to approve thread: {thread_id}")
+			log.warning(traceback.format_exc())
+			return None
+
 	def match_thread_settings(self, thread_id):
+		self.approve(thread_id)
 		self.spoiler_thread(thread_id)
 		self.set_suggested_sort(thread_id, "new")
 		self.disable_inbox_replies(thread_id)

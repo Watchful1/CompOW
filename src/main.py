@@ -55,8 +55,8 @@ def main(events, reddit, sticky):
 
 						thread_id = reddit.submit_self_post(
 							globals.SUBREDDIT,
-							string_utils.render_reddit_post_match_title(event),
-							string_utils.render_reddit_post_match(event)
+							string_utils.render_reddit_post_match_title(match),
+							string_utils.render_reddit_post_match(match)
 						)
 
 						reddit.match_thread_settings(thread_id)
@@ -120,13 +120,14 @@ if __name__ == "__main__":
 		time.sleep(60*2)
 
 
+# sticky in correct order
 # save previous sticky and re-sticky
 # unpin at end
 # contenders post match thread if more than x comments, and lock post/sticky comment
-# get stream names from overgg
 # discord notifications
-# only post from whitelisted tournaments
-# post match threads for OWL
-# order/whitelist/flag streams
-# approve post
+# post match threads in OP, comments in thread
+# remove completed events
+# team symbols in match thread, post match thread
+# map details in post match thread
+# loop faster when a match is in progress and slower if there is none
 

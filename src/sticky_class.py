@@ -61,6 +61,10 @@ class StickyManager:
 		self.current_stickies = result_stickies
 		log.debug(f"Updated current stickies to: {result_stickies[0]}, {result_stickies[1]}")
 
+	def sticky(self, thread_id, competition, start):
+		self.update_current_stickies()
+
+
 	def sticky_second(self, thread_id, competition, start):
 		self.update_current_stickies()
 		second_sticky = self.current_stickies[1]
