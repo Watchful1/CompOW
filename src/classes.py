@@ -1,7 +1,6 @@
 from enum import Enum
 from datetime import timedelta
 import logging
-import bisect
 from urllib.parse import urlparse
 
 
@@ -16,11 +15,12 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self, name, post_discord=False, discord_role=None, post_match_threads=False):
+	def __init__(self, name, post_discord=False, discord_role=None, post_match_threads=False, post_minutes_ahead=15):
 		self.name = name
 		self.post_discord = post_discord
 		self.discord_role = discord_role
 		self.post_match_threads = post_match_threads
+		self.post_minutes_ahead = post_minutes_ahead
 
 	def __str__(self):
 		return self.name
@@ -98,46 +98,6 @@ class Match:
 		return self.id == other.id
 
 
-class StageBak:
-	def __init__(self, stage):
-		self.start = None
-		self.last = None
-		self.matches = []
-		self.stage = stage
-
-		self.dirty = False
-		self.thread = None
-		self.streams = []
-
-		self.state = GameState.PENDING
-
-	def add_match(self, match):
-		bisect.insort(self.matches, match)
-		self.add_match_time(match.start)
-		if match.dirty:
-			self.dirty = True
-
-	def add_match_time(self, match_time):
-		if self.start is None or self.start > match_time:
-			self.start = match_time
-		if self.last is None or self.last < match_time:
-			self.last = match_time
-
-	def clean(self):
-		self.dirty = False
-		for match in self.matches:
-			match.dirty = False
-
-	def rebuild_start_last(self):
-		self.start = None
-		self.last = None
-		matches_temp = []
-		for match in self.matches:
-			self.add_match_time(match.start)
-			bisect.insort(matches_temp, match)
-		self.matches = matches_temp
-
-
 class Event:
 	def __init__(self, competition):
 		self.competition = competition
@@ -184,6 +144,15 @@ class Event:
 		for match in self.matches_new:
 			self.add_match_time(match.start)
 
+	def merge_match(self, match):
+		if match.stage not in self.stage_names:
+			self.stage_names.append(match.stage)
+		if match.dirty:
+			self.dirty = True
+		for stream in match.streams:
+			if stream not in self.streams:
+				self.streams.append(stream)
+
 	def match_fits(self, start, competition):
 		if self.competition.name != competition:
 			return False
@@ -193,10 +162,6 @@ class Event:
 		self.dirty = False
 		for match in self.matches_new:
 			match.dirty = False
-
-	def add_stage_name(self, stage_name):
-		if stage_name not in self.stage_names:
-			self.stage_names.append(stage_name)
 
 	def game_state(self):
 		all_complete = True

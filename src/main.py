@@ -44,26 +44,24 @@ def main(events, reddit, sticky):
 
 	overggparser.get_upcoming_events(events)
 	for event in events:
-		if current_time + timedelta(minutes=30) >= event.start and event.thread is None:
-			log.info(f"Populating event: {event}")
-			overggparser.populate_event(event)
-
-			# thread_id = reddit.submit_self_post(
-			# 	globals.SUBREDDIT,
-			# 	string_utils.render_reddit_event_title(event),
-			# 	string_utils.render_reddit_event(event)
-			# )
-			# sticky.sticky_second(thread_id, event.competition, event.start)
-			#
-			# reddit.spoiler_thread(thread_id)
-			# reddit.set_suggested_sort(thread_id, "new")
-			#
-			# event.thread = thread_id
-			event.clean()
-
 		if event.thread is not None:
 			log.info(f"Rechecking event: {event}")
 			overggparser.populate_event(event)
+
+			if event.competition.post_match_threads:
+				for match in event.matches_new:
+					if match.state == classes.GameState.COMPLETE and match.post_thread is None:
+						log.info(f"Match complete, posting post match thread: {match}")
+
+						thread_id = reddit.submit_self_post(
+							globals.SUBREDDIT,
+							string_utils.render_reddit_post_match_title(event),
+							string_utils.render_reddit_post_match(event)
+						)
+
+						reddit.match_thread_settings(thread_id)
+
+						match.post_thread = thread_id
 
 			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")
@@ -72,6 +70,22 @@ def main(events, reddit, sticky):
 					string_utils.render_reddit_event(event)
 				)
 				event.clean()
+
+		if current_time + timedelta(minutes=30) >= event.start and event.thread is None:
+			log.info(f"Populating event: {event}")
+			overggparser.populate_event(event)
+
+			thread_id = reddit.submit_self_post(
+				globals.SUBREDDIT,
+				string_utils.render_reddit_event_title(event),
+				string_utils.render_reddit_event(event)
+			)
+			sticky.sticky_second(thread_id, event.competition, event.start)
+
+			reddit.match_thread_settings(thread_id)
+
+			event.thread = thread_id
+			event.clean()
 
 	file_utils.save_state(events, sticky.get_save())
 
@@ -106,9 +120,7 @@ if __name__ == "__main__":
 		time.sleep(60*2)
 
 
-# flair: Match Thread
 # save previous sticky and re-sticky
-# disable inbox replies
 # unpin at end
 # contenders post match thread if more than x comments, and lock post/sticky comment
 # get stream names from overgg

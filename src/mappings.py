@@ -15,11 +15,15 @@ competitions = [
 		name="Overwatch League 2019 Season",
 		post_discord=True,
 		discord_role="OWL-Notify",
-		post_match_threads=True
+		post_match_threads=True,
+		post_minutes_ahead=30
 	),
-	classes.Competition(
-		name="Overwatch Contenders 2019 Season 1 Trials"
-	),
+	# classes.Competition(
+	# 	name="Overwatch Contenders 2019 Season 1 Trials: North America"
+	# ),
+	# classes.Competition(
+	# 	name="Overwatch Contenders 2019 Season 1 Trials: Europe"
+	# ),
 ]
 
 
@@ -42,7 +46,7 @@ def get_competition(competition_name):
 	if competition_name is None:
 		return None, None
 	for i, competition in enumerate(competitions):
-		if competition_name in competition.name:
+		if competition_name == competition.name:
 			return i, competition
 	return None, None
 

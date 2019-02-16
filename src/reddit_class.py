@@ -101,9 +101,51 @@ class Reddit:
 	def set_suggested_sort(self, thread_id, sort):
 		try:
 			self.reddit.submission(thread_id).mod.suggested_sort(sort=sort)
-			log.debug(f"Setting suggested sort to new for {thread_id}")
+			log.debug(f"Setting suggested sort to {sort} for {thread_id}")
 			return True
 		except Exception as err:
-			log.warning(f"Unable to set suggested for for {thread_id}")
+			log.warning(f"Unable to set suggested for {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
+
+	def disable_inbox_replies(self, thread_id):
+		try:
+			self.reddit.submission(thread_id).disable_inbox_replies()
+			log.debug(f"Disabling inbox replies for {thread_id}")
+			return True
+		except Exception as err:
+			log.warning(f"Unable to disable inbox replies for {thread_id}")
+			log.warning(traceback.format_exc())
+			return None
+
+	def get_flair_id(self, thread_id, flair_name):
+		try:
+			flairs = self.reddit.submission(thread_id).flair.choices()
+			for flair in flairs:
+				if flair['flair_text'] == flair_name:
+					log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
+					return flair['flair_template_id']
+			log.debug(f"Couldn't find template for flair: {flair_name}")
+			return None
+		except Exception as err:
+			log.warning(f"Unable to find template for flair: {thread_id}")
+			log.warning(traceback.format_exc())
+			return None
+
+	def set_flair(self, thread_id, flair_template_id):
+		try:
+			self.reddit.submission(thread_id).flair.select(flair_template_id)
+			log.debug(f"Setting flair for: {thread_id} : {flair_template_id}")
+			return None
+		except Exception as err:
+			log.warning(f"Unable to set flair for: {thread_id}")
+			log.warning(traceback.format_exc())
+			return None
+
+	def match_thread_settings(self, thread_id):
+		self.spoiler_thread(thread_id)
+		self.set_suggested_sort(thread_id, "new")
+		self.disable_inbox_replies(thread_id)
+		flair_template_id = self.get_flair_id(thread_id, "Match Thread")
+		if flair_template_id is not None:
+			self.set_flair(thread_id, flair_template_id)
