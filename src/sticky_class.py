@@ -67,7 +67,7 @@ class StickyManager:
 		if second_sticky is None:
 			self.reddit.sticky_thread(thread_id)
 		else:
-			new_sticky = Sticky(thread_id, competition, start)
+			new_sticky = Sticky(thread_id, competition.name, start)
 			if second_sticky < new_sticky:
 				bisect.insort(self.saved_stickies, second_sticky)
 				self.reddit.sticky_thread(thread_id)

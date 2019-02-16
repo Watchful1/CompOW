@@ -16,11 +16,18 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self, name, post_discord=False, split_stages=False, discord_role=None):
+	def __init__(self, name, post_discord=False, split_stages=False, discord_role=None, post_match_threads=False):
 		self.name = name
 		self.post_discord = post_discord
 		self.split_stages = split_stages
 		self.discord_role = discord_role
+		self.post_match_threads = post_match_threads
+
+	def __str__(self):
+		return self.name
+
+	def __eq__(self, other):
+		return self.name == other.name
 
 
 def extract_url_name(url):
@@ -78,6 +85,7 @@ class Match:
 		self.streams = []
 		self.competition = None
 		self.stage = None
+		self.post_thread = None
 
 		self.dirty = False
 
@@ -88,7 +96,7 @@ class Match:
 		return self.start < other.start
 
 
-class Stage:
+class StageBak:
 	def __init__(self, stage):
 		self.start = None
 		self.last = None
@@ -133,10 +141,12 @@ class Event:
 		self.start = None
 		self.last = None
 		self.competition = competition
+		self.thread = None
 
 		self.matches = {}
+		self.matches_new = []
 
-		self.stages = []
+		self.stage_names = []
 
 	def add_match(self, match):
 		if match.id in self.matches:
@@ -164,13 +174,13 @@ class Event:
 	def rebuild_start_last(self):
 		self.start = None
 		self.last = None
-		for match in self.matches:
+		for match_id, match in self.matches.items():
 			self.add_match_time(match.start)
 		for stage in self.stages:
 			stage.rebuild_start_last()
 
 	def match_fits(self, start, competition):
-		if self.competition != competition:
+		if self.competition.name != competition:
 			return False
 		return self.start - timedelta(hours=3) < start < self.last + timedelta(hours=3)
 
@@ -211,6 +221,35 @@ class Event:
 			return GameState.COMPLETE
 		else:
 			return GameState.PENDING
+
+	def has_thread(self):
+		if self.thread is not None:
+			return True
+		for stage in self.stages:
+			if stage.thread is not None:
+				return True
+		return False
+
+	def stage_names(self):
+		bldr = []
+		for stage in self.stages:
+			bldr.append(stage.stage)
+
+		return ' - '.join(bldr)
+
+	def streams(self):
+		streams = []
+		for stage in self.stages:
+			for stream in stage.streams:
+				if stream not in streams:
+					streams.append(stream)
+		return streams
+
+	def dirty(self):
+		for stage in self.stages:
+			if stage.dirty:
+				return True
+		return False
 
 	def __str__(self):
 		return f"{self.competition} : {self.start}"

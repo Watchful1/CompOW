@@ -44,14 +44,18 @@ def main(events, reddit, sticky):
 
 	overggparser.get_upcoming_events(events)
 	for event in events:
-		if current_time + timedelta(minutes=15) >= event.start and event.thread is None:
+		if current_time + timedelta(minutes=30) >= event.start and not event.has_thread():
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
+			if event.competition.split_stages:
+				log.info("Posting split stages for event")
+			else:
+				log.info("Posting combined stages for event")
 
 			thread_id = reddit.submit_self_post(
 				globals.SUBREDDIT,
-				string_utils.render_reddit_title(event),
-				string_utils.render_reddit(event)
+				string_utils.render_reddit_event_title(event),
+				string_utils.render_reddit_event(event)
 			)
 			sticky.sticky_second(thread_id, event.competition, event.start)
 
@@ -61,15 +65,15 @@ def main(events, reddit, sticky):
 			event.thread = thread_id
 			event.clean()
 
-		if event.thread is not None:
+		if event.has_thread():
 			log.info(f"Rechecking event: {event}")
 			overggparser.populate_event(event)
 
-			if event.dirty:
+			if event.dirty():
 				log.info(f"Event dirty, updating: {event}")
 				reddit.edit_thread(
 					event.thread,
-					string_utils.render_reddit(event)
+					string_utils.render_reddit_event(event)
 				)
 				event.clean()
 
@@ -103,7 +107,7 @@ if __name__ == "__main__":
 		if once:
 			break
 
-		time.sleep(60*3)
+		time.sleep(60*2)
 
 
 # flair: Match Thread

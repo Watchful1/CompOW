@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 STATE_FILENAME = "state.pickle"
 ACCOUNT_NAME = None
 USER_AGENT = "r/CompetitiveOverwatch bot (by u/Watchful1)"
-SUBREDDIT = "SubTestBot1"
+SUBREDDIT = "CompetitiveOverwatch"
 
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
 

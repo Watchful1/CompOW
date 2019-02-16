@@ -9,6 +9,7 @@ from datetime import timedelta
 
 import globals
 import classes
+import mappings
 
 
 log = logging.getLogger("bot")
@@ -95,7 +96,7 @@ def merge_fields_into_match(fields, match):
 					matched = True
 
 			if not matched:
-				match.streams.append(classes.Stream(fields[fields[url_name]], fields["stream_name"+stream_num]))
+				match.streams.append(classes.Stream(fields[url_name], fields["stream_name"+stream_num]))
 				log.debug(f"Streams dirty: {fields[url_name]}")
 				match.dirty = True
 
@@ -126,7 +127,7 @@ def merge_fields_into_match(fields, match):
 
 
 def populate_event(event):
-	for match in event.matches:
+	for match_id, match in event.matches.items():
 		fields = parse_match(match.url)
 		merge_fields_into_match(fields, match)
 		event.add_match_to_stage(match)
@@ -141,7 +142,6 @@ def get_upcoming_events(events):
 
 	current_time = globals.debug_time
 
-	log.debug(f"{str(current_time)}")
 	for match_table in data['matches']:
 		match = classes.Match(
 			id=match_table['id'],
@@ -159,9 +159,15 @@ def get_upcoming_events(events):
 				break
 
 		if not fits_event and current_time + timedelta(hours=1) > match.start:
-			log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
-			event = classes.Event(
-				competition=match_table['event_name']
-			)
-			event.add_match(match)
-			events.append(event)
+			rank, competition = mappings.get_competition(match_table['event_name'])
+			if competition is None:
+				pass # placeholder
+				#log.debug(f"Upcoming event not mapped: {match_table['event_name']} : {str(match.start)}")
+			else:
+				log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
+
+				event = classes.Event(
+					competition=competition
+				)
+				event.add_match(match)
+				events.append(event)
