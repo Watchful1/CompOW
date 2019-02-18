@@ -104,5 +104,5 @@ def render_reddit_event(event):
 
 
 def render_reddit_event_title(event):
-	return f"{event.competition.name} - {event.stage_names()}"
+	return f"{event.competition.name} - {event.stages_name()}"
 

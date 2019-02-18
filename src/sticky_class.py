@@ -16,6 +16,8 @@ class Sticky:
 		return f"{self.thread_id} : {self.competition} : {self.start}"
 
 	def __lt__(self, other):
+		if other is None:
+			return False
 		self_ranking = mappings.competition_ranking(self.competition)
 		other_ranking = mappings.competition_ranking(other.competition)
 		if self_ranking is None:
@@ -63,21 +65,32 @@ class StickyManager:
 
 	def sticky(self, thread_id, competition, start):
 		self.update_current_stickies()
+		new_sticky = Sticky(thread_id, competition.name, start)
 
+		if self.current_stickies[0] is None or self.current_stickies[0] < new_sticky:
+			log.info(f"Stickying first: {new_sticky.thread_id}")
+			for current_sticky in self.current_stickies:
+				if current_sticky is not None:
+					self.reddit.unsticky_thread(current_sticky.thread_id)
+			self.reddit.sticky_thread(new_sticky.thread_id)
+			if self.current_stickies[0] is not None:
+				self.reddit.sticky_thread(self.current_stickies[0])
 
-	def sticky_second(self, thread_id, competition, start):
-		self.update_current_stickies()
-		second_sticky = self.current_stickies[1]
-		if second_sticky is None:
-			self.reddit.sticky_thread(thread_id)
+			if self.current_stickies[1] is not None:
+				bisect.insort(self.saved_stickies, self.current_stickies[1])
+
+		elif self.current_stickies[1] is None or self.current_stickies[1] < new_sticky:
+			log.info(f"Stickying second: {new_sticky.thread_id}")
+			self.reddit.sticky_thread(new_sticky)
+
+			if self.current_stickies[1] is not None:
+				bisect.insort(self.saved_stickies, self.current_stickies[1])
+
 		else:
-			new_sticky = Sticky(thread_id, competition.name, start)
-			if second_sticky < new_sticky:
-				bisect.insort(self.saved_stickies, second_sticky)
-				self.reddit.sticky_thread(thread_id)
-			else:
-				log.info("Saving for later sticky")
-				bisect.insort(self.saved_stickies, new_sticky)
+			log.info(f"Saving for later: {new_sticky.thread_id}")
+			bisect.insort(self.saved_stickies, new_sticky)
+
+		self.update_current_stickies()
 
 	def unsticky(self, thread_id):
 		self.update_current_stickies()
@@ -88,3 +101,5 @@ class StickyManager:
 					re_sticky = self.saved_stickies.pop()
 					self.reddit.sticky_thread(re_sticky.thread_id)
 					break
+
+		self.update_current_stickies()
