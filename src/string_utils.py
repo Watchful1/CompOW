@@ -2,7 +2,7 @@ import classes
 import mappings
 
 
-def render_reddit_post_match(match):
+def render_reddit_post_match(match, flairs):
 	bldr = []
 
 	bldr.append(">#**")
@@ -18,11 +18,15 @@ def render_reddit_post_match(match):
 
 	bldr.append(">|")
 	bldr.append(match.home.name)
-	bldr.append("||")
+	bldr.append("|")
+	bldr.append(flairs.get_flair(match.home.name))
+	bldr.append("|")
 	bldr.append(str(match.home_score))
 	bldr.append("-")
 	bldr.append(str(match.away_score))
-	bldr.append("||")
+	bldr.append("|")
+	bldr.append(flairs.get_flair(match.away.name))
+	bldr.append("|")
 	bldr.append(match.away.name)
 	bldr.append("|")
 
@@ -35,7 +39,7 @@ def render_reddit_post_match_title(match):
 	return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
 
 
-def render_reddit_event(event):
+def render_reddit_event(event, flairs):
 	bldr = []
 
 	bldr.append("> ## **")
@@ -79,7 +83,7 @@ def render_reddit_event(event):
 		bldr.append(match.home.name)
 		bldr.append("|")
 
-		bldr.append(mappings.get_flair(match.home.name))
+		bldr.append(flairs.get_flair(match.home.name))
 		bldr.append("|")
 
 		bldr.append(str(match.home_score))
@@ -87,7 +91,7 @@ def render_reddit_event(event):
 		bldr.append(str(match.away_score))
 		bldr.append("|")
 
-		bldr.append(mappings.get_flair(match.away.name))
+		bldr.append(flairs.get_flair(match.away.name))
 		bldr.append("|")
 
 		bldr.append(match.away.name)

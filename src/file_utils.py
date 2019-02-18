@@ -4,10 +4,11 @@ import os
 import globals
 
 
-def save_state(events, stickies):
+def save_state(events, stickies, flairs):
 	state = {
 		'events': events,
-		'stickies': stickies
+		'stickies': stickies,
+		'flairs': flairs
 	}
 	with open(globals.STATE_FILENAME, 'wb') as handle:
 		pickle.dump(state, handle)
@@ -23,5 +24,7 @@ def load_state(reset=False):
 		state['events'] = []
 	if 'stickies' not in state:
 		state['stickies'] = {'current': [None] * 2, 'saved': []}
+	if 'flairs' not in state:
+		state['flairs'] = {}
 
-	return state['events'], state['stickies']
+	return state

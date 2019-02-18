@@ -6,6 +6,7 @@ USER_AGENT = "r/CompetitiveOverwatch bot (by u/Watchful1)"
 SUBREDDIT = "CompetitiveOverwatch"
 
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
+FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/flairs.json"
 
 DISCORD_TOKEN = None
 

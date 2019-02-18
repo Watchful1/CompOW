@@ -12,6 +12,7 @@ import classes
 import sticky_class
 import reddit_class
 import file_utils
+import flair_class
 
 LOG_LEVEL = logging.DEBUG
 
@@ -38,7 +39,7 @@ if LOG_FILENAME is not None:
 	log.addHandler(log_fileHandler)
 
 
-def main(events, reddit, sticky):
+def main(events, reddit, sticky, flairs):
 	globals.debug_time = datetime.utcnow()
 	current_time = globals.debug_time
 
@@ -57,7 +58,7 @@ def main(events, reddit, sticky):
 						thread_id = reddit.submit_self_post(
 							globals.SUBREDDIT,
 							string_utils.render_reddit_post_match_title(match),
-							string_utils.render_reddit_post_match(match)
+							string_utils.render_reddit_post_match(match, flairs)
 						)
 
 						reddit.match_thread_settings(thread_id, None)
@@ -68,7 +69,7 @@ def main(events, reddit, sticky):
 				log.info(f"Event dirty, updating: {event}")
 				reddit.edit_thread(
 					event.thread,
-					string_utils.render_reddit_event(event)
+					string_utils.render_reddit_event(event, flairs)
 				)
 				event.clean()
 
@@ -84,7 +85,7 @@ def main(events, reddit, sticky):
 			thread_id = reddit.submit_self_post(
 				globals.SUBREDDIT,
 				string_utils.render_reddit_event_title(event),
-				string_utils.render_reddit_event(event)
+				string_utils.render_reddit_event(event, flairs)
 			)
 			sticky.sticky(thread_id, event.competition, event.start)
 
@@ -96,7 +97,7 @@ def main(events, reddit, sticky):
 	for event in events_to_delete:
 		events.remove(event)
 
-	file_utils.save_state(events, sticky.get_save())
+	file_utils.save_state(events, sticky.get_save(), flairs.flairs)
 
 
 if __name__ == "__main__":
@@ -117,11 +118,12 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	reddit = reddit_class.Reddit(user)
-	events, stickies = file_utils.load_state()
-	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, stickies)
+	state = file_utils.load_state()
+	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
+	flairs = flair_class.FlairManager(state['flairs'])
 
 	while True:
-		main(events, reddit, sticky)
+		main(state['events'], reddit, sticky, flairs)
 
 		if once:
 			break
@@ -129,7 +131,6 @@ if __name__ == "__main__":
 		time.sleep(60*2)
 
 
-# contenders post match thread if more than x comments, and lock post/sticky comment
 # discord notifications
 # post match threads in OP, comments in thread
 # team symbols in match thread, post match thread
