@@ -73,7 +73,8 @@ def main(events, reddit, sticky):
 				event.clean()
 
 			if event.game_state() == classes.GameState.COMPLETE:
-				log.info(f"Event complete, removing: {event}")
+				log.info(f"Event complete, un-stickying and removing: {event}")
+				reddit.unsticky_thread(event.thread)
 				events_to_delete.append(event)
 
 		if current_time + timedelta(minutes=event.competition.post_minutes_ahead) >= event.start and event.thread is None:
@@ -87,7 +88,7 @@ def main(events, reddit, sticky):
 			)
 			sticky.sticky(thread_id, event.competition, event.start)
 
-			reddit.match_thread_settings(thread_id)
+			reddit.match_thread_settings(thread_id, "new")
 
 			event.thread = thread_id
 			event.clean()
@@ -128,9 +129,6 @@ if __name__ == "__main__":
 		time.sleep(60*2)
 
 
-# sticky in correct order
-# save previous sticky and re-sticky
-# unpin at end
 # contenders post match thread if more than x comments, and lock post/sticky comment
 # discord notifications
 # post match threads in OP, comments in thread

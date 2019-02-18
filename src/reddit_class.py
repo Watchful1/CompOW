@@ -152,7 +152,7 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
-	def match_thread_settings(self, thread_id, sort="new"):
+	def match_thread_settings(self, thread_id, sort):
 		self.approve(thread_id)
 		self.spoiler_thread(thread_id)
 		if sort is not None:
