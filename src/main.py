@@ -136,8 +136,6 @@ if __name__ == "__main__":
 
 
 # discord notifications
-# post match threads in OP, comments in thread
-# stream symbols on streams
 # map details in post match thread
 # loop faster when a match is in progress and slower if there is none
 

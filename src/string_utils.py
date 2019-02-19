@@ -58,12 +58,19 @@ def render_reddit_event(event, flairs):
 	bldr.append("\n>\n")
 
 	bldr.append(">> *Streams:* ")
+	streamBldr = []
 	for stream in event.streams:
-		bldr.append("[")
-		bldr.append(stream.name)
-		bldr.append("](")
-		bldr.append(stream.url)
-		bldr.append(") ")
+		streamInner = []
+		if "twitch.tv" in stream.url:
+			streamInner.append(flairs.get_flair("twitch"))
+		streamInner.append("[")
+		streamInner.append(stream.name)
+		streamInner.append("](")
+		streamInner.append(stream.url)
+		streamInner.append(") ")
+		streamBldr.append(''.join(streamInner))
+
+	bldr.append(' | '.join(streamBldr))
 
 	bldr.append("\n>\n")
 
