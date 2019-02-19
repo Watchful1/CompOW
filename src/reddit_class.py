@@ -10,7 +10,8 @@ log = logging.getLogger("bot")
 
 
 class Reddit:
-	def __init__(self, user):
+	def __init__(self, user, debug=False):
+		self.debug = debug
 		try:
 			self.reddit = praw.Reddit(
 				user,
@@ -34,9 +35,15 @@ class Reddit:
 
 	def submit_self_post(self, subreddit, title, text):
 		try:
-			thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text)
-			log.debug(f"Posted thread to r/{subreddit} - {thread.id}")
-			return thread.id
+			if self.debug:
+				log.info(f"Title: {title}")
+				log.info(f"Body: {text}")
+				thread_id = "test"
+			else:
+				thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text)
+				thread_id = thread.id
+			log.debug(f"Posted thread to r/{subreddit} - {thread_id}")
+			return thread_id
 		except Exception as err:
 			log.warning(f"Unable to post thread to r/{subreddit}")
 			log.warning(traceback.format_exc())
@@ -44,12 +51,29 @@ class Reddit:
 
 	def edit_thread(self, thread_id, text):
 		try:
-			submission = self.reddit.submission(id=thread_id)
-			submission.edit(text)
+			if self.debug:
+				log.info(f"Body: {text}")
+			else:
+				submission = self.reddit.submission(id=thread_id)
+				submission.edit(text)
 			log.debug(f"Edited thread {thread_id}")
 			return True
 		except Exception as err:
 			log.warning(f"Unable to edit thread {thread_id}")
+			log.warning(traceback.format_exc())
+			return False
+
+	def reply_thread(self, thread_id, text):
+		try:
+			if self.debug:
+				log.info(f"Text: {text}")
+			else:
+				submission = self.reddit.submission(id=thread_id)
+				submission.reply(text)
+			log.debug(f"Replied to thread {thread_id}")
+			return True
+		except Exception as err:
+			log.warning(f"Unable to reply to thread {thread_id}")
 			log.warning(traceback.format_exc())
 			return False
 
@@ -70,7 +94,8 @@ class Reddit:
 
 	def sticky_thread(self, thread_id):
 		try:
-			self.reddit.submission(thread_id).mod.sticky(state=True)
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.sticky(state=True)
 			log.debug(f"Stickied {thread_id}")
 			return True
 		except Exception as err:
@@ -80,7 +105,8 @@ class Reddit:
 
 	def unsticky_thread(self, thread_id):
 		try:
-			self.reddit.submission(thread_id).mod.sticky(state=False)
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.sticky(state=False)
 			log.debug(f"Unstickied {thread_id}")
 			return True
 		except Exception as err:
@@ -90,7 +116,8 @@ class Reddit:
 
 	def spoiler_thread(self, thread_id):
 		try:
-			self.reddit.submission(thread_id).mod.spoiler()
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.spoiler()
 			log.debug(f"Spoilered {thread_id}")
 			return True
 		except Exception as err:
@@ -100,7 +127,8 @@ class Reddit:
 
 	def set_suggested_sort(self, thread_id, sort):
 		try:
-			self.reddit.submission(thread_id).mod.suggested_sort(sort=sort)
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.suggested_sort(sort=sort)
 			log.debug(f"Setting suggested sort to {sort} for {thread_id}")
 			return True
 		except Exception as err:
@@ -110,7 +138,8 @@ class Reddit:
 
 	def disable_inbox_replies(self, thread_id):
 		try:
-			self.reddit.submission(thread_id).disable_inbox_replies()
+			if not self.debug:
+				self.reddit.submission(thread_id).disable_inbox_replies()
 			log.debug(f"Disabling inbox replies for {thread_id}")
 			return True
 		except Exception as err:
@@ -120,13 +149,16 @@ class Reddit:
 
 	def get_flair_id(self, thread_id, flair_name):
 		try:
-			flairs = self.reddit.submission(thread_id).flair.choices()
-			for flair in flairs:
-				if flair['flair_text'] == flair_name:
-					log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
-					return flair['flair_template_id']
-			log.debug(f"Couldn't find template for flair: {flair_name}")
-			return None
+			if self.debug:
+				return "test"
+			else:
+				flairs = self.reddit.submission(thread_id).flair.choices()
+				for flair in flairs:
+					if flair['flair_text'] == flair_name:
+						log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
+						return flair['flair_template_id']
+				log.debug(f"Couldn't find template for flair: {flair_name}")
+				return None
 		except Exception as err:
 			log.warning(f"Unable to find template for flair: {thread_id}")
 			log.warning(traceback.format_exc())
@@ -134,7 +166,8 @@ class Reddit:
 
 	def set_flair(self, thread_id, flair_template_id):
 		try:
-			self.reddit.submission(thread_id).flair.select(flair_template_id)
+			if not self.debug:
+				self.reddit.submission(thread_id).flair.select(flair_template_id)
 			log.debug(f"Setting flair for: {thread_id} : {flair_template_id}")
 			return None
 		except Exception as err:
@@ -144,7 +177,8 @@ class Reddit:
 
 	def approve(self, thread_id):
 		try:
-			self.reddit.submission(thread_id).mod.approve()
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.approve()
 			log.debug(f"Approving thread: {thread_id}")
 			return None
 		except Exception as err:

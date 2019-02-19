@@ -8,9 +8,10 @@ competitions = [
 		post_match_threads=True,
 		post_minutes_ahead=30
 	),
-	# classes.Competition(
-	# 	name="Overwatch Contenders 2019 Season 1 Trials: North America"
-	# ),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1 Trials: North America",
+		post_match_threads=True
+	),
 	# classes.Competition(
 	# 	name="Overwatch Contenders 2019 Season 1 Trials: Europe"
 	# ),

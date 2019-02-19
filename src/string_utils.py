@@ -1,5 +1,5 @@
 import classes
-import mappings
+import globals
 
 
 def render_reddit_post_match(match, flairs):
@@ -30,13 +30,19 @@ def render_reddit_post_match(match, flairs):
 	bldr.append(match.away.name)
 	bldr.append("|")
 
-
-
 	return ''.join(bldr)
 
 
 def render_reddit_post_match_title(match):
 	return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
+
+
+def render_reddit_post_match_comment(match):
+	return f"Post match thread [here]({thread_link(globals.SUBREDDIT, match.post_thread)})."
+
+
+def thread_link(subreddit, thread_id):
+	return f"https://www.reddit.com/r/{subreddit}/comments/{thread_id}/"
 
 
 def render_reddit_event(event, flairs):
@@ -86,9 +92,11 @@ def render_reddit_event(event, flairs):
 		bldr.append(flairs.get_flair(match.home.name))
 		bldr.append("|")
 
-		bldr.append(str(match.home_score))
-		bldr.append("-")
-		bldr.append(str(match.away_score))
+		if match.state != classes.GameState.PENDING:
+			bldr.append(str(match.home_score))
+			bldr.append("-")
+			bldr.append(str(match.away_score))
+
 		bldr.append("|")
 
 		bldr.append(flairs.get_flair(match.away.name))
@@ -98,9 +106,16 @@ def render_reddit_event(event, flairs):
 		bldr.append("|")
 		bldr.append("|")
 
-		bldr.append("[Page](")
+		bldr.append(flairs.get_flair("overgg"))
+		bldr.append("[over.gg](")
 		bldr.append(match.url)
 		bldr.append(")")
+
+		if event.competition.post_match_threads and match.post_thread is not None:
+			bldr.append(" [Post Match](")
+			bldr.append(thread_link(globals.SUBREDDIT, match.post_thread))
+			bldr.append(")")
+
 		bldr.append("|")
 		bldr.append("\n")
 
@@ -109,4 +124,3 @@ def render_reddit_event(event, flairs):
 
 def render_reddit_event_title(event):
 	return f"{event.competition.name} - {event.stages_name()}"
-

@@ -10,4 +10,4 @@ FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/flairs.json"
 
 DISCORD_TOKEN = None
 
-debug_time = datetime.strptime("2019-01-29 05:00:00", "%Y-%m-%d %H:%M:%S") - timedelta(minutes=20)
+debug_time = datetime.strptime("2019-02-19 16:45:00", "%Y-%m-%d %H:%M:%S")

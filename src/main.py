@@ -40,7 +40,8 @@ if LOG_FILENAME is not None:
 
 
 def main(events, reddit, sticky, flairs):
-	globals.debug_time = datetime.utcnow()
+	if globals.debug_time is None:
+		globals.debug_time = datetime.utcnow()
 	current_time = globals.debug_time
 
 	overggparser.get_upcoming_events(events)
@@ -64,6 +65,8 @@ def main(events, reddit, sticky, flairs):
 						reddit.match_thread_settings(thread_id, None)
 
 						match.post_thread = thread_id
+
+						reddit.reply_thread(event.thread, string_utils.render_reddit_post_match_comment(match))
 
 			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")
@@ -117,8 +120,8 @@ if __name__ == "__main__":
 		log.error("No user specified, aborting")
 		sys.exit(0)
 
-	reddit = reddit_class.Reddit(user)
-	state = file_utils.load_state()
+	reddit = reddit_class.Reddit(user, debug)
+	state = file_utils.load_state(debug)
 	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
 	flairs = flair_class.FlairManager(state['flairs'])
 
@@ -133,7 +136,6 @@ if __name__ == "__main__":
 
 # discord notifications
 # post match threads in OP, comments in thread
-# team symbols in match thread, post match thread
 # stream symbols on streams
 # map details in post match thread
 # loop faster when a match is in progress and slower if there is none
