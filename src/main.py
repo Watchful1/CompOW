@@ -66,7 +66,8 @@ def main(events, reddit, sticky, flairs):
 
 						match.post_thread = thread_id
 
-						reddit.reply_thread(event.thread, string_utils.render_reddit_post_match_comment(match))
+						comment_id = reddit.reply_thread(event.thread, string_utils.render_reddit_post_match_comment(match))
+						reddit.distinguish_comment(comment_id)
 
 			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")

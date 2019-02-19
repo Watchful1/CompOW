@@ -186,6 +186,17 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
+	def distinguish_comment(self, comment_id):
+		try:
+			if not self.debug:
+				self.reddit.comment(comment_id).mod.distinguish(how='yes')
+			log.debug(f"Distinguishing comment: {comment_id}")
+			return None
+		except Exception as err:
+			log.warning(f"Unable to distinguish comment: {comment_id}")
+			log.warning(traceback.format_exc())
+			return None
+
 	def match_thread_settings(self, thread_id, sort):
 		self.approve(thread_id)
 		self.spoiler_thread(thread_id)
