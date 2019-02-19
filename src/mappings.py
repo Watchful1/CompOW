@@ -3,14 +3,17 @@ import classes
 competitions = [
 	classes.Competition(
 		name="Overwatch League 2019 Season",
-		post_discord=True,
+		discord_minutes_ahead=15,
 		discord_role="OWL-Notify",
 		post_match_threads=True,
 		post_minutes_ahead=30
 	),
 	classes.Competition(
 		name="Overwatch Contenders 2019 Season 1 Trials: North America",
-		post_match_threads=True
+		post_match_threads=True,
+		discord_role="NAContenders",
+		discord_minutes_ahead=20,
+		post_minutes_ahead=30
 	),
 	# classes.Competition(
 	# 	name="Overwatch Contenders 2019 Season 1 Trials: Europe"

@@ -2,6 +2,7 @@ import logging.handlers
 import os
 import sys
 import time
+import requests
 from datetime import datetime
 from datetime import timedelta
 
@@ -66,7 +67,8 @@ def main(events, reddit, sticky, flairs):
 
 						match.post_thread = thread_id
 
-						comment_id = reddit.reply_thread(event.thread, string_utils.render_reddit_post_match_comment(match))
+						comment_id = reddit.reply_thread(event.thread,
+														 string_utils.render_reddit_post_match_comment(match))
 						reddit.distinguish_comment(comment_id)
 
 			if event.dirty:
@@ -82,7 +84,8 @@ def main(events, reddit, sticky, flairs):
 				reddit.unsticky_thread(event.thread)
 				events_to_delete.append(event)
 
-		if current_time + timedelta(minutes=event.competition.post_minutes_ahead) >= event.start and event.thread is None:
+		if current_time + timedelta(
+				minutes=event.competition.post_minutes_ahead) >= event.start and event.thread is None:
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
@@ -97,6 +100,14 @@ def main(events, reddit, sticky, flairs):
 
 			event.thread = thread_id
 			event.clean()
+
+		if event.competition.discord_minutes_ahead is not None and \
+				current_time + timedelta(minutes=event.competition.discord_minutes_ahead) >= event.start and \
+				not event.posted_discord:
+			if globals.WEBHOOK is not None:
+				log.info(f"Posting announcement to discord: {event}")
+				requests.post(globals.WEBHOOK, data={"content": string_utils.render_discord(event)})
+				event.posted_discord = True
 
 	for event in events_to_delete:
 		events.remove(event)
@@ -122,6 +133,12 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	reddit = reddit_class.Reddit(user, debug)
+
+	if globals.DISCORD_WEBHOOK is not None and globals.DISCORD_TOKEN is not None:
+		globals.WEBHOOK = globals.WEBHOOK.format(globals.DISCORD_WEBHOOK, globals.DISCORD_TOKEN)
+	else:
+		globals.WEBHOOK = None
+
 	state = file_utils.load_state(debug)
 	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
 	flairs = flair_class.FlairManager(state['flairs'])
@@ -132,10 +149,8 @@ if __name__ == "__main__":
 		if once:
 			break
 
-		time.sleep(60*2)
-
+		time.sleep(60 * 2)
 
 # discord notifications
 # map details in post match thread
 # loop faster when a match is in progress and slower if there is none
-

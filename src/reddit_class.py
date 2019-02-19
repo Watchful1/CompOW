@@ -25,13 +25,14 @@ class Reddit:
 		log.info("Logged into reddit as /u/" + globals.ACCOUNT_NAME)
 
 		config_keys = [
-			{'var': "DISCORD_TOKEN", 'name': "discord_token"},
+			{'var': "DISCORD_WEBHOOK", 'name': "comp_ow_webhook"},
+			{'var': "DISCORD_TOKEN", 'name': "comp_ow_token"},
 		]
 		for key in config_keys:
 			if self.reddit.config.CONFIG.has_option(user, key['name']):
 				setattr(globals, key['var'], self.reddit.config.CONFIG[user][key['name']])
 			else:
-				log.error(f"{key['name']} key not in config, aborting")
+				log.error(f"{key['name']} key not in config")
 
 	def submit_self_post(self, subreddit, title, text):
 		try:

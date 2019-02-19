@@ -15,9 +15,12 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self, name, post_discord=False, discord_role=None, post_match_threads=False, post_minutes_ahead=15):
+	def __init__(self, name, discord_minutes_ahead=None, discord_role=None, post_match_threads=False, post_minutes_ahead=15):
 		self.name = name
-		self.post_discord = post_discord
+		if discord_minutes_ahead is not None and discord_minutes_ahead > post_minutes_ahead:
+			self.discord_minutes_ahead = post_minutes_ahead
+		else:
+			self.discord_minutes_ahead = discord_minutes_ahead
 		self.discord_role = discord_role
 		self.post_match_threads = post_match_threads
 		self.post_minutes_ahead = post_minutes_ahead
@@ -105,6 +108,7 @@ class Event:
 		self.start = None
 		self.last = None
 		self.thread = None
+		self.posted_discord = False
 		self.dirty = False
 
 		self.matches = []

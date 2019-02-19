@@ -1,3 +1,5 @@
+import pytz
+
 import classes
 import globals
 
@@ -131,3 +133,68 @@ def render_reddit_event(event, flairs):
 
 def render_reddit_event_title(event):
 	return f"{event.competition.name} - {event.stages_name()}"
+
+
+def render_discord(event):
+	bldr = []
+
+	bldr.append("**")
+	bldr.append(event.competition.name)
+	bldr.append(" - ")
+	bldr.append(event.stages_name())
+	bldr.append("**")
+
+	minutes_difference = int((event.start - globals.debug_time).seconds / 60)
+	if minutes_difference < 60:
+		bldr.append(" begins in ")
+		bldr.append(str(minutes_difference))
+		bldr.append(" minutes!")
+	else:
+		bldr.append(" begins soon!")
+
+	bldr.append("\n")
+
+	notifications = []
+	notifications.append("[All-Notify]")
+	notifications.append("[All-Matches]")
+	if event.competition.discord_role is not None:
+		notifications.append(f"[{event.competition.discord_role}]")
+
+	bldr.append(' '.join(notifications))
+
+	bldr.append("\n\n")
+
+	for i, match in enumerate(event.matches):
+		bldr.append("**__Match ")
+		bldr.append(str(i + 1))
+		bldr.append("__** - *")
+
+		timezones = [
+			pytz.timezone("US/Pacific"),
+			pytz.timezone("US/Eastern"),
+			pytz.timezone("Europe/Paris"),
+		]
+		match_time = pytz.utc.localize(match.start)
+
+		time_names = []
+		for timezone in timezones:
+			time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
+
+		bldr.append(' / '.join(time_names))
+
+		bldr.append("*\n")
+
+		bldr.append("**")
+		bldr.append(match.home.name)
+		bldr.append("**")
+
+		bldr.append(" vs ")
+
+		bldr.append("**")
+		bldr.append(match.away.name)
+		bldr.append("**")
+
+		bldr.append("\n\n")
+
+
+	return ''.join(bldr)
