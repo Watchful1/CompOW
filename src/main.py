@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import logging.handlers
 import os
 import sys
