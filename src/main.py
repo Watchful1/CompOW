@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
 	once = False
 	debug = False
+	force = False
 	user = None
 	if len(sys.argv) >= 2:
 		user = sys.argv[1]
@@ -130,6 +131,8 @@ if __name__ == "__main__":
 				once = True
 			elif arg == 'debug':
 				debug = True
+			elif arg == 'force':
+				force = True
 	else:
 		log.error("No user specified, aborting")
 		sys.exit(0)
@@ -142,6 +145,10 @@ if __name__ == "__main__":
 		globals.WEBHOOK = None
 
 	state = file_utils.load_state(debug)
+	if force:
+		for event in state['events']:
+			event.dirty = True
+
 	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
 	flairs = flair_class.FlairManager(state['flairs'])
 

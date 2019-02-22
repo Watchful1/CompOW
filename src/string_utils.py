@@ -40,7 +40,7 @@ def render_reddit_post_match_title(match):
 
 
 def render_reddit_post_match_comment(match):
-	return f"Post match thread [here]({thread_link(globals.SUBREDDIT, match.post_thread)})."
+	return f"Post match thread: [{match.home} vs {match.away}]({thread_link(globals.SUBREDDIT, match.post_thread)})."
 
 
 def thread_link(subreddit, thread_id):
