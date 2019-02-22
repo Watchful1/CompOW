@@ -68,15 +68,16 @@ class Reddit:
 		try:
 			if self.debug:
 				log.info(f"Text: {text}")
+				comment_id = "test"
 			else:
 				submission = self.reddit.submission(id=thread_id)
-				submission.reply(text)
+				comment_id = submission.reply(text)
 			log.debug(f"Replied to thread {thread_id}")
-			return True
+			return submission
 		except Exception as err:
 			log.warning(f"Unable to reply to thread {thread_id}")
 			log.warning(traceback.format_exc())
-			return False
+			return None
 
 	def get_stickied_threads(self, subreddit):
 		try:
