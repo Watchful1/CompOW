@@ -73,7 +73,7 @@ class Reddit:
 				submission = self.reddit.submission(id=thread_id)
 				comment_id = submission.reply(text)
 			log.debug(f"Replied to thread {thread_id}")
-			return submission
+			return comment_id
 		except Exception as err:
 			log.warning(f"Unable to reply to thread {thread_id}")
 			log.warning(traceback.format_exc())
