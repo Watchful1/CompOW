@@ -125,6 +125,7 @@ class Event:
 					self.rebuild_start_last()
 				if event_match.url != match.url:
 					log.warning(f"Url updated for match: {event_match.url} : {match.url}")
+					event_match.url = match.url
 				if event_match.home != match.home:
 					log.warning(f"Home updated for match: {match.id} : {match.home}")
 				if event_match.away != match.away:

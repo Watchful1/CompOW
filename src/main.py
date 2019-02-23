@@ -83,7 +83,7 @@ def main(events, reddit, sticky, flairs):
 
 			if event.game_state() == classes.GameState.COMPLETE:
 				log.info(f"Event complete, un-stickying and removing: {event}")
-				reddit.unsticky_thread(event.thread)
+				sticky.unsticky(event.thread)
 				events_to_delete.append(event)
 
 		if current_time + timedelta(

@@ -51,6 +51,7 @@ class StickyManager:
 		for sticky in stickies:
 			if sticky is None:
 				result_stickies.append(None)
+				continue
 
 			found = False
 			for current_sticky in self.current_stickies:
