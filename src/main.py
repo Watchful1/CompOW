@@ -171,4 +171,3 @@ if __name__ == "__main__":
 # thread and tournament in discord notification
 # team flairs in discord notification
 # map details in post match thread
-# loop faster when a match is in progress and slower if there is none

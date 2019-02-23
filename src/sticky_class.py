@@ -75,7 +75,7 @@ class StickyManager:
 					self.reddit.unsticky_thread(current_sticky.thread_id)
 			self.reddit.sticky_thread(new_sticky.thread_id)
 			if self.current_stickies[0] is not None:
-				self.reddit.sticky_thread(self.current_stickies[0])
+				self.reddit.sticky_thread(self.current_stickies[0].thread_id)
 
 			if self.current_stickies[1] is not None:
 				bisect.insort(self.saved_stickies, self.current_stickies[1])
