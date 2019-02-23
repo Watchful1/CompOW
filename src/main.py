@@ -116,6 +116,13 @@ def main(events, reddit, sticky, flairs):
 
 	file_utils.save_state(events, sticky.get_save(), flairs.flairs)
 
+	if len(events):
+		return 1 * 60
+	else:
+		log.info("Run complete, no events processed")
+		return 5 * 60
+
+
 
 if __name__ == "__main__":
 	log.info("Starting")
@@ -153,12 +160,12 @@ if __name__ == "__main__":
 	flairs = flair_class.FlairManager(state['flairs'])
 
 	while True:
-		main(state['events'], reddit, sticky, flairs)
+		sleep_time = main(state['events'], reddit, sticky, flairs)
 
 		if once:
 			break
 
-		time.sleep(60 * 2)
+		time.sleep(sleep_time)
 
 # discord notifications
 # thread and tournament in discord notification
