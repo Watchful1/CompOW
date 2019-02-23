@@ -59,7 +59,7 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
-	bldr.append(">> *Streams:* ")
+	bldr.append(">> *Streams:*  \n")
 	streamBldr = []
 	for stream in event.streams:
 		streamInner = []
@@ -69,7 +69,7 @@ def render_reddit_event(event, flairs):
 		streamInner.append(stream.name)
 		streamInner.append("](")
 		streamInner.append(stream.url)
-		streamInner.append(") ")
+		streamInner.append(")  \n")
 		streamBldr.append(''.join(streamInner))
 
 	bldr.append(' | '.join(streamBldr))
@@ -116,7 +116,7 @@ def render_reddit_event(event, flairs):
 		bldr.append("|")
 
 		bldr.append(flairs.get_flair("over.gg"))
-		bldr.append("[over.gg](")
+		bldr.append(" - [Match](")
 		bldr.append(match.url)
 		bldr.append(")")
 
