@@ -69,10 +69,10 @@ def render_reddit_event(event, flairs):
 		streamInner.append(stream.name)
 		streamInner.append("](")
 		streamInner.append(stream.url)
-		streamInner.append(")  \n")
+		streamInner.append(")")
 		streamBldr.append(''.join(streamInner))
 
-	bldr.append(' | '.join(streamBldr))
+	bldr.append('  \n'.join(streamBldr))
 
 	bldr.append("\n>\n")
 
