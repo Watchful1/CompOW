@@ -43,10 +43,6 @@ if LOG_FILENAME is not None:
 
 
 def main(events, reddit, sticky, flairs):
-	if globals.debug_time is None:
-		globals.debug_time = datetime.utcnow()
-	current_time = globals.debug_time
-
 	overggparser.get_upcoming_events(events)
 	events_to_delete = []
 	for event in events:
@@ -86,7 +82,7 @@ def main(events, reddit, sticky, flairs):
 				sticky.unsticky(event.thread)
 				events_to_delete.append(event)
 
-		if current_time + timedelta(
+		if datetime.utcnow() + timedelta(
 				minutes=event.competition.post_minutes_ahead) >= event.start and event.thread is None:
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
@@ -104,7 +100,7 @@ def main(events, reddit, sticky, flairs):
 			event.clean()
 
 		if event.competition.discord_minutes_ahead is not None and \
-				current_time + timedelta(minutes=event.competition.discord_minutes_ahead) >= event.start and \
+				datetime.utcnow() + timedelta(minutes=event.competition.discord_minutes_ahead) >= event.start and \
 				not event.posted_discord:
 			if globals.WEBHOOK is not None:
 				log.info(f"Posting announcement to discord: {event}")
@@ -170,4 +166,5 @@ if __name__ == "__main__":
 # discord notifications
 # thread and tournament in discord notification
 # team flairs in discord notification
+# add day of week to OWL thread title
 # map details in post match thread

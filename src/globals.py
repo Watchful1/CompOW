@@ -12,4 +12,4 @@ FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/flairs.json"
 DISCORD_WEBHOOK = None
 DISCORD_TOKEN = None
 
-debug_time = None # datetime.strptime("2019-02-19 16:45:00", "%Y-%m-%d %H:%M:%S")
+# debug_time = None # datetime.strptime("2019-02-19 16:45:00", "%Y-%m-%d %H:%M:%S")

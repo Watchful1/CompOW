@@ -140,8 +140,6 @@ def get_upcoming_events(events):
 		log.warning(traceback.format_exc())
 		return False
 
-	current_time = globals.debug_time
-
 	for match_table in data['matches']:
 		match = classes.Match(
 			id=match_table['id'],
@@ -158,7 +156,7 @@ def get_upcoming_events(events):
 				fits_event = True
 				break
 
-		if not fits_event and current_time + timedelta(hours=1) > match.start:
+		if not fits_event and datetime.utcnow() + timedelta(hours=1) > match.start:
 			rank, competition = mappings.get_competition(match_table['event_name'])
 			if competition is None:
 				pass # placeholder
