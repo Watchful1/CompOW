@@ -13,7 +13,7 @@ competitions = [
 	classes.Competition(
 		name="Overwatch Contenders 2019 Season 1: Australia",
 		discord_minutes_ahead=15,
-		discord_role="OWL-Notify",
+		discord_role="AUContenders",
 		discord_channel="420968531929071628"
 	)
 ]
