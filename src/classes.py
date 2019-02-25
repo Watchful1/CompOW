@@ -86,7 +86,9 @@ class Match:
 		self.url = url
 		self.streams = []
 		self.competition = None
+		self.competition_url = None
 		self.stage = None
+
 		self.post_thread = None
 
 		self.dirty = False
@@ -114,6 +116,7 @@ class Event:
 		self.matches = []
 		self.stage_names = []
 		self.streams = []
+		self.competition_url = None
 
 	def add_match(self, match):
 		found = False
@@ -152,6 +155,10 @@ class Event:
 	def merge_match(self, match):
 		if match.stage not in self.stage_names:
 			self.stage_names.append(match.stage)
+		if self.competition_url is None:
+			self.competition_url = match.competition_url
+		elif self.competition_url != match.competition_url:
+			log.warning(f"Match competition url doesn't match event: {self.competition_url} : {match.competition_url}")
 		if match.dirty:
 			self.dirty = True
 		for stream in match.streams:

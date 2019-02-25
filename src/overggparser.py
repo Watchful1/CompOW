@@ -52,6 +52,8 @@ def parse_match(match_url):
 		 	'path': "//div[@class='match-header-vs-note']/span/text()"},
 		{'field': 'state2', 'required': False,
 		 	'path': "//div[@class='match-header-vs-note']/text()"},
+		{'field': 'tournament_url', 'required': True,
+		 	'path': "//a[@class='match-info-section-event']/@href"},
 	]
 
 	for path in paths:
@@ -86,6 +88,7 @@ def merge_fields_into_match(fields, match):
 
 	merge_field(match, "stage", fields['match_name'])
 	merge_field(match, "competition", fields['tournament'])
+	merge_field(match, "competition_url", f"https://www.over.gg/{fields['tournament_url']}")
 
 	for stream_num in ["1", "2", "3"]:
 		url_name = "stream"+stream_num

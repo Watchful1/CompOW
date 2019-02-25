@@ -76,6 +76,17 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
+	bldr.append(">> *Tournament:*  \n")
+	bldr.append("> ")
+	bldr.append(flairs.get_flair("over.gg"))
+	bldr.append("[")
+	bldr.append(event.competition)
+	bldr.append("](")
+	bldr.append(event.competition_url)
+	bldr.append(")")
+
+	bldr.append("\n>\n")
+
 	bldr.append(">---\n")
 	bldr.append(">---\n")
 	bldr.append(">\n")
