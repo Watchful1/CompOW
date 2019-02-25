@@ -47,7 +47,7 @@ def main(events, reddit, sticky, flairs, debug):
 	events_to_delete = []
 	for event in events:
 		if event.thread is not None:
-			log.info(f"Rechecking event: {event}")
+			# log.info(f"Rechecking event: {event}")
 			overggparser.populate_event(event)
 
 			if event.competition.post_match_threads:
@@ -121,7 +121,7 @@ def main(events, reddit, sticky, flairs, debug):
 	if len(events):
 		return 1 * 60
 	else:
-		log.info("Run complete, no events processed")
+		# log.info("Run complete, no events processed")
 		return 5 * 60
 
 
