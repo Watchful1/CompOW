@@ -1,4 +1,5 @@
 import pytz
+from datetime import datetime
 
 import classes
 import globals
@@ -80,7 +81,7 @@ def render_reddit_event(event, flairs):
 	bldr.append("> ")
 	bldr.append(flairs.get_flair("over.gg"))
 	bldr.append("[")
-	bldr.append(event.competition)
+	bldr.append(event.competition.name)
 	bldr.append("](")
 	bldr.append(event.competition_url)
 	bldr.append(")")
@@ -143,11 +144,20 @@ def render_reddit_event(event, flairs):
 
 
 def render_reddit_event_title(event):
-	return f"{event.competition.name} - {event.stages_name()}"
-
-
-def render_discord(event):
 	bldr = []
+	bldr.append(event.competition.name)
+	bldr.append(" - ")
+	bldr.append(event.stages_name())
+	if event.competition.day_in_title:
+		bldr.append(" - ")
+		bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
+	return ''.join(bldr)
+
+
+def render_discord(event, flairs):
+	bldr = []
+
+	bldr.append("~ping ")
 
 	bldr.append("**")
 	bldr.append(event.competition.name)
@@ -155,7 +165,7 @@ def render_discord(event):
 	bldr.append(event.stages_name())
 	bldr.append("**")
 
-	minutes_difference = int((event.start - globals.debug_time).seconds / 60)
+	minutes_difference = int((event.start - datetime.utcnow()).seconds / 60)
 	if minutes_difference < 60:
 		bldr.append(" begins in ")
 		bldr.append(str(minutes_difference))
@@ -195,6 +205,16 @@ def render_discord(event):
 
 		bldr.append("*\n")
 
+		home_flair = flairs.get_static_flair(match.home.name)
+		if home_flair is not None:
+			bldr.append(home_flair)
+			bldr.append(" ")
+		else:
+			if match.home.country != "TBD":
+				bldr.append(":")
+				bldr.append(match.home.country)
+				bldr.append(": ")
+
 		bldr.append("**")
 		bldr.append(match.home.name)
 		bldr.append("**")
@@ -205,7 +225,36 @@ def render_discord(event):
 		bldr.append(match.away.name)
 		bldr.append("**")
 
+		away_flair = flairs.get_static_flair(match.away.name)
+		if away_flair is not None:
+			bldr.append(" ")
+			bldr.append(away_flair)
+		else:
+			if match.away.country != "TBD":
+				bldr.append(" :")
+				bldr.append(match.away.country)
+				bldr.append(":")
+
 		bldr.append("\n\n")
 
+	bldr.append(":tv:")
+	bldr.append("<")
+	bldr.append(event.streams[0].url)
+	bldr.append(">\n")
+
+	bldr.append(":information_source:")
+	bldr.append("<")
+	bldr.append(event.competition_url)
+	bldr.append(">\n")
+
+	bldr.append(":keyboard:")
+	bldr.append("Discuss in <#")
+	bldr.append(event.competition.discord_channel)
+	bldr.append(">")
+	if event.thread is not None:
+		bldr.append(" or in this thread: ")
+		bldr.append("<https://redd.it/")
+		bldr.append(event.thread)
+		bldr.append(">")
 
 	return ''.join(bldr)

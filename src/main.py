@@ -42,7 +42,7 @@ if LOG_FILENAME is not None:
 	log.addHandler(log_fileHandler)
 
 
-def main(events, reddit, sticky, flairs):
+def main(events, reddit, sticky, flairs, debug):
 	overggparser.get_upcoming_events(events)
 	events_to_delete = []
 	for event in events:
@@ -101,10 +101,16 @@ def main(events, reddit, sticky, flairs):
 
 		if event.competition.discord_minutes_ahead is not None and \
 				datetime.utcnow() + timedelta(minutes=event.competition.discord_minutes_ahead) >= event.start and \
+				len(event.streams) and \
 				not event.posted_discord:
 			if globals.WEBHOOK is not None:
 				log.info(f"Posting announcement to discord: {event}")
-				requests.post(globals.WEBHOOK, data={"content": string_utils.render_discord(event)})
+				discord_announcement = string_utils.render_discord(event, flairs)
+				log.info(discord_announcement)
+				# if debug:
+				# 	log.info(discord_announcement)
+				# else:
+				# 	requests.post(globals.WEBHOOK, data={"content": discord_announcement})
 				event.posted_discord = True
 
 	for event in events_to_delete:
@@ -117,7 +123,6 @@ def main(events, reddit, sticky, flairs):
 	else:
 		log.info("Run complete, no events processed")
 		return 5 * 60
-
 
 
 if __name__ == "__main__":
@@ -156,7 +161,7 @@ if __name__ == "__main__":
 	flairs = flair_class.FlairManager(state['flairs'])
 
 	while True:
-		sleep_time = main(state['events'], reddit, sticky, flairs)
+		sleep_time = main(state['events'], reddit, sticky, flairs, debug)
 
 		if once:
 			break
@@ -164,7 +169,5 @@ if __name__ == "__main__":
 		time.sleep(sleep_time)
 
 # discord notifications
-# thread and tournament in discord notification
 # team flairs in discord notification
-# add day of week to OWL thread title
 # map details in post match thread

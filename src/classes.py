@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 from urllib.parse import urlparse
 
-
 log = logging.getLogger("bot")
 
 
@@ -15,15 +14,24 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self, name, discord_minutes_ahead=None, discord_role=None, post_match_threads=False, post_minutes_ahead=15):
+	def __init__(self,
+				 name,
+				 discord_minutes_ahead=None,
+				 discord_role=None,
+				 discord_channel="348939546878017536",
+				 post_match_threads=False,
+				 post_minutes_ahead=15,
+				 day_in_title=False):
 		self.name = name
 		if discord_minutes_ahead is not None and discord_minutes_ahead > post_minutes_ahead:
 			self.discord_minutes_ahead = post_minutes_ahead
 		else:
 			self.discord_minutes_ahead = discord_minutes_ahead
 		self.discord_role = discord_role
+		self.discord_channel = discord_channel
 		self.post_match_threads = post_match_threads
 		self.post_minutes_ahead = post_minutes_ahead
+		self.day_in_title = day_in_title
 
 	def __str__(self):
 		return self.name

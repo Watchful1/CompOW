@@ -8,6 +8,32 @@ import globals
 log = logging.getLogger("bot")
 
 
+static_flairs = {
+	'Atlanta Reign': ':ATL:',
+	'Boston Uprising': ':BOS:',
+	'Chengdu Hunters': ':CDH:',
+	'Dallas Fuel': ':DAL:',
+	'Florida Mayhem': ':FLA:',
+	'Guangzhou Charge': ':GZC:',
+	'Hangzhou Spark': ':HZS:',
+	'Houston Outlaws': ':HOU:',
+	'London Spitfire': ':LDN:',
+	'Los Angeles Gladiators': ':GLA:',
+	'Los Angeles Valiant': ':VAL:',
+	'New York Excelsior': ':NYE:',
+	'Paris Eternal': ':PAR:',
+	'Philadelphia Fusion': ':PHI:',
+	'San Francisco Shock': ':SFS:',
+	'Seoul Dynasty': ':SEO:',
+	'Shanghai Dragons': ':SHD:',
+	'Toronto Defiant': ':TOR:',
+	'Vancouver Titans': ':VAN:',
+	'Washington Justice': ':WAS:',
+	'Overwatch League': ':OWL:',
+	'Overwatch Contenders': ':OWC:',
+}
+
+
 class FlairObject:
 	def __init__(self, name, row, column, sheet):
 		self.name = name
@@ -62,3 +88,9 @@ class FlairManager:
 			self.flairs = flairs
 		else:
 			log.info(f"Only found {len(flairs)} flairs, not updating")
+
+	def get_static_flair(self, name):
+		if name in static_flairs:
+			return static_flairs[name]
+		else:
+			return None

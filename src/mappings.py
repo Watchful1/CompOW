@@ -5,9 +5,17 @@ competitions = [
 		name="Overwatch League 2019 Season",
 		discord_minutes_ahead=15,
 		discord_role="OWL-Notify",
+		discord_channel="377127072243515393",
 		post_match_threads=True,
-		post_minutes_ahead=30
+		post_minutes_ahead=30,
+		day_in_title=True
 	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: Australia",
+		discord_minutes_ahead=15,
+		discord_role="OWL-Notify",
+		discord_channel="420968531929071628"
+	)
 ]
 
 
