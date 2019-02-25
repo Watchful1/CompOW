@@ -109,8 +109,8 @@ def main(events, reddit, sticky, flairs, debug):
 				if debug:
 					log.info(discord_announcement)
 				else:
-					wrapped_discord = f"```\n{discord_announcement}\n```"
-					requests.post(globals.WEBHOOK, data={"content": wrapped_discord})
+					log.info(discord_announcement)
+					requests.post(globals.WEBHOOK, data={"content": discord_announcement})
 				event.posted_discord = True
 
 	for event in events_to_delete:
