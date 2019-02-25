@@ -169,5 +169,3 @@ if __name__ == "__main__":
 		time.sleep(sleep_time)
 
 # discord notifications
-# team flairs in discord notification
-# map details in post match thread

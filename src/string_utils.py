@@ -60,7 +60,7 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
-	bldr.append(">> *Streams:*  \n")
+	bldr.append(">> *Streams*  \n")
 	streamBldr = []
 	for stream in event.streams:
 		streamInner = []
@@ -77,8 +77,7 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
-	bldr.append(">> *Tournament:*  \n")
-	bldr.append("> ")
+	bldr.append(">> *Tournament*  \n")
 	bldr.append(flairs.get_flair("over.gg"))
 	bldr.append("[")
 	bldr.append(event.competition.name)
@@ -154,6 +153,17 @@ def render_reddit_event_title(event):
 	return ''.join(bldr)
 
 
+def get_discord_flair(flairs, name, country):
+	flair = flairs.get_static_flair(name)
+	if flair is not None:
+		return f"{flair} "
+	else:
+		if country != "TBD":
+			return f":flag_{country.lower()}:"
+		else:
+			return ""
+
+
 def render_discord(event, flairs):
 	bldr = []
 
@@ -205,15 +215,7 @@ def render_discord(event, flairs):
 
 		bldr.append("*\n")
 
-		home_flair = flairs.get_static_flair(match.home.name)
-		if home_flair is not None:
-			bldr.append(home_flair)
-			bldr.append(" ")
-		else:
-			if match.home.country != "TBD":
-				bldr.append(":")
-				bldr.append(match.home.country)
-				bldr.append(": ")
+		bldr.append(get_discord_flair(flairs, match.home.name, match.home.country))
 
 		bldr.append("**")
 		bldr.append(match.home.name)
@@ -225,15 +227,7 @@ def render_discord(event, flairs):
 		bldr.append(match.away.name)
 		bldr.append("**")
 
-		away_flair = flairs.get_static_flair(match.away.name)
-		if away_flair is not None:
-			bldr.append(" ")
-			bldr.append(away_flair)
-		else:
-			if match.away.country != "TBD":
-				bldr.append(" :")
-				bldr.append(match.away.country)
-				bldr.append(":")
+		bldr.append(get_discord_flair(flairs, match.away.name, match.away.country))
 
 		bldr.append("\n\n")
 
