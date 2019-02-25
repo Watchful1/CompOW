@@ -17,7 +17,7 @@ class Competition:
 	def __init__(self,
 				 name,
 				 discord_minutes_ahead=None,
-				 discord_role=None,
+				 discord_roles=[],
 				 discord_channel="348939546878017536",
 				 post_match_threads=False,
 				 post_minutes_ahead=15,
@@ -27,7 +27,7 @@ class Competition:
 			self.discord_minutes_ahead = post_minutes_ahead
 		else:
 			self.discord_minutes_ahead = discord_minutes_ahead
-		self.discord_role = discord_role
+		self.discord_roles = discord_roles
 		self.discord_channel = discord_channel
 		self.post_match_threads = post_match_threads
 		self.post_minutes_ahead = post_minutes_ahead

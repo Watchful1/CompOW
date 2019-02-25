@@ -4,7 +4,7 @@ competitions = [
 	classes.Competition(
 		name="Overwatch League 2019 Season",
 		discord_minutes_ahead=15,
-		discord_role="OWL-Notify",
+		discord_roles=["OWL-Notify","everyone"],
 		discord_channel="377127072243515393",
 		post_match_threads=True,
 		post_minutes_ahead=30,
@@ -13,7 +13,49 @@ competitions = [
 	classes.Competition(
 		name="Overwatch Contenders 2019 Season 1: Australia",
 		discord_minutes_ahead=15,
-		discord_role="AUContenders",
+		discord_roles=["AUContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: North America East",
+		discord_minutes_ahead=15,
+		discord_roles=["NAContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: North America West",
+		discord_minutes_ahead=15,
+		discord_roles=["NAContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: Pacific",
+		discord_minutes_ahead=15,
+		discord_roles=["PACContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: Europe",
+		discord_minutes_ahead=15,
+		discord_roles=["EUContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: South America",
+		discord_minutes_ahead=15,
+		discord_roles=["SAContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: Korea",
+		discord_minutes_ahead=15,
+		discord_roles=["KRContenders", "here"],
+		discord_channel="420968531929071628"
+	),
+	classes.Competition(
+		name="Overwatch Contenders 2019 Season 1: China",
+		discord_minutes_ahead=15,
+		discord_roles=["CNContenders", "here"],
 		discord_channel="420968531929071628"
 	)
 ]

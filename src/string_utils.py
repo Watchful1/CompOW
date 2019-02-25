@@ -188,8 +188,9 @@ def render_discord(event, flairs):
 	notifications = []
 	notifications.append("[All-Notify]")
 	notifications.append("[All-Matches]")
-	if event.competition.discord_role is not None:
-		notifications.append(f"[{event.competition.discord_role}]")
+	if len(event.competition.discord_roles):
+		for role in event.competition.discord_roles:
+			notifications.append(f"[{role}]")
 
 	bldr.append(' '.join(notifications))
 

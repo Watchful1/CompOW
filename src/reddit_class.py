@@ -25,8 +25,7 @@ class Reddit:
 		log.info("Logged into reddit as /u/" + globals.ACCOUNT_NAME)
 
 		config_keys = [
-			{'var': "DISCORD_WEBHOOK", 'name': "comp_ow_webhook"},
-			{'var': "DISCORD_TOKEN", 'name': "comp_ow_token"},
+			{'var': "WEBHOOK", 'name': "webhook_botspam"},
 		]
 		for key in config_keys:
 			if self.reddit.config.CONFIG.has_option(user, key['name']):

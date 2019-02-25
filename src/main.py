@@ -106,11 +106,11 @@ def main(events, reddit, sticky, flairs, debug):
 			if globals.WEBHOOK is not None:
 				log.info(f"Posting announcement to discord: {event}")
 				discord_announcement = string_utils.render_discord(event, flairs)
-				log.info(discord_announcement)
-				# if debug:
-				# 	log.info(discord_announcement)
-				# else:
-				# 	requests.post(globals.WEBHOOK, data={"content": discord_announcement})
+				if debug:
+					log.info(discord_announcement)
+				else:
+					wrapped_discord = f"```\n{discord_announcement}\n```"
+					requests.post(globals.WEBHOOK, data={"content": wrapped_discord})
 				event.posted_discord = True
 
 	for event in events_to_delete:
@@ -147,11 +147,6 @@ if __name__ == "__main__":
 
 	reddit = reddit_class.Reddit(user, debug)
 
-	if globals.DISCORD_WEBHOOK is not None and globals.DISCORD_TOKEN is not None:
-		globals.WEBHOOK = globals.WEBHOOK.format(globals.DISCORD_WEBHOOK, globals.DISCORD_TOKEN)
-	else:
-		globals.WEBHOOK = None
-
 	state = file_utils.load_state(debug)
 	if force:
 		for event in state['events']:
@@ -167,5 +162,3 @@ if __name__ == "__main__":
 			break
 
 		time.sleep(sleep_time)
-
-# discord notifications
