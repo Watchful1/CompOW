@@ -175,7 +175,7 @@ def render_discord(event, flairs):
 	bldr.append(event.stages_name())
 	bldr.append("**")
 
-	minutes_difference = int((event.start - datetime.utcnow()).seconds / 60)
+	minutes_difference = round((event.start - datetime.utcnow()).seconds / 60)
 	if minutes_difference < 60:
 		bldr.append(" begins in ")
 		bldr.append(str(minutes_difference))

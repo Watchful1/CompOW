@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import requests
+import traceback
 from datetime import datetime
 from datetime import timedelta
 
@@ -109,11 +110,17 @@ def main(events, reddit, sticky, flairs, debug):
 				if debug:
 					log.info(discord_announcement)
 				else:
-					log.info(discord_announcement)
-					requests.post(globals.WEBHOOK, data={"content": discord_announcement})
+					try:
+						requests.post(globals.WEBHOOK, data={"content": discord_announcement})
+					except Exception:
+						log.info(discord_announcement)
+						log.warning(f"Unable to post discord announcement")
+						log.warning(traceback.format_exc())
+
 				event.posted_discord = True
 
 	for event in events_to_delete:
+		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
 	file_utils.save_state(events, sticky.get_save(), flairs.flairs)

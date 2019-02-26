@@ -16,7 +16,13 @@ log = logging.getLogger("bot")
 
 
 def parse_match(match_url):
-	response = urllib.request.urlopen(match_url)
+	try:
+		response = urllib.request.urlopen(match_url)
+	except Exception:
+		log.warning(f"Unable to fetch match page: {match_url}")
+		log.warning(traceback.format_exc())
+		return None
+
 	tree = etree.parse(response, etree.HTMLParser())
 
 	fields = {}
@@ -132,6 +138,9 @@ def merge_fields_into_match(fields, match):
 def populate_event(event):
 	for match in event.matches:
 		fields = parse_match(match.url)
+		if fields is None:
+			log.warning("Fields is none in populate event")
+			continue
 		merge_fields_into_match(fields, match)
 		event.merge_match(match)
 
@@ -140,6 +149,7 @@ def get_upcoming_events(events):
 	try:
 		data = requests.get(globals.OVER_GG_API).json()
 	except Exception as err:
+		log.warning("Unable to fetch overgg api page")
 		log.warning(traceback.format_exc())
 		return False
 
