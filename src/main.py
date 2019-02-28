@@ -91,6 +91,10 @@ def main(events, reddit, sticky, flairs, debug):
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
+			if event.prediction_thread is not None:
+				log.info("Unstickying prediction thread")
+				sticky.unsticky(event.prediction_thread)
+
 			thread_id = reddit.submit_self_post(
 				globals.SUBREDDIT,
 				string_utils.render_reddit_event_title(event),
@@ -139,10 +143,6 @@ def main(events, reddit, sticky, flairs, debug):
 
 			event.prediction_thread = thread_id
 			event.clean()
-
-
-
-
 
 	for event in events_to_delete:
 		log.info(f"Event complete, removing: {event}")
