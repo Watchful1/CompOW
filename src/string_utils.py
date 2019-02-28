@@ -287,7 +287,7 @@ def render_reddit_prediction_thread(event, flairs):
 		bldr.append(flairs.get_flair(match.away.name))
 		bldr.append(match.away.name)
 
-		bldr.append("\n")
+		bldr.append("  \n")
 
 	bldr.append("\n\n")
 
