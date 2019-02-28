@@ -282,9 +282,11 @@ def render_reddit_prediction_thread(event, flairs):
 
 	for match in event.matches:
 		bldr.append(match.home.name)
+		bldr.append(" ")
 		bldr.append(flairs.get_flair(match.home.name))
 		bldr.append(" vs ")
 		bldr.append(flairs.get_flair(match.away.name))
+		bldr.append(" ")
 		bldr.append(match.away.name)
 
 		bldr.append("  \n")
