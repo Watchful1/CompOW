@@ -169,7 +169,7 @@ def get_upcoming_events(events):
 				fits_event = True
 				break
 
-		if not fits_event and datetime.utcnow() + timedelta(hours=1) > match.start:
+		if not fits_event and datetime.utcnow() + timedelta(hours=10) > match.start:
 			rank, competition = mappings.get_competition(match_table['event_name'])
 			if competition is None:
 				pass # placeholder

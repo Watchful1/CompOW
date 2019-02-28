@@ -8,7 +8,8 @@ competitions = [
 		discord_channel="377127072243515393",
 		post_match_threads=True,
 		post_minutes_ahead=30,
-		day_in_title=True
+		day_in_title=True,
+		prediction_thread_minutes_ahead=8 * 60
 	),
 	classes.Competition(
 		name="Overwatch Contenders 2019 Season 1: Australia",

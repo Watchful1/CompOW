@@ -14,14 +14,17 @@ class GameState(Enum):
 
 
 class Competition:
-	def __init__(self,
-				 name,
-				 discord_minutes_ahead=None,
-				 discord_roles=[],
-				 discord_channel="348939546878017536",
-				 post_match_threads=False,
-				 post_minutes_ahead=15,
-				 day_in_title=False):
+	def __init__(
+			self,
+			name,
+			discord_minutes_ahead=None,
+			discord_roles=[],
+			discord_channel="348939546878017536",
+			post_match_threads=False,
+			post_minutes_ahead=15,
+			day_in_title=False,
+			prediction_thread_minutes_ahead=None
+			):
 		self.name = name
 		if discord_minutes_ahead is not None and discord_minutes_ahead > post_minutes_ahead:
 			self.discord_minutes_ahead = post_minutes_ahead
@@ -32,6 +35,7 @@ class Competition:
 		self.post_match_threads = post_match_threads
 		self.post_minutes_ahead = post_minutes_ahead
 		self.day_in_title = day_in_title
+		self.prediction_thread_minutes_ahead = prediction_thread_minutes_ahead
 
 	def __str__(self):
 		return self.name
@@ -120,6 +124,7 @@ class Event:
 		self.thread = None
 		self.posted_discord = False
 		self.dirty = False
+		self.prediction_thread = None
 
 		self.matches = []
 		self.stage_names = []

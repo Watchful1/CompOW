@@ -88,6 +88,13 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
+	if event.competition.prediction_thread_minutes_ahead is not None:
+		bldr.append(">> *Predictions*  \n")
+		bldr.append("[Predictions Website](")
+		bldr.append(globals.PREDICTION_URL)
+		bldr.append(")")
+		bldr.append("\n>\n")
+
 	bldr.append(">---\n")
 	bldr.append(">---\n")
 	bldr.append(">\n")
@@ -252,5 +259,48 @@ def render_discord(event, flairs):
 		bldr.append("<https://redd.it/")
 		bldr.append(event.thread)
 		bldr.append(">")
+
+	return ''.join(bldr)
+
+
+def render_reddit_prediction_thread_title(event):
+	bldr = []
+	bldr.append("OWL Predictions Thread - ")
+	bldr.append(event.stages_name())
+	bldr.append(" - ")
+	bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
+	return ''.join(bldr)
+
+
+def render_reddit_prediction_thread(event, flairs):
+	bldr = []
+
+	bldr.append("How do you think today's games will play out? You can leave a comment below and also visit our ")
+	bldr.append("[Predictions Website](")
+	bldr.append(globals.PREDICTION_URL)
+	bldr.append(") to make your predictions for your chance to win prizes.\n\n")
+
+	for match in event.matches:
+		bldr.append(match.home.name)
+		bldr.append(flairs.get_flair(match.home.name))
+		bldr.append(" vs ")
+		bldr.append(flairs.get_flair(match.away.name))
+		bldr.append(match.away.name)
+
+		bldr.append("\n")
+
+	bldr.append("\n\n")
+
+	bldr.append("#Predictions\n")
+	bldr.append("* Head to [our predictions website](")
+	bldr.append(globals.PREDICTION_URL)
+	bldr.append(")\n")
+	bldr.append("* Authenticate your Reddit account\n")
+	bldr.append("* Submit your predictions\n\n")
+
+	bldr.append("#####Prizes\n\n")
+
+	bldr.append("* OWL 2019 All-Access Pass (Or equivalent value in tokens)\n")
+	bldr.append("* Special user flair")
 
 	return ''.join(bldr)

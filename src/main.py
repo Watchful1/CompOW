@@ -43,6 +43,10 @@ if LOG_FILENAME is not None:
 	log.addHandler(log_fileHandler)
 
 
+def minutes_to_start(start):
+	return (start - datetime.utcnow()).seconds / 60
+
+
 def main(events, reddit, sticky, flairs, debug):
 	overggparser.get_upcoming_events(events)
 	events_to_delete = []
@@ -83,8 +87,7 @@ def main(events, reddit, sticky, flairs, debug):
 				sticky.unsticky(event.thread)
 				events_to_delete.append(event)
 
-		if datetime.utcnow() + timedelta(
-				minutes=event.competition.post_minutes_ahead) >= event.start and event.thread is None:
+		if minutes_to_start(event.start) < event.competition.post_minutes_ahead and event.thread is None:
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
@@ -101,7 +104,7 @@ def main(events, reddit, sticky, flairs, debug):
 			event.clean()
 
 		if event.competition.discord_minutes_ahead is not None and \
-				datetime.utcnow() + timedelta(minutes=event.competition.discord_minutes_ahead) >= event.start and \
+				minutes_to_start(event.start) < event.competition.discord_minutes_ahead and \
 				len(event.streams) and \
 				not event.posted_discord:
 			if globals.WEBHOOK is not None:
@@ -119,17 +122,40 @@ def main(events, reddit, sticky, flairs, debug):
 
 				event.posted_discord = True
 
+		if event.competition.prediction_thread_minutes_ahead is not None and \
+				minutes_to_start(event.start) < event.competition.prediction_thread_minutes_ahead and \
+				event.prediction_thread is None:
+			log.info("Posting prediction thread")
+			overggparser.populate_event(event)
+
+			thread_id = reddit.submit_self_post(
+				globals.SUBREDDIT,
+				string_utils.render_reddit_prediction_thread_title(event),
+				string_utils.render_reddit_prediction_thread(event, flairs)
+			)
+			sticky.sticky(thread_id, event.competition, event.start)
+
+			reddit.prediction_thread_settings(thread_id)
+
+			event.prediction_thread = thread_id
+			event.clean()
+
+
+
+
+
 	for event in events_to_delete:
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
 	file_utils.save_state(events, sticky.get_save(), flairs.flairs)
 
-	if len(events):
-		return 1 * 60
-	else:
-		# log.info("Run complete, no events processed")
-		return 5 * 60
+	for event in events:
+		if event.thread is not None or \
+				minutes_to_start(event.start) < event.competition.post_minutes_ahead + 15:
+			return 1 * 60
+
+	return 5 * 60
 
 
 if __name__ == "__main__":
