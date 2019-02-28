@@ -1,5 +1,6 @@
 import pytz
 from datetime import datetime
+import math
 
 import classes
 import globals
@@ -175,8 +176,8 @@ def render_discord(event, flairs):
 	bldr.append(event.stages_name())
 	bldr.append("**")
 
-	minutes_difference = round((event.start - datetime.utcnow()).seconds / 60)
-	if minutes_difference < 60:
+	minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
+	if 60 > minutes_difference > 0:
 		bldr.append(" begins in ")
 		bldr.append(str(minutes_difference))
 		bldr.append(" minutes!")
