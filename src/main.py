@@ -148,7 +148,8 @@ def main(events, reddit, sticky, flairs, debug):
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
-	file_utils.save_state(events, sticky.get_save(), flairs.flairs)
+	if not debug:
+		file_utils.save_state(events, sticky.get_save(), flairs.flairs)
 
 	for event in events:
 		if event.thread is not None or \
@@ -184,6 +185,8 @@ if __name__ == "__main__":
 	if force:
 		for event in state['events']:
 			event.dirty = True
+
+	log.info(f"Loaded {len(state['events'])} events")
 
 	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
 	flairs = flair_class.FlairManager(state['flairs'])

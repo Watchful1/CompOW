@@ -164,7 +164,7 @@ def get_upcoming_events(events):
 
 		fits_event = False
 		for event in events:
-			if event.match_fits(match.start, match_table['event_name']):
+			if event.match_fits(match.start, match_table['event_name'], match.id):
 				event.add_match(match)
 				fits_event = True
 				break

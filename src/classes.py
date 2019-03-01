@@ -178,9 +178,14 @@ class Event:
 			if stream not in self.streams:
 				self.streams.append(stream)
 
-	def match_fits(self, start, competition):
+	def match_fits(self, start, competition, match_id):
 		if self.competition.name != competition:
 			return False
+
+		for event_match in self.matches:
+			if event_match.id == match_id:
+				return True
+
 		return self.start - timedelta(hours=3) < start < self.last + timedelta(hours=3)
 
 	def clean(self):
