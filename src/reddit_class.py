@@ -198,6 +198,17 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
+	def lock(self, thread_id):
+		try:
+			if not self.debug:
+				self.reddit.submission(thread_id).mod.lock()
+			log.debug(f"Locking thread: {thread_id}")
+			return None
+		except Exception as err:
+			log.warning(f"Unable to lock thread: {thread_id}")
+			log.warning(traceback.format_exc())
+			return None
+
 	def match_thread_settings(self, thread_id, sort):
 		self.approve(thread_id)
 		self.spoiler_thread(thread_id)

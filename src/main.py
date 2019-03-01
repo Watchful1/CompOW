@@ -94,6 +94,7 @@ def main(events, reddit, sticky, flairs, debug):
 			if event.prediction_thread is not None:
 				log.info("Unstickying prediction thread")
 				sticky.unsticky(event.prediction_thread)
+				reddit.lock(event.prediction_thread)
 
 			thread_id = reddit.submit_self_post(
 				globals.SUBREDDIT,
@@ -197,4 +198,5 @@ if __name__ == "__main__":
 		if once:
 			break
 
+		log.info(f"Sleeping: {sleep_time}")
 		time.sleep(sleep_time)

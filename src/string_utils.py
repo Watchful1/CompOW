@@ -302,7 +302,7 @@ def render_reddit_prediction_thread(event, flairs):
 
 	bldr.append("#####Prizes\n\n")
 
-	bldr.append("* OWL 2019 All-Access Pass (Or equivalent value in tokens)\n")
+	bldr.append("* OWL 2019 All-Access Pass (Or equivalent value in tokens) (awarded weekly)\n")
 	bldr.append("* Special user flair")
 
 	return ''.join(bldr)
