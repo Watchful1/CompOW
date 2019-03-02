@@ -198,5 +198,5 @@ if __name__ == "__main__":
 		if once:
 			break
 
-		log.info(f"Sleeping: {sleep_time}")
+		#log.info(f"Sleeping: {sleep_time}")
 		time.sleep(sleep_time)
