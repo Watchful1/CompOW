@@ -226,7 +226,7 @@ def render_discord(event, flairs):
 
 		bldr.append(get_discord_flair(flairs, match.home.name, match.home.country))
 
-		bldr.append("**")
+		bldr.append(" **")
 		bldr.append(match.home.name)
 		bldr.append("**")
 
@@ -234,7 +234,7 @@ def render_discord(event, flairs):
 
 		bldr.append("**")
 		bldr.append(match.away.name)
-		bldr.append("**")
+		bldr.append("** ")
 
 		bldr.append(get_discord_flair(flairs, match.away.name, match.away.country))
 
