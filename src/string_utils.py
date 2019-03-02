@@ -17,10 +17,10 @@ def render_reddit_post_match(match, flairs):
 	bldr.append("\n>\n")
 
 	bldr.append(">---\n")
-	bldr.append(">|Team 1| |Score| |Team 2|\n")
-	bldr.append(">|-:|-|:-:|-|:-|\n")
+	bldr.append("|Team 1| |Score| |Team 2|\n")
+	bldr.append("|-:|-|:-:|-|:-|\n")
 
-	bldr.append(">|")
+	bldr.append("|")
 	bldr.append(match.home.name)
 	bldr.append("|")
 	bldr.append(flairs.get_flair(match.home.name))
@@ -101,10 +101,10 @@ def render_reddit_event(event, flairs):
 	bldr.append(">####Schedule\n")
 	bldr.append(">\n")
 	bldr.append(">>| |  |   |   |   |  | |   |\n")
-	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
-	bldr.append(">>|Time|Team 1||||Team 2||Match Page|\n")
+	bldr.append(">|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
+	bldr.append(">|Time|Team 1||||Team 2||Match Page|\n")
 	for match in event.matches:
-		bldr.append(">>|")
+		bldr.append(">|")
 
 		bldr.append("[")
 		bldr.append(match.start.strftime("%H:%M"))
