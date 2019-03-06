@@ -39,17 +39,11 @@ def parse_match(match_url):
 		{'field': 'tournament', 'required': True,
 		 	'path': "//a[@class='match-info-section-event']/text()"},
 		{'field': 'stream1', 'required': True,
-		 	'path': "//div[@class='match-streams']/div/a/@href"},
+		 	'path': "//a[@class='wf-card mod-dark'][1]/@href"},
 		{'field': 'stream2', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[3]/a/@href"},
+		 	'path': "//a[@class='wf-card mod-dark'][2]/@href"},
 		{'field': 'stream3', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[4]/a/@href"},
-		{'field': 'stream_name1', 'required': True,
-		 	'path': "//div[@class='match-streams']/div/a/text()"},
-		{'field': 'stream_name2', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[3]/a/text()"},
-		{'field': 'stream_name3', 'required': False,
-		 	'path': "//div[@class='match-streams']/div[4]/a/text()"},
+		 	'path': "//a[@class='wf-card mod-dark'][3]/@href"},
 		{'field': 'home_score', 'required': False,
 		 	'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
 		{'field': 'away_score', 'required': False,
@@ -105,7 +99,7 @@ def merge_fields_into_match(fields, match):
 					matched = True
 
 			if not matched:
-				match.streams.append(classes.Stream(fields[url_name], fields["stream_name"+stream_num]))
+				match.streams.append(classes.Stream(fields[url_name]))
 				log.debug(f"Streams dirty: {fields[url_name]}")
 				match.dirty = True
 
