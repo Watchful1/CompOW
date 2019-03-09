@@ -213,6 +213,7 @@ def render_discord(event, flairs):
 			pytz.timezone("US/Pacific"),
 			pytz.timezone("US/Eastern"),
 			pytz.timezone("Europe/Paris"),
+			pytz.timezone("Australia/Sydney"),
 		]
 		match_time = pytz.utc.localize(match.start)
 
