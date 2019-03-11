@@ -1,4 +1,3 @@
-import urllib.request
 import logging.handlers
 import traceback
 from lxml import etree
@@ -17,13 +16,13 @@ log = logging.getLogger("bot")
 
 def parse_match(match_url):
 	try:
-		response = urllib.request.urlopen(match_url)
+		page_string = requests.get(match_url).text
 	except Exception:
 		log.warning(f"Unable to fetch match page: {match_url}")
 		log.warning(traceback.format_exc())
 		return None
 
-	tree = etree.parse(response, etree.HTMLParser())
+	tree = etree.fromstring(page_string, etree.HTMLParser())
 
 	fields = {}
 

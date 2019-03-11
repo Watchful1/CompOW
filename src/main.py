@@ -87,7 +87,7 @@ def main(events, reddit, sticky, flairs, debug):
 				sticky.unsticky(event.thread)
 				events_to_delete.append(event)
 
-		if minutes_to_start(event.start) < event.competition.post_minutes_ahead and event.thread is None:
+		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead or debug) and event.thread is None:
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
@@ -109,7 +109,7 @@ def main(events, reddit, sticky, flairs, debug):
 			event.clean()
 
 		if event.competition.discord_minutes_ahead is not None and \
-				minutes_to_start(event.start) < event.competition.discord_minutes_ahead and \
+				(minutes_to_start(event.start) < event.competition.discord_minutes_ahead or debug) and \
 				len(event.streams) and \
 				not event.posted_discord:
 			if globals.WEBHOOK is not None:
