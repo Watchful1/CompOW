@@ -101,9 +101,9 @@ def main(events, reddit, sticky, flairs, debug):
 				string_utils.render_reddit_event_title(event),
 				string_utils.render_reddit_event(event, flairs)
 			)
-			sticky.sticky(thread_id, event.competition, event.start)
-
 			reddit.match_thread_settings(thread_id, "new")
+
+			sticky.sticky(thread_id, event.competition, event.start)
 
 			event.thread = thread_id
 			event.clean()
