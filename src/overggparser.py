@@ -1,6 +1,7 @@
 import logging.handlers
 import traceback
 from lxml import etree
+import bisect
 
 import requests
 from datetime import datetime
@@ -110,10 +111,10 @@ def merge_fields_into_match(fields, match):
 
 			if not matched:
 				if language_name in fields:
-					language = fields[language_name]
+					language = fields[language_name].strip("()")
 				else:
 					language = None
-				match.streams.append(Stream(fields[url_name], language))
+				bisect.insort(match.streams, Stream(fields[url_name], language))
 				log.debug(f"Streams dirty: {fields[url_name]}")
 				match.dirty = True
 

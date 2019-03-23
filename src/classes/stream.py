@@ -36,3 +36,4 @@ class Stream:
 			return False
 		self_ranking = mappings.stream_ranking(self.url, self.language)
 		other_ranking = mappings.stream_ranking(self.url, self.language)
+		return self_ranking < other_ranking
