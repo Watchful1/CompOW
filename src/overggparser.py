@@ -7,7 +7,11 @@ from datetime import datetime
 from datetime import timedelta
 
 import globals
-import classes
+from classes.stream import Stream
+from classes.enums import GameState
+from classes.match import Match
+from classes.event import Event
+from classes.team import Team
 import mappings
 
 
@@ -37,12 +41,18 @@ def parse_match(match_url):
 		 	'path': "//a[@class='match-info-section-event']/../text()"},
 		{'field': 'tournament', 'required': True,
 		 	'path': "//a[@class='match-info-section-event']/text()"},
-		{'field': 'stream1', 'required': True,
+		{'field': 'stream1url', 'required': True,
 		 	'path': "//a[@class='wf-card mod-dark'][1]/@href"},
-		{'field': 'stream2', 'required': False,
+		{'field': 'stream2url', 'required': False,
 		 	'path': "//a[@class='wf-card mod-dark'][2]/@href"},
-		{'field': 'stream3', 'required': False,
+		{'field': 'stream3url', 'required': False,
 		 	'path': "//a[@class='wf-card mod-dark'][3]/@href"},
+		{'field': 'stream1language', 'required': True,
+		 	'path': "//a[@class='wf-card mod-dark'][1]/div/span[1]/text()"},
+		{'field': 'stream2language', 'required': False,
+		 	'path': "//a[@class='wf-card mod-dark'][2]/div/span[1]/text()"},
+		{'field': 'stream3language', 'required': False,
+		 	'path': "//a[@class='wf-card mod-dark'][3]/div/span[1]/text()"},
 		{'field': 'home_score', 'required': False,
 		 	'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
 		{'field': 'away_score', 'required': False,
@@ -89,8 +99,9 @@ def merge_fields_into_match(fields, match):
 	merge_field(match, "competition", fields['tournament'])
 	merge_field(match, "competition_url", f"https://www.over.gg{fields['tournament_url']}")
 
-	for stream_num in ["1", "2", "3"]:
-		url_name = "stream"+stream_num
+	for stream_num in ["stream1", "stream2", "stream3"]:
+		url_name = stream_num+"url"
+		language_name = stream_num+"language"
 		if url_name in fields:
 			matched = False
 			for match_stream in match.streams:
@@ -98,18 +109,22 @@ def merge_fields_into_match(fields, match):
 					matched = True
 
 			if not matched:
-				match.streams.append(classes.Stream(fields[url_name]))
+				if language_name in fields:
+					language = fields[language_name]
+				else:
+					language = None
+				match.streams.append(Stream(fields[url_name], language))
 				log.debug(f"Streams dirty: {fields[url_name]}")
 				match.dirty = True
 
 	if 'state2' in fields and fields['state2'] == "final":
-		merge_field(match, "state", classes.GameState.COMPLETE)
+		merge_field(match, "state", GameState.COMPLETE)
 	elif 'state' in fields and fields['state'] == "live":
-		merge_field(match, "state", classes.GameState.IN_PROGRESS)
+		merge_field(match, "state", GameState.IN_PROGRESS)
 	else:
-		merge_field(match, "state", classes.GameState.PENDING)
+		merge_field(match, "state", GameState.PENDING)
 
-	if match.state in [classes.GameState.IN_PROGRESS, classes.GameState.COMPLETE]:
+	if match.state in [GameState.IN_PROGRESS, GameState.COMPLETE]:
 		if 'home_score' in fields:
 			merge_field(match, "home_score", int(fields['home_score']))
 		else:
@@ -119,7 +134,7 @@ def merge_fields_into_match(fields, match):
 		else:
 			merge_field(match, "away_score", 0)
 
-	if match.state == classes.GameState.COMPLETE:
+	if match.state == GameState.COMPLETE:
 		if match.home_score > match.away_score:
 			merge_field(match, "winner", match.home.name)
 		elif match.away_score > match.home_score:
@@ -147,12 +162,12 @@ def get_upcoming_events(events):
 		return False
 
 	for match_table in data['matches']:
-		match = classes.Match(
+		match = Match(
 			id=match_table['id'],
 			start=datetime.utcfromtimestamp(int(match_table['timestamp'])),
 			url=match_table['match_link'],
-			home=classes.Team(match_table['teams'][0]['name'], match_table['teams'][0]['country']),
-			away=classes.Team(match_table['teams'][1]['name'], match_table['teams'][1]['country'])
+			home=Team(match_table['teams'][0]['name'], match_table['teams'][0]['country']),
+			away=Team(match_table['teams'][1]['name'], match_table['teams'][1]['country'])
 		)
 
 		fits_event = False
@@ -170,7 +185,7 @@ def get_upcoming_events(events):
 			else:
 				log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
 
-				event = classes.Event(
+				event = Event(
 					competition=competition
 				)
 				event.add_match(match)

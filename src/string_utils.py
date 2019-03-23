@@ -2,8 +2,8 @@ import pytz
 from datetime import datetime
 import math
 
-import classes
 import globals
+from classes.enums import GameState
 
 
 def render_reddit_post_match(match, flairs):
@@ -120,7 +120,7 @@ def render_reddit_event(event, flairs):
 		bldr.append(flairs.get_flair(match.home.name))
 		bldr.append("|")
 
-		if match.state != classes.GameState.PENDING:
+		if match.state != GameState.PENDING:
 			bldr.append(str(match.home_score))
 			bldr.append("-")
 			bldr.append(str(match.away_score))

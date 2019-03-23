@@ -7,16 +7,15 @@ import time
 import requests
 import traceback
 from datetime import datetime
-from datetime import timedelta
 
 import globals
 import overggparser
 import string_utils
-import classes
-import sticky_class
+import sticky_manager
 import reddit_class
 import file_utils
-import flair_class
+import flair_manager
+from classes.enums import GameState
 
 LOG_LEVEL = logging.DEBUG
 
@@ -57,7 +56,7 @@ def main(events, reddit, sticky, flairs, debug):
 
 			if event.competition.post_match_threads:
 				for match in event.matches:
-					if match.state == classes.GameState.COMPLETE and match.post_thread is None:
+					if match.state == GameState.COMPLETE and match.post_thread is None:
 						log.info(f"Match complete, posting post match thread: {match}")
 
 						thread_id = reddit.submit_self_post(
@@ -82,7 +81,7 @@ def main(events, reddit, sticky, flairs, debug):
 				)
 				event.clean()
 
-			if event.game_state() == classes.GameState.COMPLETE:
+			if event.game_state() == GameState.COMPLETE:
 				log.info(f"Event complete, un-stickying and removing: {event}")
 				sticky.unsticky(event.thread)
 				events_to_delete.append(event)
@@ -189,8 +188,8 @@ if __name__ == "__main__":
 
 	log.info(f"Loaded {len(state['events'])} events")
 
-	sticky = sticky_class.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
-	flairs = flair_class.FlairManager(state['flairs'])
+	sticky = sticky_manager.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
+	flairs = flair_manager.FlairManager(state['flairs'])
 
 	while True:
 		sleep_time = main(state['events'], reddit, sticky, flairs, debug)

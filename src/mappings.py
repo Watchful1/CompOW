@@ -1,7 +1,7 @@
-import classes
+from classes.competition import Competition
 
 competitions = [
-	classes.Competition(
+	Competition(
 		name="Overwatch League 2019 Season",
 		discord_minutes_ahead=15,
 		discord_roles=["OWL-Notify","everyone"],
@@ -11,54 +11,63 @@ competitions = [
 		day_in_title=True,
 		prediction_thread_minutes_ahead=8 * 60
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: Australia",
 		discord_minutes_ahead=15,
 		discord_roles=["AUContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: North America East",
 		discord_minutes_ahead=15,
 		discord_roles=["NAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: North America West",
 		discord_minutes_ahead=15,
 		discord_roles=["NAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: Pacific",
 		discord_minutes_ahead=15,
 		discord_roles=["PACContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: Europe",
 		discord_minutes_ahead=15,
 		discord_roles=["EUContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: South America",
 		discord_minutes_ahead=15,
 		discord_roles=["SAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: Korea",
 		discord_minutes_ahead=15,
 		discord_roles=["KRContenders", "here"],
 		discord_channel="420968531929071628"
 	),
-	classes.Competition(
+	Competition(
 		name="Overwatch Contenders 2019 Season 1: China",
 		discord_minutes_ahead=15,
 		discord_roles=["CNContenders", "here"],
 		discord_channel="420968531929071628"
 	)
+]
+stream_languages = [
+	"eng",
+	"kr"
+]
+stream_urls = [
+	"https://www.twitch.tv/overwatchleague",
+	"https://www.twitch.tv/overwatchcontenders",
+	"https://www.twitch.tv/broadcastgg"
 ]
 
 
@@ -83,4 +92,19 @@ def competition_matches(competition):
 		return False
 
 
+def stream_ranking(stream_url, stream_language):
+	if stream_url is None:
+		return 10
+	language_rank = 9
+	if stream_language is not None:
+		for i, language in enumerate(stream_languages):
+			if stream_language == language:
+				language_rank = i
+				break
+	url_rank = 9
+	for i, url in enumerate(stream_urls):
+		if stream_url == url:
+			url_rank = i
+			break
 
+	return language_rank + (url_rank / 10)

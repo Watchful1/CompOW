@@ -3,6 +3,7 @@ import requests
 import logging.handlers
 
 import globals
+from classes.flair_object import FlairObject
 
 
 log = logging.getLogger("bot")
@@ -32,14 +33,6 @@ static_flairs = {
 	'Overwatch League': ':OWL:',
 	'Overwatch Contenders': ':OWC:',
 }
-
-
-class FlairObject:
-	def __init__(self, name, row, column, sheet):
-		self.name = name
-		self.row = row
-		self.column = column
-		self.sheet = sheet
 
 
 class FlairManager:
