@@ -3,6 +3,7 @@ import praw
 import configparser
 import traceback
 import sys
+import time
 
 import globals
 
@@ -98,6 +99,7 @@ class Reddit:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=True)
 			log.debug(f"Stickied {thread_id}")
+			time.sleep(3)  # stickying is weird, let's sleep a bit to let things settle down
 			return True
 		except Exception as err:
 			log.warning(f"Unable to sticky {thread_id}")
@@ -109,6 +111,7 @@ class Reddit:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=False)
 			log.debug(f"Unstickied {thread_id}")
+			time.sleep(3)  # stickying is weird, let's sleep a bit to let things settle down
 			return True
 		except Exception as err:
 			log.warning(f"Unable to unsticky {thread_id}")

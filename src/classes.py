@@ -186,7 +186,7 @@ class Event:
 			if event_match.id == match_id:
 				return True
 
-		return self.start - timedelta(hours=3) < start < self.last + timedelta(hours=3)
+		return self.start - timedelta(hours=4) < start < self.last + timedelta(hours=3)
 
 	def clean(self):
 		self.dirty = False
