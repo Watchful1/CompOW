@@ -1,5 +1,6 @@
 from datetime import timedelta
 import logging
+import bisect
 
 from classes.enums import GameState
 
@@ -67,7 +68,7 @@ class Event:
 			self.dirty = True
 		for stream in match.streams:
 			if stream not in self.streams:
-				self.streams.append(stream)
+				bisect.insort(self.streams, stream)
 
 	def match_fits(self, start, competition, match_id):
 		if self.competition.name != competition:

@@ -98,7 +98,7 @@ def stream_ranking(stream_url, stream_language):
 	language_rank = 9
 	if stream_language is not None:
 		for i, language in enumerate(stream_languages):
-			if stream_language == language:
+			if stream_language.lower() == language:
 				language_rank = i
 				break
 	url_rank = 9

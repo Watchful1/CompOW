@@ -28,6 +28,9 @@ class Stream:
 		else:
 			self.name = name
 
+	def __str__(self):
+		return f"{self.url} : {self.name} : {self.language}"
+
 	def __eq__(self, other):
 		return self.url == other.url
 
@@ -35,5 +38,5 @@ class Stream:
 		if other is None:
 			return False
 		self_ranking = mappings.stream_ranking(self.url, self.language)
-		other_ranking = mappings.stream_ranking(self.url, self.language)
+		other_ranking = mappings.stream_ranking(other.url, other.language)
 		return self_ranking < other_ranking
