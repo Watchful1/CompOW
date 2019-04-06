@@ -101,10 +101,10 @@ def render_reddit_event(event, flairs):
 	bldr.append(">####Schedule\n")
 	bldr.append(">\n")
 	bldr.append(">>| |  |   |   |   |  | |   |\n")
-	bldr.append(">|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
-	bldr.append(">|Time|Team 1||||Team 2||Match Page|\n")
+	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
+	bldr.append(">>|Time|Team 1||||Team 2||Match Page|\n")
 	for match in event.matches:
-		bldr.append(">|")
+		bldr.append(">>|")
 
 		bldr.append("[")
 		bldr.append(match.start.strftime("%H:%M"))
