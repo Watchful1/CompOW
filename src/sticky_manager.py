@@ -33,7 +33,7 @@ class StickyManager:
 			if not found:
 				result_stickies.append(Sticky(sticky))
 		self.current_stickies = result_stickies
-		log.debug(f"Updated current stickies to: {result_stickies[0]}, {result_stickies[1]}")
+		log.debug(f"Updated current stickies to: {result_stickies[0]}, {result_stickies[1]} : Saved: {', '.join(self.saved_stickies)}")
 
 	def sticky(self, thread_id, competition, start):
 		self.update_current_stickies()

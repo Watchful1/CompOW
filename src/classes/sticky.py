@@ -8,7 +8,7 @@ class Sticky:
 		self.start = start
 
 	def __str__(self):
-		return f"{self.thread_id} : {self.competition} : {self.start}"
+		return f"{self.thread_id}:{self.competition}:{self.start}"
 
 	def __lt__(self, other):
 		if other is None:
