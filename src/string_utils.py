@@ -121,9 +121,11 @@ def render_reddit_event(event, flairs):
 		bldr.append("|")
 
 		if match.state != GameState.PENDING:
+			bldr.append(">!")
 			bldr.append(str(match.home_score))
 			bldr.append("-")
 			bldr.append(str(match.away_score))
+			bldr.append("!<")
 
 		bldr.append("|")
 
