@@ -51,7 +51,7 @@ def minutes_to_start(start):
 		return 0
 
 
-def main(events, reddit, sticky, flairs, debug):
+def main(events, reddit, sticky, flairs, debug, no_discord):
 	overggparser.get_upcoming_events(events)
 	events_to_delete = []
 	for event in events:
@@ -119,7 +119,7 @@ def main(events, reddit, sticky, flairs, debug):
 			if globals.WEBHOOK is not None:
 				log.info(f"Posting announcement to discord: {event}")
 				discord_announcement = string_utils.render_discord(event, flairs)
-				if debug:
+				if debug or no_discord:
 					log.info(discord_announcement)
 				else:
 					try:
@@ -170,6 +170,7 @@ if __name__ == "__main__":
 	once = False
 	debug = False
 	force = False
+	no_discord = False
 	user = None
 	if len(sys.argv) >= 2:
 		user = sys.argv[1]
@@ -180,6 +181,8 @@ if __name__ == "__main__":
 				debug = True
 			elif arg == 'force':
 				force = True
+			elif arg == 'no_discord':
+				no_discord = True
 	else:
 		log.error("No user specified, aborting")
 		sys.exit(0)
@@ -197,7 +200,7 @@ if __name__ == "__main__":
 	flairs = flair_manager.FlairManager(state['flairs'])
 
 	while True:
-		sleep_time = main(state['events'], reddit, sticky, flairs, debug)
+		sleep_time = main(state['events'], reddit, sticky, flairs, debug, no_discord)
 
 		if once:
 			break
