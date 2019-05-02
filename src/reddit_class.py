@@ -217,14 +217,14 @@ class Reddit:
 		if sort is not None:
 			self.set_suggested_sort(thread_id, sort)
 		self.disable_inbox_replies(thread_id)
-		flair_template_id = self.get_flair_id(thread_id, "Match Thread")
+		flair_template_id = self.get_flair_id(thread_id, "Matchthread")
 		if flair_template_id is not None:
 			self.set_flair(thread_id, flair_template_id)
 		self.approve(thread_id)
 
 	def prediction_thread_settings(self, thread_id):
 		self.disable_inbox_replies(thread_id)
-		flair_template_id = self.get_flair_id(thread_id, "Match Thread")
+		flair_template_id = self.get_flair_id(thread_id, "Matchthread")
 		if flair_template_id is not None:
 			self.set_flair(thread_id, flair_template_id)
 		self.approve(thread_id)
