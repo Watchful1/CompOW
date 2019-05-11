@@ -4,6 +4,10 @@ import os
 import globals
 
 
+def save_state_debug(state):
+	save_state(state['events'], state['stickies'], state['flairs'])
+
+
 def save_state(events, stickies, flairs):
 	state = {
 		'events': events,
