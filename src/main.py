@@ -214,8 +214,6 @@ def check_messages(reddit, flairs):
 
 			else:
 				log.info(f"Received a message from u/{message.author.name}, skipping")
-		else:
-			log.debug("Skipping non-message")
 
 		reddit.mark_read(message)
 
