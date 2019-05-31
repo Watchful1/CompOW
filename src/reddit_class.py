@@ -228,3 +228,38 @@ class Reddit:
 		if flair_template_id is not None:
 			self.set_flair(thread_id, flair_template_id)
 		self.approve(thread_id)
+
+	def get_unread(self):
+		try:
+			return self.reddit.inbox.unread()
+		except Exception as err:
+			log.warning(f"Unable to fetch messages")
+			log.warning(traceback.format_exc())
+			return []
+
+	def reply_message(self, message, content):
+		try:
+			if self.debug:
+				log.info(f"Reply: {content}")
+			else:
+				message.reply(content)
+			log.debug(f"Replied to message {message.id}")
+		except Exception as err:
+			log.warning(f"Unable to reply to message {message.id}")
+			log.warning(traceback.format_exc())
+
+	def mark_read(self, message):
+		if not self.debug:
+			message.mark_read()
+
+	def is_message(self, item):
+		return isinstance(item, praw.models.Message)
+
+	def get_thread_body(self, thread_id):
+		try:
+			submission = self.reddit.submission(id=thread_id)
+			return submission.selftext
+		except Exception as err:
+			log.warning(f"Unable to fetch thread {thread_id}")
+			log.warning(traceback.format_exc())
+			return None

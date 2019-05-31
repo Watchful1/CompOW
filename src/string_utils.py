@@ -1,9 +1,30 @@
 import pytz
 from datetime import datetime
 import math
+import re
 
 import globals
 from classes.enums import GameState
+
+
+def render_append_highlights(current_body, link, flairs):
+	if not re.findall(r'(>-$)', current_body):
+		return None
+
+	bldr = [current_body]
+
+	bldr.append("\n")
+	bldr.append("|Highlights|")
+	bldr.append("\n")
+	bldr.append("|-|")
+	bldr.append("\n")
+	bldr.append("|")
+	bldr.append(flairs.get_flair("YouTube"))
+	bldr.append("[Akshon Esports Highlights](")
+	bldr.append(link)
+	bldr.append(")|")
+
+	return ''.join(bldr)
 
 
 def render_reddit_post_match(match, flairs):
@@ -33,6 +54,7 @@ def render_reddit_post_match(match, flairs):
 	bldr.append("|")
 	bldr.append(match.away.name)
 	bldr.append("|")
+	bldr.append("\n>-")
 
 	return ''.join(bldr)
 

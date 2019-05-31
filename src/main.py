@@ -6,6 +6,7 @@ import sys
 import time
 import requests
 import traceback
+import re
 from datetime import datetime
 
 import globals
@@ -159,9 +160,66 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 	for event in events:
 		if event.thread is not None or \
 				minutes_to_start(event.start) < event.competition.post_minutes_ahead + 15:
-			return 1 * 60
+			return 1
 
-	return 5 * 60
+	return 5
+
+
+def check_messages(reddit, flairs):
+	for message in reddit.get_unread():
+		if reddit.is_message(message):
+			if message.author.name in globals.AUTHORIZED_USERS:
+				log.info(f"Processing an authorized message from u/{message.author.name}")
+
+				line_results = []
+				for line in message.body.splitlines():
+					post_id = re.findall(r'(?:reddit.com/r/\w*/comments/)(\w*)', line)
+					if not len(post_id):
+						log.info("Could not find reddit post")
+						line_results.append("Could not find a reddit post")
+						continue
+					post_id = post_id[0]
+
+					video = re.findall(r'(http\S*youtube\S*)', line)
+					if not len(video):
+						log.info("Could not find a video link")
+						line_results.append("Could not find a video link")
+						continue
+					video = video[0]
+
+					current_body = reddit.get_thread_body(post_id)
+					if current_body is None:
+						log.info(f"Could not find thread: {post_id}")
+						line_results.append(f"Could not find thread: {post_id}")
+						continue
+
+					new_body = string_utils.render_append_highlights(current_body, video, flairs)
+					if new_body is None:
+						log.info(f"Could not find end of post: {post_id}")
+						line_results.append(
+							"Could not find end of body. This could mean a highlight video is "
+							"already appended, or it's not a post match thread")
+						continue
+
+					if not reddit.edit_thread(post_id, new_body):
+						log.info("Could not edit thread")
+						line_results.append(
+							"Could not edit thread. This could mean it's not a thread from the bot or "
+							"something could be wrong with reddit")
+						continue
+
+					line_results.append(f"Added link {video} to thread {post_id}")
+
+				reddit.reply_message(message, "\n\n".join(line_results))
+
+			else:
+				log.info(f"Received a message from u/{message.author.name}, skipping")
+		else:
+			log.debug("Skipping non-message")
+
+		reddit.mark_read(message)
+
+	return
 
 
 if __name__ == "__main__":
@@ -199,11 +257,18 @@ if __name__ == "__main__":
 	sticky = sticky_manager.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
 	flairs = flair_manager.FlairManager(state['flairs'])
 
+	loop = 0
+	loop_sleep = 0
 	while True:
-		sleep_time = main(state['events'], reddit, sticky, flairs, debug, no_discord)
+		if loop == 0:
+			loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord)
+		check_messages(reddit, flairs)
+
+		loop += 1
+		if loop >= loop_sleep:
+			loop = 0
 
 		if once:
 			break
 
-		#log.info(f"Sleeping: {sleep_time}")
-		time.sleep(sleep_time)
+		time.sleep(60)
