@@ -12,63 +12,51 @@ competitions = [
 		prediction_thread_minutes_ahead=8 * 60
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: Australia",
+		name="Overwatch Contenders 2019 Season 2: Australia",
 		discord_minutes_ahead=15,
 		discord_roles=["AUContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: North America East",
+		name="Overwatch Contenders 2019 Season 2: North America East",
 		discord_minutes_ahead=15,
 		discord_roles=["NAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: North America West",
+		name="Overwatch Contenders 2019 Season 2: North America West",
 		discord_minutes_ahead=15,
 		discord_roles=["NAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: Pacific",
+		name="Overwatch Contenders 2019 Season 2: Pacific",
 		discord_minutes_ahead=15,
 		discord_roles=["PACContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: Europe",
+		name="Overwatch Contenders 2019 Season 2: Europe",
 		discord_minutes_ahead=15,
 		discord_roles=["EUContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: South America",
+		name="Overwatch Contenders 2019 Season 2: South America",
 		discord_minutes_ahead=15,
 		discord_roles=["SAContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: Korea",
+		name="Overwatch Contenders 2019 Season 2: Korea",
 		discord_minutes_ahead=15,
 		discord_roles=["KRContenders", "here"],
 		discord_channel="420968531929071628"
 	),
 	Competition(
-		name="Overwatch Contenders 2019 Season 1: China",
+		name="Overwatch Contenders 2019 Season 2: China",
 		discord_minutes_ahead=15,
 		discord_roles=["CNContenders", "here"],
-		discord_channel="420968531929071628"
-	),
-	Competition(
-		name="Overwatch Contenders 2019: Atlantic Showdown",
-		discord_minutes_ahead=15,
-		discord_roles=["here"],
-		discord_channel="420968531929071628"
-	),
-	Competition(
-		name="Overwatch Contenders 2019: Pacific Showdown",
-		discord_minutes_ahead=15,
-		discord_roles=["here"],
 		discord_channel="420968531929071628"
 	)
 ]
