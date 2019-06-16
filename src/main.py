@@ -53,7 +53,12 @@ def minutes_to_start(start):
 
 
 def main(events, reddit, sticky, flairs, debug, no_discord):
-	overggparser.get_upcoming_events(events)
+	try:
+		overggparser.get_upcoming_events(events)
+	except Exception as err:
+		log.warning("Something went wrong parsing the api results")
+		log.warning(traceback.format_exc())
+
 	events_to_delete = []
 	for event in events:
 		if event.thread is not None:
