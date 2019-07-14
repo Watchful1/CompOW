@@ -36,8 +36,10 @@ class Event:
 					event_match.url = match.url
 				if event_match.home != match.home:
 					log.warning(f"Home updated for match: {match.id} : {match.home}")
+					event_match.home = match.home
 				if event_match.away != match.away:
 					log.warning(f"Away updated for match: {match.id} : {match.away}")
+					event_match.away = match.away
 				found = True
 				break
 		if not found:

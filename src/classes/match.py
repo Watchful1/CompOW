@@ -1,5 +1,6 @@
 from classes.enums import GameState
 
+
 class Match:
 	def __init__(self, id, start, home, away, url):
 		self.id = id
