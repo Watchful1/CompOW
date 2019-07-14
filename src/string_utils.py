@@ -98,7 +98,7 @@ def render_reddit_event(event, flairs):
 
 	bldr.append('  \n'.join(streamBldr))
 	bldr.append('  \n')
-	bldr.append('[Reddit thread stream](')
+	bldr.append('[Reddit-stream](')
 	if event.thread is not None:
 		bldr.append('https://reddit-stream.com/comments/')
 		bldr.append(event.thread)
