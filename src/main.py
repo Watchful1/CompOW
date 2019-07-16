@@ -173,7 +173,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 def check_messages(reddit, flairs):
 	for message in reddit.get_unread():
 		if reddit.is_message(message):
-			if message.author.name in globals.AUTHORIZED_USERS:
+			if message.author is not None and message.author.name in globals.AUTHORIZED_USERS:
 				log.info(f"Processing an authorized message from u/{message.author.name}")
 
 				line_results = []
