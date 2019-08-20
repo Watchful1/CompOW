@@ -58,6 +58,12 @@ competitions = [
 		discord_minutes_ahead=15,
 		discord_roles=["CNContenders", "here"],
 		discord_channel="420968531929071628"
+	),
+	Competition(
+		name="Overwatch Contenders 2019: The Gauntlet",
+		discord_minutes_ahead=15,
+		discord_roles=["here"],
+		discord_channel="420968531929071628"
 	)
 ]
 stream_languages = [
