@@ -217,6 +217,8 @@ def check_messages(reddit, flairs):
 
 				reddit.reply_message(message, "\n\n".join(line_results))
 
+			elif message.author is None:
+				log.info(f"Received a message from reddit, skipping")
 			else:
 				log.info(f"Received a message from u/{message.author.name}, skipping")
 
