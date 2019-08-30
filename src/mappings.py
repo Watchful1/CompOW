@@ -64,6 +64,12 @@ competitions = [
 		discord_minutes_ahead=15,
 		discord_roles=["here"],
 		discord_channel="420968531929071628"
+	),
+	Competition(
+		name="Monkey Bubble Eurocup Fundraiser",
+		discord_minutes_ahead=15,
+		discord_roles=[],
+		discord_channel="348939546878017536"
 	)
 ]
 stream_languages = [
