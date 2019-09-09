@@ -8,8 +8,10 @@ requests = "*"
 lxml = "*"
 praw = "*"
 pytz = "*"
+discord-logging = {git = "https://github.com/Watchful1/DiscordLogging.git"}
 
 [dev-packages]
+pytest = "*"
 
 [requires]
 python_version = "3.7"
