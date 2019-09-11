@@ -22,6 +22,7 @@ class Event:
 		self.stage_names = []
 		self.streams = []
 		self.competition_url = None
+		self.completion_time = None
 
 	def add_match(self, match):
 		found = False

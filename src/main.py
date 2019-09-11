@@ -70,9 +70,17 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 				event.clean()
 
 			if event.game_state() == GameState.COMPLETE:
-				log.info(f"Event complete, un-stickying and removing: {event}")
-				sticky.unsticky(event.thread)
-				events_to_delete.append(event)
+				if event.competition.leave_thread_minutes is not None:
+					if event.completion_time is None:
+						event.completion_time = datetime.utcnow()
+					elif ((datetime.utcnow() - event.completion_time).seconds * 60) < event.competition.leave_thread_minutes:
+						log.info(f"Event complete after cooldown, un-stickying and removing: {event}")
+						sticky.unsticky(event.thread)
+						events_to_delete.append(event)
+				else:
+					log.info(f"Event complete, un-stickying and removing: {event}")
+					sticky.unsticky(event.thread)
+					events_to_delete.append(event)
 
 		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead) and event.thread is None:
 			log.info(f"Populating event: {event}")
