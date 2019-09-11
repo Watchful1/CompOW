@@ -5,6 +5,7 @@ import re
 
 import globals
 from classes.enums import GameState
+from classes.enums import Winner
 
 
 def render_append_highlights(current_body, link, flairs):
@@ -54,7 +55,36 @@ def render_reddit_post_match(match, flairs):
 	bldr.append("|")
 	bldr.append(match.away.name)
 	bldr.append("|")
-	bldr.append("\n>-")
+	bldr.append("\n")
+
+	for map_obj in match.maps:
+		bldr.append("|")
+		if map_obj.winner == Winner.HOME:
+			bldr.append("Winner")
+		elif map_obj.winner == Winner.TIED:
+			bldr.append("TIED")
+		bldr.append("||")
+		bldr.append(map_obj.name)
+		bldr.append("||")
+		if map_obj.winner == Winner.AWAY:
+			bldr.append("Winner")
+		elif map_obj.winner == Winner.TIED:
+			bldr.append("TIED")
+		bldr.append("|\n")
+
+	if match.vod is not None:
+		bldr.append(">\n")
+		bldr.append("|VOD|")
+		bldr.append("\n")
+		bldr.append("|-|")
+		bldr.append("\n")
+		bldr.append("|")
+		bldr.append(flairs.get_flair("Twitch"))
+		bldr.append("[VOD](")
+		bldr.append(match.vod)
+		bldr.append(")|")
+
+	bldr.append(">-")
 
 	return ''.join(bldr)
 
@@ -174,6 +204,11 @@ def render_reddit_event(event, flairs):
 		if event.competition.post_match_threads and match.post_thread is not None:
 			bldr.append(" [Post Match](")
 			bldr.append(thread_link(globals.SUBREDDIT, match.post_thread))
+			bldr.append(")")
+
+		if match.vod is not None:
+			bldr.append(" [VOD](")
+			bldr.append(match.vod)
 			bldr.append(")")
 
 		bldr.append("|")

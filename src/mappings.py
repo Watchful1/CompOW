@@ -9,7 +9,8 @@ competitions = [
 		post_match_threads=True,
 		post_minutes_ahead=30,
 		day_in_title=True,
-		prediction_thread_minutes_ahead=4 * 60
+		prediction_thread_minutes_ahead=4 * 60,
+		leave_thread_minutes=12 * 60
 	),
 	Competition(
 		name="Overwatch Contenders 2019 Season 2: Australia",
