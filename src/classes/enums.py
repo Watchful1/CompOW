@@ -6,3 +6,10 @@ class GameState(Enum):
 	IN_PROGRESS = 2
 	COMPLETE = 3
 	UNKNOWN = 4
+
+
+class Winner(Enum):
+	NONE = 1
+	HOME = 2
+	AWAY = 3
+	TIED = 4

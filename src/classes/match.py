@@ -17,6 +17,8 @@ class Match:
 		self.competition = None
 		self.competition_url = None
 		self.stage = None
+		self.vod = None
+		self.maps = []
 
 		self.post_thread = None
 

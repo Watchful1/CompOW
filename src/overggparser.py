@@ -10,13 +10,19 @@ from datetime import timedelta
 import globals
 from classes.stream import Stream
 from classes.enums import GameState
+from classes.enums import Winner
 from classes.match import Match
 from classes.event import Event
 from classes.team import Team
+from classes.map import Map
 import mappings
 
 
 log = logging.getLogger("bot")
+
+
+def strip_string(value):
+	return value.strip().replace('\n', '').replace('\t', '')
 
 
 def parse_match(match_url):
@@ -64,6 +70,8 @@ def parse_match(match_url):
 		 	'path': "//div[@class='match-header-vs-note']/text()"},
 		{'field': 'tournament_url', 'required': True,
 		 	'path': "//a[@class='match-info-section-event']/@href"},
+		{'field': 'vod', 'required': False,
+		 	'path': "//div[@class='match-vods']/div[2]/a/@href"},
 	]
 
 	for path in paths:
@@ -73,13 +81,28 @@ def parse_match(match_url):
 			items = []
 		for item in items:
 			if item.strip() != "":
-				fields[path['field']] = item.strip().replace('\n', '').replace('\t', '')
+				fields[path['field']] = strip_string(item)
 				break
 		if path['field'] not in fields:
 			if path['required']:
 				log.debug(f"Could not find {path['field']}")
 				return None
 			continue
+
+	fields['maps'] = []
+	fields['maps_home'] = []
+	fields['maps_away'] = []
+	for i in range(1, 11):
+		maps = tree.xpath(f"//div[contains(@class, 'game-switch-map-name')][1]/text()")
+		if len(maps) < i or strip_string(maps[i - 1]) == "N/A":
+			break
+		fields['maps'].append(strip_string(maps[i - 1]))
+
+		home = tree.xpath(f"//div[contains(@class, 'game ')][{i}]/div/div/div[1]/div/span/span/text()")
+		fields['maps_home'].append(len(home) and home[0] != "")
+
+		away = tree.xpath(f"//div[contains(@class, 'game ')][{i}]/div/div/div[2]/div/span/span/text()")
+		fields['maps_away'].append(len(away) and away[0] != "")
 
 	return fields
 
@@ -100,6 +123,7 @@ def merge_fields_into_match(fields, match):
 	merge_field(match, "stage", fields['match_name'])
 	merge_field(match, "competition", fields['tournament'])
 	merge_field(match, "competition_url", f"https://www.over.gg{fields['tournament_url']}")
+	merge_field(match, "vod", fields['vod'])
 
 	for stream_num in ["stream1", "stream2", "stream3"]:
 		url_name = stream_num+"url"
@@ -143,6 +167,27 @@ def merge_fields_into_match(fields, match):
 			merge_field(match, "winner", match.away.name)
 		else:
 			merge_field(match, "winner", "Tied")
+
+	for i, map_name in enumerate(fields['maps']):
+		winner_home = fields['maps_home'][i]
+		winner_away = fields['maps_away'][i]
+		if winner_home and winner_away:
+			winner = Winner.TIED
+		elif winner_home:
+			winner = Winner.HOME
+		elif winner_away:
+			winner = Winner.AWAY
+		else:
+			winner = Winner.NONE
+
+		map_obj = Map(map_name, winner)
+		if len(match.maps) < i + 1:
+			match.maps.append(map_obj)
+			match.dirty = True
+		else:
+			if match.maps[i] != map_obj:
+				match.maps[i] = map_obj
+				match.dirty = True
 
 
 def populate_event(event):
