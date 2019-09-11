@@ -1,13 +1,13 @@
-import logging.handlers
 import praw
 import configparser
 import traceback
 import sys
 import time
+import discord_logging
 
 import globals
 
-log = logging.getLogger("bot")
+log = discord_logging.get_logger()
 
 
 class Reddit:

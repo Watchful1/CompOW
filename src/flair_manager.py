@@ -1,12 +1,12 @@
 import json
 import requests
-import logging.handlers
+import discord_logging
 
 import globals
 from classes.flair_object import FlairObject
 
 
-log = logging.getLogger("bot")
+log = discord_logging.get_logger()
 
 
 static_flairs = {

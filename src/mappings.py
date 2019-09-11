@@ -4,12 +4,12 @@ competitions = [
 	Competition(
 		name="Overwatch League 2019 Season",
 		discord_minutes_ahead=15,
-		discord_roles=["OWL-Notify","everyone"],
+		discord_roles=["OWL-Notify", "everyone"],
 		discord_channel="377127072243515393",
 		post_match_threads=True,
 		post_minutes_ahead=30,
 		day_in_title=True,
-		prediction_thread_minutes_ahead=8 * 60
+		prediction_thread_minutes_ahead=4 * 60
 	),
 	Competition(
 		name="Overwatch Contenders 2019 Season 2: Australia",
@@ -64,12 +64,6 @@ competitions = [
 		discord_minutes_ahead=15,
 		discord_roles=["here"],
 		discord_channel="420968531929071628"
-	),
-	Competition(
-		name="Monkey Bubble Eurocup Fundraiser",
-		discord_minutes_ahead=15,
-		discord_roles=[],
-		discord_channel="348939546878017536"
 	)
 ]
 stream_languages = [

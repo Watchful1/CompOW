@@ -1,9 +1,9 @@
 import bisect
-import logging.handlers
+import discord_logging
 
 from classes.sticky import Sticky
 
-log = logging.getLogger("bot")
+log = discord_logging.get_logger()
 
 
 class StickyManager:

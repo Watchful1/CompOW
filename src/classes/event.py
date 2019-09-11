@@ -1,10 +1,10 @@
 from datetime import timedelta
-import logging
 import bisect
+import discord_logging
 
 from classes.enums import GameState
 
-log = logging.getLogger("bot")
+log = discord_logging.get_logger()
 
 
 class Event:

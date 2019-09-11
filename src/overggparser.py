@@ -1,7 +1,7 @@
-import logging.handlers
 import traceback
 from lxml import etree
 import bisect
+import discord_logging
 
 import requests
 from datetime import datetime
@@ -18,7 +18,7 @@ from classes.map import Map
 import mappings
 
 
-log = logging.getLogger("bot")
+log = discord_logging.get_logger()
 
 
 def strip_string(value):
