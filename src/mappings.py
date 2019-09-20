@@ -65,6 +65,12 @@ competitions = [
 		discord_minutes_ahead=15,
 		discord_roles=["here"],
 		discord_channel="420968531929071628"
+	),
+	Competition(
+		name="SEA Invitational Presented by Overwatch Contenders",
+		discord_minutes_ahead=15,
+		discord_roles=["here"],
+		discord_channel="441208195814260747"
 	)
 ]
 stream_languages = [
