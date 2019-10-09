@@ -41,6 +41,8 @@ class FlairManager:
 		self.update_flairs()
 
 	def get_flair(self, name):
+		if name == "TBD":
+			return ""
 		if name in self.flairs:
 			flair = self.flairs[name]
 			return f"[](#{flair.sheet}-c{flair.column}-r{flair.row})"
