@@ -13,6 +13,12 @@ competitions = [
 		leave_thread_minutes=12 * 60
 	),
 	Competition(
+		name="World Cup 2019",
+		discord_minutes_ahead=15,
+		discord_roles=["here"],
+		discord_channel="441208195814260747"
+	),
+	Competition(
 		name="Overwatch Contenders 2019 Season 2: Australia",
 		discord_minutes_ahead=15,
 		discord_roles=["AUContenders", "here"],
@@ -59,18 +65,6 @@ competitions = [
 		discord_minutes_ahead=15,
 		discord_roles=["CNContenders", "here"],
 		discord_channel="420968531929071628"
-	),
-	Competition(
-		name="Overwatch Contenders 2019: The Gauntlet",
-		discord_minutes_ahead=15,
-		discord_roles=["here"],
-		discord_channel="420968531929071628"
-	),
-	Competition(
-		name="SEA Invitational Presented by Overwatch Contenders",
-		discord_minutes_ahead=15,
-		discord_roles=["here"],
-		discord_channel="441208195814260747"
 	)
 ]
 stream_languages = [
