@@ -15,7 +15,7 @@ competitions = [
 	Competition(
 		name="World Cup 2019",
 		discord_minutes_ahead=15,
-		discord_roles=["here"],
+		discord_roles=["OWWC","here"],
 		discord_channel="441208195814260747"
 	),
 	Competition(
