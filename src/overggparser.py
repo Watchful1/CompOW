@@ -195,7 +195,7 @@ def populate_event(event):
 	for match in event.matches:
 		fields = parse_match(match.url)
 		if fields is None:
-			log.warning("Fields is none in populate event")
+			log.warning(f"Fields is none in populate event: {match.url}")
 			continue
 		merge_fields_into_match(fields, match)
 		event.merge_match(match)
