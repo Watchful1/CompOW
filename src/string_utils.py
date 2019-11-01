@@ -104,10 +104,9 @@ def thread_link(subreddit, thread_id):
 def render_reddit_event(event, flairs):
 	bldr = []
 
-	bldr.append("We are going to be testing out reddit's new Live Chat thread feature. If you are viewing this post on ")
-	bldr.append("the redesign or the official mobile apps, you'll see comments as a chat stream. If you're viewing on ")
-	bldr.append("the legacy site or a third party mobile app, you'll see comments as normal, but they will all be ")
-	bldr.append("locked and you will only be able to make top level comment replies.\n\n")
+	bldr.append("We tried the live chat format for a bit, but now we're switching back to regular thread for the "
+				"rest of the day. Please [fill out this survey](https://forms.gle/pBWcbFiPRhqANuhm8) whether you "
+				"liked it or not.\n\n")
 
 	bldr.append("> ## **")
 	bldr.append(event.competition.name)
