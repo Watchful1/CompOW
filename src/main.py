@@ -103,24 +103,24 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 			event.thread = thread_id
 			event.clean()
 
-		if event.competition.discord_minutes_ahead is not None and \
-				(minutes_to_start(event.start) < event.competition.discord_minutes_ahead) and \
-				len(event.streams) and \
-				not event.posted_discord:
-			if globals.WEBHOOK is not None:
-				log.info(f"Posting announcement to discord: {event}")
-				discord_announcement = string_utils.render_discord(event, flairs)
-				if debug or no_discord:
-					log.info(discord_announcement)
-				else:
-					try:
-						requests.post(globals.WEBHOOK, data={"content": discord_announcement})
-					except Exception:
+		if event.competition.discord is not None:
+			for discord_notification in event.competition.discord:
+				if discord_notification.type not in event.posted_discord and \
+						(minutes_to_start(event.start) < discord_notification.minutes_ahead) and \
+						len(event.streams):
+					log.info(f"Posting announcement to discord: {event} : {discord_notification.type}")
+					discord_announcement = string_utils.render_discord(event, flairs, discord_notification)
+					if debug or no_discord:
 						log.info(discord_announcement)
-						log.warning(f"Unable to post discord announcement")
-						log.warning(traceback.format_exc())
+					else:
+						try:
+							requests.post(globals.get_webhook(discord_notification.type), data={"content": discord_announcement})
+						except Exception:
+							log.info(discord_announcement)
+							log.warning(f"Unable to post discord announcement")
+							log.warning(traceback.format_exc())
 
-				event.posted_discord = True
+					event.posted_discord.append(discord_notification.type)
 
 		if event.competition.prediction_thread_minutes_ahead is not None and \
 				minutes_to_start(event.start) < event.competition.prediction_thread_minutes_ahead and \

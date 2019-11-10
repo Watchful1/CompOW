@@ -6,6 +6,7 @@ import re
 import globals
 from classes.enums import GameState
 from classes.enums import Winner
+from classes.enums import DiscordType
 
 
 def render_append_highlights(current_body, link, flairs):
@@ -232,8 +233,8 @@ def render_reddit_event_title(event):
 	return ''.join(bldr)
 
 
-def get_discord_flair(flairs, name, country):
-	flair = flairs.get_static_flair(name)
+def get_discord_flair(flairs, name, country, discord_type):
+	flair = flairs.get_static_flair(name, discord_type)
 	if flair is not None:
 		return f"{flair} "
 	else:
@@ -243,94 +244,144 @@ def get_discord_flair(flairs, name, country):
 			return ""
 
 
-def render_discord(event, flairs):
+def render_discord(event, flairs, discord_notification):
 	bldr = []
 
-	bldr.append("~ping ")
-
-	bldr.append("**")
-	bldr.append(event.competition.name)
-	bldr.append(" - ")
-	bldr.append(event.stages_name())
-	bldr.append("**")
-
-	minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
-	if 60 > minutes_difference > 0:
-		bldr.append(" begins in ")
-		bldr.append(str(minutes_difference))
-		bldr.append(" minutes!")
-	else:
-		bldr.append(" begins soon!")
-
-	bldr.append("\n")
-
-	notifications = []
-	notifications.append("[All-Notify]")
-	notifications.append("[All-Matches]")
-	if len(event.competition.discord_roles):
-		for role in event.competition.discord_roles:
-			notifications.append(f"[{role}]")
-
-	bldr.append(' '.join(notifications))
-
-	bldr.append("\n\n")
-
-	for i, match in enumerate(event.matches):
-		bldr.append("**__Match ")
-		bldr.append(str(i + 1))
-		bldr.append("__** - *")
-
-		timezones = [
-			pytz.timezone("US/Pacific"),
-			pytz.timezone("US/Eastern"),
-			pytz.timezone("Europe/Paris"),
-			pytz.timezone("Australia/Sydney"),
-		]
-		match_time = pytz.utc.localize(match.start)
-
-		time_names = []
-		for timezone in timezones:
-			time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
-
-		bldr.append(' / '.join(time_names))
-
-		bldr.append("*\n")
-
-		bldr.append(get_discord_flair(flairs, match.home.name, match.home.country))
-
-		bldr.append(" **")
-		bldr.append(match.home.name)
-		bldr.append("**")
-
-		bldr.append(" vs ")
+	if discord_notification.type == DiscordType.COW:
+		bldr.append("~ping ")
 
 		bldr.append("**")
-		bldr.append(match.away.name)
-		bldr.append("** ")
+		bldr.append(event.competition.name)
+		bldr.append(" - ")
+		bldr.append(event.stages_name())
+		bldr.append("**")
 
-		bldr.append(get_discord_flair(flairs, match.away.name, match.away.country))
+		minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
+		if 60 > minutes_difference > 0:
+			bldr.append(" begins in ")
+			bldr.append(str(minutes_difference))
+			bldr.append(" minutes!")
+		else:
+			bldr.append(" begins soon!")
+
+		bldr.append("\n")
+
+		notifications = []
+		notifications.append("[All-Notify]")
+		notifications.append("[All-Matches]")
+		if len(event.competition.discord_roles):
+			for role in event.competition.discord_roles:
+				notifications.append(f"[{role}]")
+
+		bldr.append(' '.join(notifications))
 
 		bldr.append("\n\n")
 
-	bldr.append(":tv:")
-	bldr.append("<")
-	bldr.append(event.streams[0].url)
-	bldr.append(">\n")
+		for i, match in enumerate(event.matches):
+			bldr.append("**__Match ")
+			bldr.append(str(i + 1))
+			bldr.append("__** - *")
 
-	bldr.append(":information_source:")
-	bldr.append("<")
-	bldr.append(event.competition_url)
-	bldr.append(">\n")
+			timezones = [
+				pytz.timezone("US/Pacific"),
+				pytz.timezone("US/Eastern"),
+				pytz.timezone("Europe/Paris"),
+				pytz.timezone("Australia/Sydney"),
+			]
+			match_time = pytz.utc.localize(match.start)
 
-	bldr.append(":keyboard:")
-	bldr.append("Discuss in <#")
-	bldr.append(event.competition.discord_channel)
-	bldr.append(">")
-	if event.thread is not None:
-		bldr.append(" or in this thread: ")
-		bldr.append("<https://redd.it/")
-		bldr.append(event.thread)
+			time_names = []
+			for timezone in timezones:
+				time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
+
+			bldr.append(' / '.join(time_names))
+
+			bldr.append("*\n")
+
+			bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
+
+			bldr.append(" **")
+			bldr.append(match.home.name)
+			bldr.append("**")
+
+			bldr.append(" vs ")
+
+			bldr.append("**")
+			bldr.append(match.away.name)
+			bldr.append("** ")
+
+			bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
+
+			bldr.append("\n\n")
+
+		bldr.append(":tv:")
+		bldr.append("<")
+		bldr.append(event.streams[0].url)
+		bldr.append(">\n")
+
+		bldr.append(":information_source:")
+		bldr.append("<")
+		bldr.append(event.competition_url)
+		bldr.append(">\n")
+
+		bldr.append(":keyboard:")
+		bldr.append("Discuss in <#")
+		bldr.append(event.competition.discord_channel)
 		bldr.append(">")
+		if event.thread is not None:
+			bldr.append(" or in this thread: ")
+			bldr.append("<https://redd.it/")
+			bldr.append(event.thread)
+			bldr.append(">")
+
+	elif discord_notification.type == DiscordType.THEOW:
+		bldr.append("**")
+		bldr.append(event.competition.name)
+		bldr.append("**")
+
+		minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
+		if 60 > minutes_difference > 0:
+			bldr.append(" is going live in ")
+			bldr.append(str(minutes_difference))
+			bldr.append(" minutes! ")
+		else:
+			bldr.append(" begins soon! ")
+
+		notifications = []
+		for role in event.competition.discord_roles:
+			notifications.append(f"@{role}")
+
+		bldr.append(' '.join(notifications))
+
+		bldr.append("\n\n")
+
+		bldr.append("__")
+		bldr.append(event.stages_name())
+		bldr.append("__")
+
+		bldr.append("\n")
+
+		for i, match in enumerate(event.matches):
+			bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
+
+			bldr.append(" **")
+			bldr.append(match.home.name)
+			bldr.append("**")
+
+			bldr.append(" vs ")
+
+			bldr.append("**")
+			bldr.append(match.away.name)
+			bldr.append("** ")
+
+			bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
+
+			bldr.append("\n")
+
+		bldr.append(":tv:")
+		bldr.append("<")
+		bldr.append(event.streams[0].url)
+		bldr.append(">\n")
 
 	return ''.join(bldr)
 

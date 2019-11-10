@@ -1,10 +1,22 @@
+class DiscordNotification:
+	def __init__(
+			self,
+			type,
+			minutes_ahead,
+			roles=[],
+			channel=None
+			):
+		self.type = type
+		self.minutes_ahead = minutes_ahead
+		self.roles = roles
+		self.channel = channel
+
+
 class Competition:
 	def __init__(
 			self,
 			name,
-			discord_minutes_ahead=None,
-			discord_roles=[],
-			discord_channel="348939546878017536",
+			discord=None,
 			post_match_threads=False,
 			post_minutes_ahead=15,
 			day_in_title=False,
@@ -12,12 +24,7 @@ class Competition:
 			leave_thread_minutes=None
 			):
 		self.name = name
-		if discord_minutes_ahead is not None and discord_minutes_ahead > post_minutes_ahead:
-			self.discord_minutes_ahead = post_minutes_ahead
-		else:
-			self.discord_minutes_ahead = discord_minutes_ahead
-		self.discord_roles = discord_roles
-		self.discord_channel = discord_channel
+		self.discord = discord
 		self.post_match_threads = post_match_threads
 		self.post_minutes_ahead = post_minutes_ahead
 		self.day_in_title = day_in_title

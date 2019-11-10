@@ -13,3 +13,8 @@ class Winner(Enum):
 	HOME = 2
 	AWAY = 3
 	TIED = 4
+
+
+class DiscordType(Enum):
+	COW = 1
+	THEOW = 2

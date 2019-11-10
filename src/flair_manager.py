@@ -4,12 +4,13 @@ import discord_logging
 
 import globals
 from classes.flair_object import FlairObject
+from classes.enums import DiscordType
 
 
 log = discord_logging.get_logger()
 
 
-static_flairs = {
+static_flairs_cow = {
 	'Atlanta Reign': ':ATL:',
 	'Boston Uprising': ':BOS:',
 	'Chengdu Hunters': ':CDH:',
@@ -32,6 +33,32 @@ static_flairs = {
 	'Washington Justice': ':WAS:',
 	'Overwatch League': ':OWL:',
 	'Overwatch Contenders': ':OWC:',
+}
+
+
+static_flairs_theow = {
+	'Atlanta Reign': ':AtlantaReign:',
+	'Boston Uprising': ':BostonUprising:',
+	'Chengdu Hunters': ':ChengduHunters:',
+	'Dallas Fuel': ':DallasFuel:',
+	'Florida Mayhem': ':FloridaMayhem:',
+	'Guangzhou Charge': ':GuangzhouCharge:',
+	'Hangzhou Spark': ':HangzhouSpark:',
+	'Houston Outlaws': ':HoustonOutlaws:',
+	'London Spitfire': ':LondonSpitfire:',
+	'Los Angeles Gladiators': ':LosAngelesGladiators:',
+	'Los Angeles Valiant': ':LosAngelesValiant:',
+	'New York Excelsior': ':NewYorkExcelsior:',
+	'Paris Eternal': ':ParisEternal:',
+	'Philadelphia Fusion': ':PhiladelphiaFusion:',
+	'San Francisco Shock': ':SanFranciscoShock:',
+	'Seoul Dynasty': ':SeoulDynasty:',
+	'Shanghai Dragons': ':ShanghaiDragons:',
+	'Toronto Defiant': ':TorontoDefiant:',
+	'Vancouver Titans': ':VancouverTitans:',
+	'Washington Justice': ':WashingtonJustice:',
+	'Overwatch League': ':OWL:',
+	'Overwatch Contenders': ':Contenders:',
 }
 
 
@@ -84,8 +111,11 @@ class FlairManager:
 		else:
 			log.info(f"Only found {len(flairs)} flairs, not updating")
 
-	def get_static_flair(self, name):
-		if name in static_flairs:
-			return static_flairs[name]
-		else:
-			return None
+	def get_static_flair(self, name, discord_type):
+		if discord_type == DiscordType.COW:
+			if name in static_flairs_cow:
+				return static_flairs_cow[name]
+		elif discord_type == DiscordType.THEOW:
+			if name in static_flairs_theow:
+				return static_flairs_theow[name]
+		return None

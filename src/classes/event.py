@@ -14,7 +14,7 @@ class Event:
 		self.start = None
 		self.last = None
 		self.thread = None
-		self.posted_discord = False
+		self.posted_discord = []
 		self.dirty = False
 		self.prediction_thread = None
 
