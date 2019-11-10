@@ -264,6 +264,9 @@ if __name__ == "__main__":
 		except prawcore.exceptions.Conflict as err:
 			log.warning("Caught praw Conflict")
 			log.warning(traceback.format_exc())
+		except prawcore.exceptions.RequestException as err:
+			log.warning("Caught praw RequestException")
+			log.warning(traceback.format_exc())
 
 		loop += 1
 		if loop >= loop_sleep:
