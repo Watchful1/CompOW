@@ -7,6 +7,7 @@ import traceback
 import re
 from datetime import datetime
 import discord_logging
+import prawcore
 
 log = discord_logging.init_logging()
 
@@ -250,9 +251,16 @@ if __name__ == "__main__":
 	loop = 0
 	loop_sleep = 0
 	while True:
-		if loop == 0:
-			loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord)
-		check_messages(reddit, flairs)
+		try:
+			if loop == 0:
+				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord)
+			check_messages(reddit, flairs)
+		except prawcore.exceptions.ServerError as err:
+			log.warning("Caught praw ServerError")
+			log.warning(traceback.format_exc())
+		except prawcore.exceptions.Conflict as err:
+			log.warning("Caught praw Conflict")
+			log.warning(traceback.format_exc())
 
 		loop += 1
 		if loop >= loop_sleep:
