@@ -123,6 +123,9 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 
 					event.posted_discord.append(discord_notification.type)
 
+					if not debug:
+						file_utils.save_state(events, sticky.get_save(), flairs.flairs)
+
 		if event.competition.prediction_thread_minutes_ahead is not None and \
 				minutes_to_start(event.start) < event.competition.prediction_thread_minutes_ahead and \
 				event.prediction_thread is None:
