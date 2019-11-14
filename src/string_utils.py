@@ -269,9 +269,8 @@ def render_discord(event, flairs, discord_notification):
 		notifications = []
 		notifications.append("[All-Notify]")
 		notifications.append("[All-Matches]")
-		if len(event.competition.discord_roles):
-			for role in event.competition.discord_roles:
-				notifications.append(f"[{role}]")
+		for role in discord_notification.roles:
+			notifications.append(f"[{role}]")
 
 		bldr.append(' '.join(notifications))
 
@@ -348,7 +347,7 @@ def render_discord(event, flairs, discord_notification):
 			bldr.append(" begins soon! ")
 
 		notifications = []
-		for role in event.competition.discord_roles:
+		for role in discord_notification.roles:
 			notifications.append(f"@{role}")
 
 		bldr.append(' '.join(notifications))
@@ -377,6 +376,8 @@ def render_discord(event, flairs, discord_notification):
 			bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
 
 			bldr.append("\n")
+
+		bldr.append("\n")
 
 		bldr.append(":tv:")
 		bldr.append("<")

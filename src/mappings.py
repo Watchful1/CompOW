@@ -35,8 +35,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -51,8 +50,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -67,8 +65,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -83,8 +80,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -99,8 +95,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -115,8 +110,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -131,8 +125,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
 			)
 		]
 	),
@@ -147,8 +140,23 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
-				roles=["everyone"]
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Esports Shanghai Masters",
+		post_minutes_ahead=24760,
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=24760
 			)
 		]
 	)
