@@ -321,7 +321,7 @@ def render_discord(event, flairs, discord_notification):
 
 		bldr.append(":keyboard:")
 		bldr.append("Discuss in <#")
-		bldr.append(event.competition.discord_channel)
+		bldr.append(discord_notification.channel)
 		bldr.append(">")
 		if event.thread is not None:
 			bldr.append(" or in this thread: ")

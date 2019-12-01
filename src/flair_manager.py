@@ -97,14 +97,13 @@ class FlairManager:
 		flairs = {}
 		for key in json_data['flairs']:
 			flair_json = json_data['flairs'][key]
-			if flair_json['active']:
-				flair = FlairObject(
-					flair_json['name'],
-					flair_json['row'],
-					flair_json['col'],
-					flair_json['sheet']
-				)
-				flairs[flair.name] = flair
+			flair = FlairObject(
+				flair_json['name'],
+				flair_json['row'],
+				flair_json['col'],
+				flair_json['sheet']
+			)
+			flairs[flair.name] = flair
 
 		if len(flairs) > 20:
 			self.flairs = flairs
