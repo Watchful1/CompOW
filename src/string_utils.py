@@ -105,10 +105,6 @@ def thread_link(subreddit, thread_id):
 def render_reddit_event(event, flairs):
 	bldr = []
 
-	bldr.append("We tried the live chat format for a bit, but now we're switching back to regular thread for the "
-				"rest of the day. Please [fill out this survey](https://forms.gle/pBWcbFiPRhqANuhm8) whether you "
-				"liked it or not.\n\n")
-
 	bldr.append("> ## **")
 	bldr.append(event.competition.name)
 	bldr.append("**\n")

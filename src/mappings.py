@@ -146,7 +146,7 @@ competitions = [
 	# ),
 	Competition(
 		name="Esports Shanghai Masters",
-		post_minutes_ahead=24760,
+		post_minutes_ahead=15,
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -156,7 +156,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=24760
+				minutes_ahead=5
 			)
 		]
 	)
