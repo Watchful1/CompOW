@@ -2,6 +2,11 @@ from classes.competition import Competition
 from classes.competition import DiscordNotification
 from classes.enums import DiscordType
 
+#contenders 420968531929071628
+#match-discussion 377127072243515393
+#ow-esports 348939546878017536
+
+
 competitions = [
 	# Competition(
 	# 	name="Overwatch League 2020 Season",
@@ -145,7 +150,7 @@ competitions = [
 	# 	]
 	# ),
 	Competition(
-		name="Esports Shanghai Masters",
+		name="Mayhem Winter Classic",
 		post_minutes_ahead=15,
 		discord=[
 			DiscordNotification(
