@@ -158,11 +158,11 @@ competitions = [
 				minutes_ahead=15,
 				roles=["here"],
 				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
+			)#,
+			# DiscordNotification(
+			# 	type=DiscordType.THEOW,
+			# 	minutes_ahead=5
+			# )
 		]
 	)
 ]
