@@ -150,7 +150,7 @@ competitions = [
 	# 	]
 	# ),
 	Competition(
-		name="Mayhem Winter Classic",
+		name="Mayhem Winter Classic 2020",
 		post_minutes_ahead=15,
 		discord=[
 			DiscordNotification(
