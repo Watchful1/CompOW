@@ -270,6 +270,7 @@ if __name__ == "__main__":
 			log.warning("Caught praw RequestException")
 			log.warning(traceback.format_exc())
 
+		discord_logging.flush_discord()
 		loop += 1
 		if loop >= loop_sleep:
 			loop = 0
