@@ -5,7 +5,7 @@ import sys
 import time
 import discord_logging
 
-import globals
+import static
 
 log = discord_logging.get_logger()
 
@@ -16,14 +16,14 @@ class Reddit:
 		try:
 			self.reddit = praw.Reddit(
 				user,
-				user_agent=globals.USER_AGENT)
+				user_agent=static.USER_AGENT)
 		except configparser.NoSectionError:
 			log.error("User "+user+" not in praw.ini, aborting")
 			sys.exit(0)
 
-		globals.ACCOUNT_NAME = str(self.reddit.user.me()).lower()
+		static.ACCOUNT_NAME = str(self.reddit.user.me()).lower()
 
-		log.info("Logged into reddit as /u/" + globals.ACCOUNT_NAME)
+		log.info("Logged into reddit as /u/" + static.ACCOUNT_NAME)
 
 		config_keys = [
 			{'var': "WEBHOOK_COW", 'name': "webhook_cow"},
@@ -31,7 +31,7 @@ class Reddit:
 		]
 		for key in config_keys:
 			if self.reddit.config.CONFIG.has_option(user, key['name']):
-				setattr(globals, key['var'], self.reddit.config.CONFIG[user][key['name']])
+				setattr(static, key['var'], self.reddit.config.CONFIG[user][key['name']])
 			else:
 				log.error(f"{key['name']} key not in config")
 

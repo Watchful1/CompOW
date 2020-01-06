@@ -150,6 +150,21 @@ competitions = [
 	# 	]
 	# ),
 	Competition(
+		name="Overwatch Contenders 2020 Seeding Tournament: China",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["CNContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
 		name="Mayhem Winter Classic 2020",
 		post_minutes_ahead=15,
 		discord=[

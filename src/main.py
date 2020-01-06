@@ -8,10 +8,11 @@ import re
 from datetime import datetime
 import discord_logging
 import prawcore
+import logging.handlers
 
 log = discord_logging.init_logging()
 
-import globals
+import static
 import overggparser
 import string_utils
 import sticky_manager
@@ -49,7 +50,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 						log.info(f"Match complete, posting post match thread: {match}")
 
 						thread_id = reddit.submit_self_post(
-							globals.SUBREDDIT,
+							static.SUBREDDIT,
 							string_utils.render_reddit_post_match_title(match),
 							string_utils.render_reddit_post_match(match, flairs)
 						)
@@ -93,7 +94,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 				reddit.lock(event.prediction_thread)
 
 			thread_id = reddit.submit_self_post(
-				globals.SUBREDDIT,
+				static.SUBREDDIT,
 				string_utils.render_reddit_event_title(event),
 				string_utils.render_reddit_event(event, flairs)
 			)
@@ -115,7 +116,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 						log.info(discord_announcement)
 					else:
 						try:
-							requests.post(globals.get_webhook(discord_notification.type), data={"content": discord_announcement})
+							requests.post(static.get_webhook(discord_notification.type), data={"content": discord_announcement})
 						except Exception:
 							log.info(discord_announcement)
 							log.warning(f"Unable to post discord announcement")
@@ -133,7 +134,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 			overggparser.populate_event(event)
 
 			thread_id = reddit.submit_self_post(
-				globals.SUBREDDIT,
+				static.SUBREDDIT,
 				string_utils.render_reddit_prediction_thread_title(event),
 				string_utils.render_reddit_prediction_thread(event, flairs)
 			)
@@ -162,7 +163,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 def check_messages(reddit, flairs):
 	for message in reddit.get_unread():
 		if reddit.is_message(message):
-			if message.author is not None and message.author.name in globals.AUTHORIZED_USERS:
+			if message.author is not None and message.author.name in static.AUTHORIZED_USERS:
 				log.info(f"Processing an authorized message from u/{message.author.name}")
 
 				line_results = []
@@ -239,6 +240,7 @@ if __name__ == "__main__":
 		log.error("No user specified, aborting")
 		sys.exit(0)
 
+	discord_logging.init_discord_logging(user, logging.WARNING, 1)
 	reddit = reddit_class.Reddit(user, debug)
 
 	state = file_utils.load_state(debug)
@@ -248,7 +250,7 @@ if __name__ == "__main__":
 
 	log.info(f"Loaded {len(state['events'])} events")
 
-	sticky = sticky_manager.StickyManager(reddit, globals.SUBREDDIT, state['stickies'])
+	sticky = sticky_manager.StickyManager(reddit, static.SUBREDDIT, state['stickies'])
 	flairs = flair_manager.FlairManager(state['flairs'])
 
 	loop = 0

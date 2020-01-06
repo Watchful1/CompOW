@@ -3,7 +3,7 @@ from datetime import datetime
 import math
 import re
 
-import globals
+import static
 from classes.enums import GameState
 from classes.enums import Winner
 from classes.enums import DiscordType
@@ -95,7 +95,7 @@ def render_reddit_post_match_title(match):
 
 
 def render_reddit_post_match_comment(match):
-	return f"Post match thread: [{match.home} vs {match.away}]({thread_link(globals.SUBREDDIT, match.post_thread)})."
+	return f"Post match thread: [{match.home} vs {match.away}]({thread_link(static.SUBREDDIT, match.post_thread)})."
 
 
 def thread_link(subreddit, thread_id):
@@ -152,7 +152,7 @@ def render_reddit_event(event, flairs):
 	if event.competition.prediction_thread_minutes_ahead is not None:
 		bldr.append(">> *Predictions*  \n")
 		bldr.append("[Predictions Website](")
-		bldr.append(globals.PREDICTION_URL)
+		bldr.append(static.PREDICTION_URL)
 		bldr.append(")")
 		bldr.append("\n>\n")
 
@@ -204,7 +204,7 @@ def render_reddit_event(event, flairs):
 
 		if event.competition.post_match_threads and match.post_thread is not None:
 			bldr.append(" [Post Match](")
-			bldr.append(thread_link(globals.SUBREDDIT, match.post_thread))
+			bldr.append(thread_link(static.SUBREDDIT, match.post_thread))
 			bldr.append(")")
 
 		if match.vod is not None:
@@ -397,7 +397,7 @@ def render_reddit_prediction_thread(event, flairs):
 
 	bldr.append("How do you think today's games will play out? You can leave a comment below and also visit our ")
 	bldr.append("[Predictions Website](")
-	bldr.append(globals.PREDICTION_URL)
+	bldr.append(static.PREDICTION_URL)
 	bldr.append(") to make your predictions for your chance to win prizes.\n\n")
 
 	for match in event.matches:
@@ -415,7 +415,7 @@ def render_reddit_prediction_thread(event, flairs):
 
 	bldr.append("#Predictions\n")
 	bldr.append("* Head to [our predictions website](")
-	bldr.append(globals.PREDICTION_URL)
+	bldr.append(static.PREDICTION_URL)
 	bldr.append(")\n")
 	bldr.append("* Authenticate your Reddit account\n")
 	bldr.append("* Submit your predictions\n\n")

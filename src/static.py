@@ -13,8 +13,12 @@ PREDICTION_URL = "https://lerhond.pl/predictor/owl-2019-4/"
 
 AUTHORIZED_USERS = ["Watchful1", "AkshonEsports"]
 
+
 def get_webhook(discord_type):
 	if discord_type == DiscordType.COW:
 		return WEBHOOK_COW
 	elif discord_type == DiscordType.THEOW:
 		return WEBHOOK_THEOW
+
+
+missing_competition = set()

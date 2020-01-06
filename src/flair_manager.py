@@ -2,7 +2,7 @@ import json
 import requests
 import discord_logging
 
-import globals
+import static
 from classes.flair_object import FlairObject
 from classes.enums import DiscordType
 
@@ -66,6 +66,7 @@ class FlairManager:
 	def __init__(self, flairs):
 		self.flairs = flairs
 		self.update_flairs()
+		self.missing_flairs = set()
 
 	def get_flair(self, name):
 		if name == "TBD":
@@ -74,12 +75,14 @@ class FlairManager:
 			flair = self.flairs[name]
 			return f"[](#{flair.sheet}-c{flair.column}-r{flair.row})"
 		else:
-			log.info(f"Could not find flair: {name}")
+			if name not in self.missing_flairs:
+				self.missing_flairs.add(name)
+				log.warning(f"Could not find flair: {name}")
 			return ""
 
 	def update_flairs(self):
 		try:
-			response = requests.get(url=globals.FLAIR_LIST, headers={'User-Agent': globals.USER_AGENT})
+			response = requests.get(url=static.FLAIR_LIST, headers={'User-Agent': static.USER_AGENT})
 		except Exception as err:
 			log.warning("Flair load request failed")
 			return

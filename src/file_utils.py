@@ -1,7 +1,7 @@
 import pickle
 import os
 
-import globals
+import static
 
 
 def save_state_debug(state):
@@ -14,15 +14,15 @@ def save_state(events, stickies, flairs):
 		'stickies': stickies,
 		'flairs': flairs
 	}
-	with open(globals.STATE_FILENAME, 'wb') as handle:
+	with open(static.STATE_FILENAME, 'wb') as handle:
 		pickle.dump(state, handle)
 
 
 def load_state(reset=False):
-	if reset or not os.path.exists(globals.STATE_FILENAME):
+	if reset or not os.path.exists(static.STATE_FILENAME):
 		state = {}
 	else:
-		with open(globals.STATE_FILENAME, 'rb') as handle:
+		with open(static.STATE_FILENAME, 'rb') as handle:
 			state = pickle.load(handle)
 	if 'events' not in state:
 		state['events'] = []

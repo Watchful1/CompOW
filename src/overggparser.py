@@ -7,7 +7,7 @@ import requests
 from datetime import datetime
 from datetime import timedelta
 
-import globals
+import static
 from classes.stream import Stream
 from classes.enums import GameState
 from classes.enums import Winner
@@ -203,7 +203,7 @@ def populate_event(event):
 
 def get_upcoming_events(events):
 	try:
-		data = requests.get(globals.OVER_GG_API).json()
+		data = requests.get(static.OVER_GG_API).json()
 	except Exception as err:
 		log.warning("Unable to fetch overgg api page")
 		log.warning(traceback.format_exc())
@@ -228,8 +228,9 @@ def get_upcoming_events(events):
 		if not fits_event and datetime.utcnow() + timedelta(hours=10) > match.start > datetime.utcnow() - timedelta(hours=10):
 			rank, competition = mappings.get_competition(match_table['event_name'])
 			if competition is None:
-				pass # placeholder
-				#log.debug(f"Upcoming event not mapped: {match_table['event_name']} : {str(match.start)}")
+				if match_table['event_name'] not in static.missing_competition:
+					static.missing_competition.add(match_table['event_name'])
+					log.warning(f"Upcoming event not mapped: {match_table['event_name']} : {str(match.start)}")
 			else:
 				log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
 
