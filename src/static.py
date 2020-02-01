@@ -8,8 +8,8 @@ WEBHOOK_COW = None
 WEBHOOK_THEOW = None
 
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
-FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/flairs.json"
-PREDICTION_URL = "https://lerhond.pl/predictor/owl-2019-4/"
+FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/data/flairs.json"
+PREDICTION_URL = "https://lerhond.pl/predictor/owl-2020/"
 
 AUTHORIZED_USERS = ["Watchful1", "AkshonEsports"]
 

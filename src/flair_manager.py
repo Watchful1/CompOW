@@ -98,8 +98,8 @@ class FlairManager:
 			return
 
 		flairs = {}
-		for key in json_data['flairs']:
-			flair_json = json_data['flairs'][key]
+		for key in json_data:
+			flair_json = json_data[key]
 			flair = FlairObject(
 				flair_json['name'],
 				flair_json['row'],

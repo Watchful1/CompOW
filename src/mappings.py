@@ -8,27 +8,27 @@ from classes.enums import DiscordType
 
 
 competitions = [
-	# Competition(
-	# 	name="Overwatch League 2020 Season",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["OWL-Notify", "everyone"],
-	# 			channel="377127072243515393"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5,
-	# 			roles=["everyone"]
-	# 		)
-	# 	],
-	# 	post_match_threads=True,
-	# 	post_minutes_ahead=30,
-	# 	day_in_title=True,
-	# 	prediction_thread_minutes_ahead=4 * 60,
-	# 	leave_thread_minutes=12 * 60
-	# ),
+	Competition(
+		name="Overwatch League 2020 Season",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["OWL-Notify", "everyone"],
+				channel="377127072243515393"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5,
+				roles=["everyone"]
+			)
+		],
+		post_match_threads=True,
+		post_minutes_ahead=30,
+		day_in_title=True,
+		prediction_thread_minutes_ahead=4 * 60,
+		leave_thread_minutes=12 * 60
+	),
 	# Competition(
 	# 	name="Overwatch Contenders 2020 Season 1: Australia",
 	# 	discord=[
