@@ -390,10 +390,10 @@ def render_reddit_prediction_thread_title(event):
 def render_reddit_prediction_thread(events, flairs):
 	bldr = []
 
-	bldr.append("How do you think today's games will play out? You can leave a comment below and also visit our ")
+	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and also visit our ")
 	bldr.append("[Predictions Website](")
 	bldr.append(static.PREDICTION_URL)
-	bldr.append(") to make your predictions for your chance to win prizes.\n\n")
+	bldr.append(") to make your predictions.\n\n")
 
 	for event in events:
 		for match in event.matches:
@@ -415,10 +415,5 @@ def render_reddit_prediction_thread(events, flairs):
 	bldr.append(")\n")
 	bldr.append("* Authenticate your Reddit account\n")
 	bldr.append("* Submit your predictions\n\n")
-
-	bldr.append("#####Prizes\n\n")
-
-	bldr.append("* OWL 2019 All-Access Pass (Or equivalent value in tokens) (awarded weekly)\n")
-	bldr.append("* Special user flair")
 
 	return ''.join(bldr)
