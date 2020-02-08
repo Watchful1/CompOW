@@ -238,7 +238,8 @@ if __name__ == "__main__":
 		log.error("No user specified, aborting")
 		sys.exit(0)
 
-	discord_logging.init_discord_logging(user, logging.WARNING, 1)
+	if not debug:
+		discord_logging.init_discord_logging(user, logging.WARNING, 1)
 	reddit = reddit_class.Reddit(user, debug)
 
 	state = file_utils.load_state(debug)
