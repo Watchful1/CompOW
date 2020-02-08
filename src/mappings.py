@@ -19,7 +19,7 @@ competitions = [
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
-				minutes_ahead=5,
+				minutes_ahead=15,
 				roles=["everyone"]
 			)
 		],

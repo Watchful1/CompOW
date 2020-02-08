@@ -24,9 +24,9 @@ from classes.enums import GameState
 
 def minutes_to_start(start):
 	if start > datetime.utcnow():
-		return (start - datetime.utcnow()).seconds / 60
+		return (start - datetime.utcnow()).total_seconds() / 60
 	elif start < datetime.utcnow():
-		return ((datetime.utcnow() - start).seconds / 60) * -1
+		return ((datetime.utcnow() - start).total_seconds() / 60) * -1
 	else:
 		return 0
 
