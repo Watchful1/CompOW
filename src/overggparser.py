@@ -84,7 +84,7 @@ def parse_match(match_url):
 				break
 		if path['field'] not in fields:
 			if path['required']:
-				log.debug(f"Could not find {path['field']}")
+				log.info(f"Could not find {path['field']}")
 				return None
 			continue
 

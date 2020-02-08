@@ -149,12 +149,12 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
-	# if event.competition.post_prediction_thread is not None:
-	# 	bldr.append(">> *Predictions*  \n")
-	# 	bldr.append("[Predictions Website](")
-	# 	bldr.append(static.PREDICTION_URL)
-	# 	bldr.append(")")
-	# 	bldr.append("\n>\n")
+	if event.is_owl():
+		bldr.append(">> *Predictions*  \n")
+		bldr.append("[Predictions Website](")
+		bldr.append(static.PREDICTION_URL)
+		bldr.append(")")
+		bldr.append("\n>\n")
 
 	bldr.append(">---\n")
 	bldr.append(">---\n")
