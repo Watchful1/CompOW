@@ -16,7 +16,6 @@ class Event:
 		self.thread = None
 		self.posted_discord = []
 		self.dirty = False
-		self.prediction_thread = None
 
 		self.matches = []
 		self.stage_names = []
@@ -44,7 +43,7 @@ class Event:
 				found = True
 				break
 		if not found:
-			log.info(f"Adding match to event: {match.id} : {match.home.name} vs {match.away.name}")
+			log.info(f"Adding match to event {self.competition.name}: {match.id} : {match.home.name} vs {match.away.name}")
 			self.matches.append(match)
 			self.add_match_time(match.start)
 
@@ -108,5 +107,8 @@ class Event:
 
 		return ' - '.join(bldr)
 
+	def is_owl(self):
+		return self.competition.name == "Overwatch League 2020 Season"
+
 	def __str__(self):
-		return f"{self.competition} : {self.start}"
+		return f"{self.competition} : {self.start} : {len(self.matches)} matches"

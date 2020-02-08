@@ -17,7 +17,6 @@ from classes.team import Team
 from classes.map import Map
 import mappings
 
-
 log = discord_logging.get_logger()
 
 
@@ -39,39 +38,39 @@ def parse_match(match_url):
 
 	paths = [
 		{'field': 'home', 'required': True,
-			'path': "//div[@class='match-header-link-name mod-1']/div[@class='wf-title-med']/text()"},
+		 'path': "//div[@class='match-header-link-name mod-1']/div[@class='wf-title-med']/text()"},
 		{'field': 'away', 'required': True,
-		 	'path': "//div[@class='match-header-link-name mod-2']/div[@class='wf-title-med']/text()"},
+		 'path': "//div[@class='match-header-link-name mod-2']/div[@class='wf-title-med']/text()"},
 		{'field': 'date', 'required': True,
-			'path': "//div[@class='match-header-date']/div/@data-utc-ts"},
+		 'path': "//div[@class='match-header-date']/div/@data-utc-ts"},
 		{'field': 'match_name', 'required': True,
-		 	'path': "//a[@class='match-info-section-event']/../text()"},
+		 'path': "//a[@class='match-info-section-event']/../text()"},
 		{'field': 'tournament', 'required': True,
-		 	'path': "//a[@class='match-info-section-event']/text()"},
+		 'path': "//a[@class='match-info-section-event']/text()"},
 		{'field': 'stream1url', 'required': True,
-		 	'path': "//a[@class='wf-card mod-dark'][1]/@href"},
+		 'path': "//a[@class='wf-card mod-dark'][1]/@href"},
 		{'field': 'stream2url', 'required': False,
-		 	'path': "//a[@class='wf-card mod-dark'][2]/@href"},
+		 'path': "//a[@class='wf-card mod-dark'][2]/@href"},
 		{'field': 'stream3url', 'required': False,
-		 	'path': "//a[@class='wf-card mod-dark'][3]/@href"},
+		 'path': "//a[@class='wf-card mod-dark'][3]/@href"},
 		{'field': 'stream1language', 'required': True,
-		 	'path': "//a[@class='wf-card mod-dark'][1]/div/span[1]/text()"},
+		 'path': "//a[@class='wf-card mod-dark'][1]/div/span[1]/text()"},
 		{'field': 'stream2language', 'required': False,
-		 	'path': "//a[@class='wf-card mod-dark'][2]/div/span[1]/text()"},
+		 'path': "//a[@class='wf-card mod-dark'][2]/div/span[1]/text()"},
 		{'field': 'stream3language', 'required': False,
-		 	'path': "//a[@class='wf-card mod-dark'][3]/div/span[1]/text()"},
+		 'path': "//a[@class='wf-card mod-dark'][3]/div/span[1]/text()"},
 		{'field': 'home_score', 'required': False,
-		 	'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
+		 'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
 		{'field': 'away_score', 'required': False,
-		 	'path': "//div[@class='match-header-vs-score']/div/span[3]/text()"},
+		 'path': "//div[@class='match-header-vs-score']/div/span[3]/text()"},
 		{'field': 'state', 'required': False,
-		 	'path': "//div[@class='match-header-vs-note']/span/text()"},
+		 'path': "//div[@class='match-header-vs-note']/span/text()"},
 		{'field': 'state2', 'required': False,
-		 	'path': "//div[@class='match-header-vs-note']/text()"},
+		 'path': "//div[@class='match-header-vs-note']/text()"},
 		{'field': 'tournament_url', 'required': True,
-		 	'path': "//a[@class='match-info-section-event']/@href"},
+		 'path': "//a[@class='match-info-section-event']/@href"},
 		{'field': 'vod', 'required': False,
-		 	'path': "//div[@class='match-vods']/div[2]/a/@href"},
+		 'path': "//div[@class='match-vods']/div[2]/a/@href"},
 	]
 
 	for path in paths:
@@ -127,8 +126,8 @@ def merge_fields_into_match(fields, match):
 		merge_field(match, "vod", fields['vod'])
 
 	for stream_num in ["stream1", "stream2", "stream3"]:
-		url_name = stream_num+"url"
-		language_name = stream_num+"language"
+		url_name = stream_num + "url"
+		language_name = stream_num + "language"
 		if url_name in fields:
 			matched = False
 			for match_stream in match.streams:
@@ -225,13 +224,16 @@ def get_upcoming_events(events):
 				fits_event = True
 				break
 
-		if not fits_event and datetime.utcnow() + timedelta(hours=10) > match.start > datetime.utcnow() - timedelta(hours=10):
+		if not fits_event:
 			rank, competition = mappings.get_competition(match_table['event_name'])
 			if competition is None:
 				if match_table['event_name'] not in static.missing_competition:
 					static.missing_competition.add(match_table['event_name'])
 					log.warning(f"Upcoming event not mapped: {match_table['event_name']} : {str(match.start)}")
-			else:
+
+			elif datetime.utcnow() + timedelta(hours=competition.event_build_hours_ahead) > \
+					match.start > \
+					datetime.utcnow() - timedelta(hours=10):
 				log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
 
 				event = Event(

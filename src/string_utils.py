@@ -149,7 +149,7 @@ def render_reddit_event(event, flairs):
 
 	bldr.append("\n>\n")
 
-	if event.competition.prediction_thread_minutes_ahead is not None:
+	if event.competition.post_prediction_thread is not None:
 		bldr.append(">> *Predictions*  \n")
 		bldr.append("[Predictions Website](")
 		bldr.append(static.PREDICTION_URL)
@@ -223,9 +223,6 @@ def render_reddit_event_title(event):
 	bldr.append(event.competition.name)
 	bldr.append(" - ")
 	bldr.append(event.stages_name())
-	if event.competition.day_in_title:
-		bldr.append(" - ")
-		bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
 	return ''.join(bldr)
 
 
@@ -387,12 +384,10 @@ def render_reddit_prediction_thread_title(event):
 	bldr = []
 	bldr.append("OWL Predictions Thread - ")
 	bldr.append(event.stages_name())
-	bldr.append(" - ")
-	bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
 	return ''.join(bldr)
 
 
-def render_reddit_prediction_thread(event, flairs):
+def render_reddit_prediction_thread(events, flairs):
 	bldr = []
 
 	bldr.append("How do you think today's games will play out? You can leave a comment below and also visit our ")
@@ -400,16 +395,17 @@ def render_reddit_prediction_thread(event, flairs):
 	bldr.append(static.PREDICTION_URL)
 	bldr.append(") to make your predictions for your chance to win prizes.\n\n")
 
-	for match in event.matches:
-		bldr.append(match.home.name)
-		bldr.append(" ")
-		bldr.append(flairs.get_flair(match.home.name))
-		bldr.append(" vs ")
-		bldr.append(flairs.get_flair(match.away.name))
-		bldr.append(" ")
-		bldr.append(match.away.name)
+	for event in events:
+		for match in event.matches:
+			bldr.append(match.home.name)
+			bldr.append(" ")
+			bldr.append(flairs.get_flair(match.home.name))
+			bldr.append(" vs ")
+			bldr.append(flairs.get_flair(match.away.name))
+			bldr.append(" ")
+			bldr.append(match.away.name)
 
-		bldr.append("  \n")
+			bldr.append("  \n")
 
 	bldr.append("\n\n")
 

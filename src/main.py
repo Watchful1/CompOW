@@ -31,13 +31,14 @@ def minutes_to_start(start):
 		return 0
 
 
-def main(events, reddit, sticky, flairs, debug, no_discord):
+def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 	try:
 		overggparser.get_upcoming_events(events)
 	except Exception as err:
 		log.warning("Something went wrong parsing the api results")
 		log.warning(traceback.format_exc())
 
+	upcoming_owl_events = []
 	events_to_delete = []
 	for event in events:
 		if event.thread is not None:
@@ -88,10 +89,11 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
-			if event.prediction_thread is not None:
+			if event.is_owl() and keys['prediction_thread'] is not None:
 				log.info("Unstickying prediction thread")
-				sticky.unsticky(event.prediction_thread)
-				reddit.lock(event.prediction_thread)
+				sticky.unsticky(keys['prediction_thread'])
+				reddit.lock(keys['prediction_thread'])
+				keys['prediction_thread'] = None
 
 			thread_id = reddit.submit_self_post(
 				static.SUBREDDIT,
@@ -125,32 +127,28 @@ def main(events, reddit, sticky, flairs, debug, no_discord):
 					event.posted_discord.append(discord_notification.type)
 
 					if not debug:
-						file_utils.save_state(events, sticky.get_save(), flairs.flairs)
+						file_utils.save_state(events, sticky.get_save(), flairs.flairs, keys)
 
-		if event.competition.prediction_thread_minutes_ahead is not None and \
-				minutes_to_start(event.start) < event.competition.prediction_thread_minutes_ahead and \
-				event.prediction_thread is None:
-			log.info("Posting prediction thread")
-			overggparser.populate_event(event)
-
-			thread_id = reddit.submit_self_post(
-				static.SUBREDDIT,
-				string_utils.render_reddit_prediction_thread_title(event),
-				string_utils.render_reddit_prediction_thread(event, flairs)
-			)
-			sticky.sticky(thread_id, event.competition, event.start)
-
-			reddit.prediction_thread_settings(thread_id)
-
-			event.prediction_thread = thread_id
-			event.clean()
+		if event.is_owl() and minutes_to_start(event.start) < 36:
+			upcoming_owl_events.append(event)
 
 	for event in events_to_delete:
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
+	if len(upcoming_owl_events) and keys['prediction_thread'] is None and datetime.utcnow().weekday() == 4 and datetime.utcnow().hour > 18:
+		log.info("Posting prediction thread")
+		thread_id = reddit.submit_self_post(
+			static.SUBREDDIT,
+			string_utils.render_reddit_prediction_thread_title(events),
+			string_utils.render_reddit_prediction_thread(events[0], flairs)
+		)
+		sticky.sticky(thread_id, events[0].competition, events[0].start)
+
+		reddit.prediction_thread_settings(thread_id)
+
 	if not debug:
-		file_utils.save_state(events, sticky.get_save(), flairs.flairs)
+		file_utils.save_state(events, sticky.get_save(), flairs.flairs, keys)
 
 	for event in events:
 		if event.thread is not None or \
@@ -258,7 +256,7 @@ if __name__ == "__main__":
 	while True:
 		try:
 			if loop == 0:
-				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord)
+				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord, state['keys'])
 			check_messages(reddit, flairs)
 		except prawcore.exceptions.ServerError as err:
 			log.warning("Caught praw ServerError")
@@ -274,6 +272,10 @@ if __name__ == "__main__":
 		loop += 1
 		if loop >= loop_sleep:
 			loop = 0
+
+		if debug:
+			for event in state['events']:
+				log.info(str(event))
 
 		if once:
 			break

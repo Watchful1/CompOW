@@ -25,9 +25,8 @@ competitions = [
 		],
 		post_match_threads=True,
 		post_minutes_ahead=30,
-		day_in_title=True,
-		prediction_thread_minutes_ahead=4 * 60,
-		leave_thread_minutes=12 * 60
+		leave_thread_minutes=12 * 60,
+		event_build_hours_ahead=72
 	),
 	# Competition(
 	# 	name="Overwatch Contenders 2020 Season 1: Australia",
@@ -150,22 +149,7 @@ competitions = [
 	# 	]
 	# ),
 	Competition(
-		name="Overwatch Contenders 2020 Seeding Tournament: China",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["CNContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Mayhem Winter Classic 2020",
+		name="MB Community Koala Trials",
 		post_minutes_ahead=15,
 		discord=[
 			DiscordNotification(
@@ -173,11 +157,11 @@ competitions = [
 				minutes_ahead=15,
 				roles=["here"],
 				channel="420968531929071628"
-			)#,
-			# DiscordNotification(
-			# 	type=DiscordType.THEOW,
-			# 	minutes_ahead=5
-			# )
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
 		]
 	)
 ]
