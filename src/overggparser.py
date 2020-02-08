@@ -84,7 +84,7 @@ def parse_match(match_url):
 				break
 		if path['field'] not in fields:
 			if path['required']:
-				log.info(f"Could not find {path['field']}")
+				log.debug(f"Could not find {path['field']}")
 				return None
 			continue
 
@@ -194,7 +194,7 @@ def populate_event(event):
 	for match in event.matches:
 		fields = parse_match(match.url)
 		if fields is None:
-			log.info(f"Fields is none in populate event: {match.url}")
+			log.debug(f"Fields is none in populate event: {match.url}")
 			continue
 		merge_fields_into_match(fields, match)
 		event.merge_match(match)
