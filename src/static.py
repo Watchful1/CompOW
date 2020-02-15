@@ -1,4 +1,5 @@
 from classes.enums import DiscordType
+from datetime import datetime
 
 STATE_FILENAME = "state.pickle"
 ACCOUNT_NAME = None
@@ -19,6 +20,16 @@ def get_webhook(discord_type):
 		return WEBHOOK_COW
 	elif discord_type == DiscordType.THEOW:
 		return WEBHOOK_THEOW
+
+
+debug_now = datetime.strptime("02-14-20 20:00:00", '%m-%d-%y %H:%M:%S')
+
+
+def utcnow():
+	if debug_now is not None:
+		return debug_now
+	else:
+		return datetime.utcnow()
 
 
 missing_competition = set()

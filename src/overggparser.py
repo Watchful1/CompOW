@@ -231,9 +231,9 @@ def get_upcoming_events(events):
 					static.missing_competition.add(match_table['event_name'])
 					log.warning(f"Upcoming event not mapped: {match_table['event_name']} : {str(match.start)}")
 
-			elif datetime.utcnow() + timedelta(hours=competition.event_build_hours_ahead) > \
+			elif static.utcnow() + timedelta(hours=competition.event_build_hours_ahead) > \
 					match.start > \
-					datetime.utcnow() - timedelta(hours=10):
+					static.utcnow() - timedelta(hours=10):
 				log.debug(f"Found new upcoming event: {match_table['event_name']} : {str(match.start)}")
 
 				event = Event(

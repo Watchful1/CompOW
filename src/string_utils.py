@@ -1,5 +1,4 @@
 import pytz
-from datetime import datetime
 import math
 import re
 
@@ -249,7 +248,7 @@ def render_discord(event, flairs, discord_notification):
 		bldr.append(event.stages_name())
 		bldr.append("**")
 
-		minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
+		minutes_difference = math.ceil((event.start - static.utcnow()).seconds / 60)
 		if 60 > minutes_difference > 0:
 			bldr.append(" begins in ")
 			bldr.append(str(minutes_difference))
@@ -331,7 +330,7 @@ def render_discord(event, flairs, discord_notification):
 		bldr.append(event.competition.name)
 		bldr.append("**")
 
-		minutes_difference = math.ceil((event.start - datetime.utcnow()).seconds / 60)
+		minutes_difference = math.ceil((event.start - static.utcnow()).seconds / 60)
 		if 60 > minutes_difference > 0:
 			bldr.append(" is going live in ")
 			bldr.append(str(minutes_difference))

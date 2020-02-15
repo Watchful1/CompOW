@@ -5,7 +5,6 @@ import time
 import requests
 import traceback
 import re
-from datetime import datetime
 import discord_logging
 import prawcore
 import logging.handlers
@@ -23,10 +22,10 @@ from classes.enums import GameState
 
 
 def minutes_to_start(start):
-	if start > datetime.utcnow():
-		return (start - datetime.utcnow()).total_seconds() / 60
-	elif start < datetime.utcnow():
-		return ((datetime.utcnow() - start).total_seconds() / 60) * -1
+	if start > static.utcnow():
+		return (start - static.utcnow()).total_seconds() / 60
+	elif start < static.utcnow():
+		return ((static.utcnow() - start).total_seconds() / 60) * -1
 	else:
 		return 0
 
@@ -75,8 +74,8 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 			if event.game_state() == GameState.COMPLETE:
 				if event.competition.leave_thread_minutes is not None:
 					if event.completion_time is None:
-						event.completion_time = datetime.utcnow()
-					elif ((datetime.utcnow() - event.completion_time).seconds * 60) < event.competition.leave_thread_minutes:
+						event.completion_time = static.utcnow()
+					elif ((static.utcnow() - event.completion_time).seconds * 60) < event.competition.leave_thread_minutes:
 						log.info(f"Event complete after cooldown, un-stickying and removing: {event}")
 						sticky.unsticky(event.thread)
 						events_to_delete.append(event)
@@ -129,19 +128,19 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 					if not debug:
 						file_utils.save_state(events, sticky.get_save(), flairs.flairs, keys)
 
-		if event.is_owl() and minutes_to_start(event.start) < 36:
+		if event.is_owl() and minutes_to_start(event.start) < 72 * 60:
 			upcoming_owl_events.append(event)
 
 	for event in events_to_delete:
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
-	if len(upcoming_owl_events) and keys['prediction_thread'] is None and datetime.utcnow().weekday() == 4 and datetime.utcnow().hour > 18:
+	if len(upcoming_owl_events) and keys['prediction_thread'] is None and static.utcnow().weekday() == 4 and static.utcnow().hour > 18:
 		log.info("Posting prediction thread")
 		thread_id = reddit.submit_self_post(
 			static.SUBREDDIT,
-			string_utils.render_reddit_prediction_thread_title(events),
-			string_utils.render_reddit_prediction_thread(events[0], flairs)
+			string_utils.render_reddit_prediction_thread_title(events[0]),
+			string_utils.render_reddit_prediction_thread(events, flairs)
 		)
 		sticky.sticky(thread_id, events[0].competition, events[0].start)
 
@@ -239,6 +238,7 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	if not debug:
+		static.debug_now = None
 		discord_logging.init_discord_logging(user, logging.WARNING, 1)
 	reddit = reddit_class.Reddit(user, debug)
 
