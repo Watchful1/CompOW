@@ -11,6 +11,7 @@ WEBHOOK_THEOW = None
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
 FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/data/flairs.json"
 PREDICTION_URL = "https://lerhond.pl/predictor/owl-2020/"
+JUKED_EVENT = "https://juked.gg/events/4252"
 
 AUTHORIZED_USERS = ["Watchful1", "AkshonEsports"]
 

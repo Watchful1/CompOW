@@ -149,6 +149,12 @@ def render_reddit_event(event, flairs):
 	bldr.append("\n>\n")
 
 	if event.is_owl():
+		bldr.append(">> *Juked*  \n")
+		bldr.append("[Juked.gg](")
+		bldr.append(static.JUKED_EVENT)
+		bldr.append(")")
+		bldr.append("\n>\n")
+
 		bldr.append(">> *Predictions*  \n")
 		bldr.append("[Predictions Website](")
 		bldr.append(static.PREDICTION_URL)
@@ -314,6 +320,12 @@ def render_discord(event, flairs, discord_notification):
 		bldr.append("<")
 		bldr.append(event.competition_url)
 		bldr.append(">\n")
+
+		if event.is_owl():
+			bldr.append(":information_source:")
+			bldr.append("<")
+			bldr.append(static.JUKED_EVENT)
+			bldr.append(">\n")
 
 		bldr.append(":keyboard:")
 		bldr.append("Discuss in <#")
