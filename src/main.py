@@ -75,7 +75,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 				if event.competition.leave_thread_minutes is not None:
 					if event.completion_time is None:
 						event.completion_time = static.utcnow()
-					elif ((static.utcnow() - event.completion_time).seconds / 60) < event.competition.leave_thread_minutes:
+					elif ((static.utcnow() - event.completion_time).seconds / 60) > event.competition.leave_thread_minutes:
 						log.info(f"Event complete after cooldown, un-stickying and removing: {event}")
 						sticky.unsticky(event.thread)
 						events_to_delete.append(event)
