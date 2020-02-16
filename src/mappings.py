@@ -25,7 +25,7 @@ competitions = [
 		],
 		post_match_threads=True,
 		post_minutes_ahead=30,
-		leave_thread_minutes=12 * 60,
+		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=72
 	),
 	# Competition(
