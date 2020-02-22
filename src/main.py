@@ -142,6 +142,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 			string_utils.render_reddit_prediction_thread_title(events[0]),
 			string_utils.render_reddit_prediction_thread(events, flairs)
 		)
+		keys['prediction_thread'] = thread_id
 		sticky.sticky(thread_id, events[0].competition, events[0].start)
 
 		reddit.prediction_thread_settings(thread_id)
