@@ -28,6 +28,21 @@ competitions = [
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=72
 	),
+	Competition(
+		name="Overwatch Contenders 2020 Trials: Australia",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["AUContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Overwatch Contenders 2020 Season 1: Australia",
 	# 	discord=[
