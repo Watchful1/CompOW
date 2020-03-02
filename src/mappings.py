@@ -29,7 +29,7 @@ competitions = [
 		event_build_hours_ahead=72
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Trials: Australia",
+		name="Overwatch Contenders 2020 Season 1: Australia",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -42,22 +42,7 @@ competitions = [
 				minutes_ahead=5
 			)
 		]
-	),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: Australia",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["AUContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	)
 	# Competition(
 	# 	name="Overwatch Contenders 2020 Season 1: North America East",
 	# 	discord=[
@@ -163,22 +148,6 @@ competitions = [
 	# 		)
 	# 	]
 	# ),
-	Competition(
-		name="MB Community Koala Trials",
-		post_minutes_ahead=15,
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	)
 ]
 stream_languages = [
 	"eng",
