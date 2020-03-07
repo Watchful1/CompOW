@@ -139,11 +139,11 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 		log.info("Posting prediction thread")
 		thread_id = reddit.submit_self_post(
 			static.SUBREDDIT,
-			string_utils.render_reddit_prediction_thread_title(events[0]),
-			string_utils.render_reddit_prediction_thread(events, flairs)
+			string_utils.render_reddit_prediction_thread_title(upcoming_owl_events[0]),
+			string_utils.render_reddit_prediction_thread(upcoming_owl_events, flairs)
 		)
 		keys['prediction_thread'] = thread_id
-		sticky.sticky(thread_id, events[0].competition, events[0].start)
+		sticky.sticky(thread_id, upcoming_owl_events[0].competition, upcoming_owl_events[0].start)
 
 		reddit.prediction_thread_settings(thread_id)
 
