@@ -100,6 +100,12 @@ class Event:
 		else:
 			return GameState.PENDING
 
+	def is_streamed(self):
+		for match in self.matches:
+			if len(match.streams):
+				return True
+		return False
+
 	def stages_name(self):
 		bldr = []
 		for stage_name in self.stage_names:

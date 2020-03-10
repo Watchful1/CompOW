@@ -84,7 +84,8 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 					sticky.unsticky(event.thread)
 					events_to_delete.append(event)
 
-		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead) and event.thread is None:
+		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead) and event.thread is None \
+				and event.is_streamed():
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
@@ -106,7 +107,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 			event.thread = thread_id
 			event.clean()
 
-		if event.competition.discord is not None:
+		if event.competition.discord is not None and event.is_streamed():
 			for discord_notification in event.competition.discord:
 				if discord_notification.type not in event.posted_discord and \
 						(minutes_to_start(event.start) < discord_notification.minutes_ahead) and \
