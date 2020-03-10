@@ -42,112 +42,97 @@ competitions = [
 				minutes_ahead=5
 			)
 		]
-	)
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: North America East",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["NAContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: North America West",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["NAContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: Pacific",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["PACContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: Europe",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["EUContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: South America",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["SAContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: Korea",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["KRContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 1: China",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["CNContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: North America",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["NAContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: Pacific",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["PACContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: Europe",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["EUContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: South America",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["SAContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: Korea",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["KRContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2020 Season 1: China",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["CNContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 ]
 stream_languages = [
 	"eng",
