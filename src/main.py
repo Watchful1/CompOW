@@ -268,13 +268,13 @@ if __name__ == "__main__":
 			check_messages(reddit, flairs)
 		except prawcore.exceptions.ServerError as err:
 			log.warning("Caught praw ServerError")
-			log.warning(traceback.format_exc())
+			log.info(traceback.format_exc())
 		except prawcore.exceptions.Conflict as err:
 			log.warning("Caught praw Conflict")
-			log.warning(traceback.format_exc())
+			log.info(traceback.format_exc())
 		except prawcore.exceptions.RequestException as err:
 			log.warning("Caught praw RequestException")
-			log.warning(traceback.format_exc())
+			log.info(traceback.format_exc())
 
 		discord_logging.flush_discord()
 		loop += 1

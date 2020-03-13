@@ -205,7 +205,7 @@ def get_upcoming_events(events):
 		data = requests.get(static.OVER_GG_API).json()
 	except Exception as err:
 		log.warning("Unable to fetch overgg api page")
-		log.warning(traceback.format_exc())
+		log.info(traceback.format_exc())
 		return False
 
 	for match_table in data['matches']:
