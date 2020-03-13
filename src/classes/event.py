@@ -32,13 +32,13 @@ class Event:
 					event_match.start = match.start
 					self.rebuild_start_last()
 				if event_match.url != match.url:
-					log.warning(f"Url updated for match: {event_match.url} : {match.url}")
+					log.info(f"Url updated for match: {event_match.url} : {match.url}")
 					event_match.url = match.url
 				if event_match.home != match.home:
-					log.warning(f"Home updated for match: {match.id} : {match.home}")
+					log.info(f"Home updated for match: {match.id} : {match.home}")
 					event_match.home = match.home
 				if event_match.away != match.away:
-					log.warning(f"Away updated for match: {match.id} : {match.away}")
+					log.info(f"Away updated for match: {match.id} : {match.away}")
 					event_match.away = match.away
 				found = True
 				break
@@ -78,6 +78,8 @@ class Event:
 
 		for event_match in self.matches:
 			if event_match.id == match_id:
+				if start < self.start - timedelta(hours=4) or start > self.last + timedelta(hours=4):
+					log.warning(f"Match in event is now outside timebounds: {event_match}")
 				return True
 
 		return self.start - timedelta(hours=4) <= start <= self.last + timedelta(hours=4)

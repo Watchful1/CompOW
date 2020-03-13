@@ -18,6 +18,7 @@ import sticky_manager
 import reddit_class
 import file_utils
 import flair_manager
+import mappings
 from classes.enums import GameState
 
 
@@ -88,23 +89,24 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 			log.info(f"Populating event: {event}")
 			overggparser.populate_event(event)
 
-			if event.is_owl() and keys['prediction_thread'] is not None:
-				log.info("Unstickying prediction thread")
-				sticky.unsticky(keys['prediction_thread'])
-				reddit.lock(keys['prediction_thread'])
-				keys['prediction_thread'] = None
+			if len(event.streams):
+				if event.is_owl() and keys['prediction_thread'] is not None:
+					log.info("Unstickying prediction thread")
+					sticky.unsticky(keys['prediction_thread'])
+					reddit.lock(keys['prediction_thread'])
+					keys['prediction_thread'] = None
 
-			thread_id = reddit.submit_self_post(
-				static.SUBREDDIT,
-				string_utils.render_reddit_event_title(event),
-				string_utils.render_reddit_event(event, flairs)
-			)
-			reddit.match_thread_settings(thread_id, "new")
+				thread_id = reddit.submit_self_post(
+					static.SUBREDDIT,
+					string_utils.render_reddit_event_title(event),
+					string_utils.render_reddit_event(event, flairs)
+				)
+				reddit.match_thread_settings(thread_id, "new")
 
-			sticky.sticky(thread_id, event.competition, event.start)
+				sticky.sticky(thread_id, event.competition, event.start)
 
-			event.thread = thread_id
-			event.clean()
+				event.thread = thread_id
+				event.clean()
 
 		if event.competition.discord is not None:
 			for discord_notification in event.competition.discord:
@@ -252,6 +254,10 @@ if __name__ == "__main__":
 
 	sticky = sticky_manager.StickyManager(reddit, static.SUBREDDIT, state['stickies'])
 	flairs = flair_manager.FlairManager(state['flairs'])
+	events = state['events']
+	for event in events:
+		rank, competition = mappings.get_competition(event.competition.name)
+		event.competition = competition
 
 	loop = 0
 	loop_sleep = 0
