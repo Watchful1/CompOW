@@ -108,6 +108,10 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 				event.thread = thread_id
 				event.clean()
 
+			if event.game_state() == GameState.COMPLETE:
+				log.info(f"Non-posted event complete, removing: {event}")
+				events_to_delete.append(event)
+
 		if event.competition.discord is not None:
 			for discord_notification in event.competition.discord:
 				if discord_notification.type not in event.posted_discord and \
