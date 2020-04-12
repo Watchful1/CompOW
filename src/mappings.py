@@ -133,6 +133,36 @@ competitions = [
 			)
 		]
 	),
+	Competition(
+		name="NetEase Esports X Tournament 2020 - Spring",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["CNContenders", "KRContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Oceanic Esports Open Quarantine Cup",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["AUContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 ]
 stream_languages = [
 	"eng",
