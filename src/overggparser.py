@@ -26,7 +26,7 @@ def strip_string(value):
 
 def parse_match(match_url):
 	try:
-		page_string = requests.get(match_url).text
+		page_string = requests.get(match_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
 	except Exception:
 		log.warning(f"Unable to fetch match page: {match_url}")
 		log.warning(traceback.format_exc())
@@ -202,7 +202,7 @@ def populate_event(event):
 
 def get_upcoming_events(events):
 	try:
-		data = requests.get(static.OVER_GG_API).json()
+		data = requests.get(static.OVER_GG_API, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
 	except Exception as err:
 		log.warning("Unable to fetch overgg api page")
 		log.info(traceback.format_exc())

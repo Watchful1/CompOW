@@ -82,7 +82,7 @@ class FlairManager:
 
 	def update_flairs(self):
 		try:
-			response = requests.get(url=static.FLAIR_LIST, headers={'User-Agent': static.USER_AGENT})
+			response = requests.get(url=static.FLAIR_LIST, headers={'User-Agent': static.USER_AGENT}, timeout=5)
 		except Exception as err:
 			log.warning("Flair load request failed")
 			return
