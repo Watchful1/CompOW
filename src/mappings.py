@@ -119,7 +119,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020: China",
+		name="Overwatch Contenders 2020 Season 1: China",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
