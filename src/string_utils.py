@@ -104,6 +104,8 @@ def thread_link(subreddit, thread_id):
 def render_reddit_event(event, flairs):
 	bldr = []
 
+	bldr.append("We're trying chat posts again. [Leave feedback here](https://www.reddit.com/r/Competitiveoverwatch/comments/h8codx/match_thread_chat_posts_discussion/?)\n\n")
+
 	bldr.append("> ## **")
 	bldr.append(event.competition.name)
 	bldr.append("**\n")

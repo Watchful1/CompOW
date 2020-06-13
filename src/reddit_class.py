@@ -42,7 +42,7 @@ class Reddit:
 				log.info(f"Body: {text}")
 				thread_id = "test"
 			else:
-				thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text)
+				thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="chat")
 				thread_id = thread.id
 			log.debug(f"Posted thread to r/{subreddit} - {thread_id}")
 			return thread_id
