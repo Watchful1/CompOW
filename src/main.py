@@ -99,7 +99,8 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 				thread_id = reddit.submit_self_post(
 					static.SUBREDDIT,
 					string_utils.render_reddit_event_title(event),
-					string_utils.render_reddit_event(event, flairs)
+					string_utils.render_reddit_event(event, flairs),
+					True
 				)
 				reddit.match_thread_settings(thread_id, "new")
 

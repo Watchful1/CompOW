@@ -35,14 +35,17 @@ class Reddit:
 			else:
 				log.error(f"{key['name']} key not in config")
 
-	def submit_self_post(self, subreddit, title, text):
+	def submit_self_post(self, subreddit, title, text, chat_post=False):
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
 				log.info(f"Body: {text}")
 				thread_id = "test"
 			else:
-				thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT")
+				if chat_post:
+					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT")
+				else:
+					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text)
 				thread_id = thread.id
 			log.debug(f"Posted thread to r/{subreddit} - {thread_id}")
 			return thread_id
