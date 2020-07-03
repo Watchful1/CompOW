@@ -141,7 +141,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
-	if len(upcoming_owl_events) and keys['prediction_thread'] is None and static.utcnow().weekday() == 4 and static.utcnow().hour > 0:
+	if len(upcoming_owl_events) and keys['prediction_thread'] is None and static.utcnow().weekday() == 4 and static.utcnow().hour > 18:
 		log.info("Posting prediction thread")
 		thread_id = reddit.submit_self_post(
 			static.SUBREDDIT,
