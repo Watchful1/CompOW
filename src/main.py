@@ -43,7 +43,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 	for event in events:
 		if event.thread is not None:
 			# log.info(f"Rechecking event: {event}")
-			overggparser.populate_event(event)
+			overggparser.populate_event(event, event.is_owl())
 
 			if event.competition.post_match_threads:
 				for match in event.matches:
@@ -87,7 +87,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 
 		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead) and event.thread is None:
 			log.info(f"Populating event: {event}")
-			overggparser.populate_event(event)
+			overggparser.populate_event(event, event.is_owl())
 
 			if len(event.streams):
 				if event.is_owl() and keys['prediction_thread'] is not None:
@@ -247,6 +247,8 @@ if __name__ == "__main__":
 	if not debug:
 		static.debug_now = None
 		discord_logging.init_discord_logging(user, logging.WARNING, 1)
+	else:
+		discord_logging.set_level(logging.DEBUG)
 	reddit = reddit_class.Reddit(user, debug)
 
 	state = file_utils.load_state(debug)

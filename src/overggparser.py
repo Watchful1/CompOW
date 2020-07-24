@@ -24,7 +24,7 @@ def strip_string(value):
 	return value.strip().replace('\n', '').replace('\t', '')
 
 
-def parse_match(match_url):
+def parse_match(match_url, is_owl=False):
 	try:
 		page_string = requests.get(match_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
 	except Exception:
@@ -44,21 +44,21 @@ def parse_match(match_url):
 		{'field': 'date', 'required': True,
 		 'path': "//div[@class='match-header-date']/div/@data-utc-ts"},
 		{'field': 'match_name', 'required': True,
-		 'path': "//div[@class='wf-card mod-match mod-bg-after-orange']/div[1]/div[1]/a/div/div[2]/text()"},
+		 'path': "//div[contains(@class, 'mod-match mod-bg-after-orange')]/div[1]/div[1]/a/div/div[2]/text()"},
 		{'field': 'tournament', 'required': True,
-		 'path': "//div[@class='wf-card mod-match mod-bg-after-orange']/div[1]/div[1]/a/div/div[1]/text()"},
+		 'path': "//div[contains(@class, 'mod-match mod-bg-after-orange')]/div[1]/div[1]/a/div/div[1]/text()"},
 		{'field': 'stream1url', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][1]/@href"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][1]/@href"},
 		{'field': 'stream2url', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][2]/@href"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][2]/@href"},
 		{'field': 'stream3url', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][3]/@href"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][3]/@href"},
 		{'field': 'stream1language', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][1]/div/span[1]/text()"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][1]/div/span[1]/text()"},
 		{'field': 'stream2language', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][2]/div/span[1]/text()"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][2]/div/span[1]/text()"},
 		{'field': 'stream3language', 'required': False,
-		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][3]/div/span[1]/text()"},
+		 'path': "//a[contains(@class, 'match-streams-btn')][3]/div/span[1]/text()"},
 		{'field': 'home_score', 'required': False,
 		 'path': "//div[@class='match-header-vs-score']/div/span[1]/text()"},
 		{'field': 'away_score', 'required': False,
@@ -84,7 +84,12 @@ def parse_match(match_url):
 				break
 		if path['field'] not in fields:
 			if path['required']:
-				log.info(f"Could not find {path['field']}")
+				if is_owl and match_url not in static.unparsed_matches:
+					static.unparsed_matches.add(match_url)
+					log.warning("Unable to parse OWL match")
+					log.warning(f"Could not find {path['field']}")
+				else:
+					log.debug(f"Could not find {path['field']}")
 				return None
 			continue
 
@@ -190,9 +195,9 @@ def merge_fields_into_match(fields, match):
 				match.dirty = True
 
 
-def populate_event(event):
+def populate_event(event, is_owl=False):
 	for match in event.matches:
-		fields = parse_match(match.url)
+		fields = parse_match(match.url, is_owl)
 		if fields is None:
 			log.debug(f"Fields is none in populate event: {match.url}")
 			continue
