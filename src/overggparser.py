@@ -44,9 +44,9 @@ def parse_match(match_url):
 		{'field': 'date', 'required': True,
 		 'path': "//div[@class='match-header-date']/div/@data-utc-ts"},
 		{'field': 'match_name', 'required': True,
-		 'path': "//a[@class='match-info-section-event']/../text()"},
+		 'path': "//div[@class='wf-card mod-match mod-bg-after-orange']/div[1]/div[1]/a/div/div[2]/text()"},
 		{'field': 'tournament', 'required': True,
-		 'path': "//a[@class='match-info-section-event']/text()"},
+		 'path': "//div[@class='wf-card mod-match mod-bg-after-orange']/div[1]/div[1]/a/div/div[1]/text()"},
 		{'field': 'stream1url', 'required': False,
 		 'path': "//a[@class='wf-card mod-dark match-streams-btn'][1]/@href"},
 		{'field': 'stream2url', 'required': False,
@@ -68,7 +68,7 @@ def parse_match(match_url):
 		{'field': 'state2', 'required': False,
 		 'path': "//div[@class='match-header-vs-note']/text()"},
 		{'field': 'tournament_url', 'required': True,
-		 'path': "//a[@class='match-info-section-event']/@href"},
+		 'path': "//div[@class='wf-card mod-match mod-bg-after-orange']/div[1]/div[1]/a/@href"},
 		{'field': 'vod', 'required': False,
 		 'path': "//div[@class='match-vods']/div[2]/a/@href"},
 	]
@@ -84,7 +84,7 @@ def parse_match(match_url):
 				break
 		if path['field'] not in fields:
 			if path['required']:
-				log.debug(f"Could not find {path['field']}")
+				log.info(f"Could not find {path['field']}")
 				return None
 			continue
 
