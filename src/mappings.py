@@ -29,7 +29,7 @@ competitions = [
 		event_build_hours_ahead=96
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: Australia",
+		name="Overwatch Contenders 2020 Season 2: Australia",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -44,7 +44,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: North America",
+		name="Overwatch Contenders 2020 Season 2: North America",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -59,22 +59,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: Pacific",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["PACContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2020 Season 1: Europe",
+		name="Overwatch Contenders 2020 Season 2: Europe",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -89,7 +74,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: South America",
+		name="Overwatch Contenders 2020 Season 2: South America",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -104,7 +89,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: Korea",
+		name="Overwatch Contenders 2020 Season 2: Korea",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -119,42 +104,12 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2020 Season 1: China",
+		name="Overwatch Contenders 2020 Season 2: China",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
 				minutes_ahead=15,
 				roles=["CNContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="NetEase Esports X Tournament 2020 - Spring",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["CNContenders", "KRContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Oceanic Esports Open Quarantine Cup",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["AUContenders", "here"],
 				channel="420968531929071628"
 			),
 			DiscordNotification(
