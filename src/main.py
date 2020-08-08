@@ -52,7 +52,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 
 						thread_id = reddit.submit_self_post(
 							static.SUBREDDIT,
-							string_utils.render_reddit_post_match_title(match),
+							string_utils.render_reddit_post_match_title(match, spoilers=match.stage in event.competition.spoiler_stages),
 							string_utils.render_reddit_post_match(match, flairs)
 						)
 

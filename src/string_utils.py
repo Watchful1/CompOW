@@ -89,8 +89,11 @@ def render_reddit_post_match(match, flairs):
 	return ''.join(bldr)
 
 
-def render_reddit_post_match_title(match):
-	return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
+def render_reddit_post_match_title(match, spoilers=False):
+	if spoilers:
+		return f"{match.competition} | {match.stage} | Post-Match Discussion"
+	else:
+		return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
 
 
 def render_reddit_post_match_comment(match):
@@ -219,6 +222,8 @@ def render_reddit_event(event, flairs):
 
 		bldr.append("|")
 		bldr.append("\n")
+
+	bldr.append("\nIf there's a problem with the match thread, ping u/Watchful1 in the comments")
 
 	return ''.join(bldr)
 

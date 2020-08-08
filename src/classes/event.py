@@ -64,8 +64,8 @@ class Event:
 			self.stage_names.append(match.stage)
 		if self.competition_url is None:
 			self.competition_url = match.competition_url
-		# elif self.competition_url != match.competition_url:
-		# 	log.warning(f"Match competition url doesn't match event: {self.competition_url} : {match.competition_url}")
+		elif self.competition_url != match.competition_url:
+			log.warning(f"Match competition url doesn't match event: {self.competition_url} : {match.competition_url}")
 		if match.dirty:
 			self.dirty = True
 		for stream in match.streams:

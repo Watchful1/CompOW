@@ -26,7 +26,8 @@ competitions = [
 		post_match_threads=True,
 		post_minutes_ahead=30,
 		leave_thread_minutes=4 * 60,
-		event_build_hours_ahead=96
+		event_build_hours_ahead=96,
+		spoiler_stages=["Countdown Cup: North America Grand Finals", "Countdown Cup: Asia Grand Finals"]
 	),
 	Competition(
 		name="Overwatch Contenders 2020 Season 2: Australia",
