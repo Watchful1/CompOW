@@ -438,5 +438,5 @@ def render_reddit_prediction_thread(events, flairs):
 def match_list_to_string(matches):
 	order_str = []
 	for match in matches:
-		order_str.append(match.__str__())
-	return ','.join(order_str)
+		order_str.append(f"{match.home.name} vs {match.away.name}")
+	return ', '.join(order_str)

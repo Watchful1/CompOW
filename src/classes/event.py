@@ -33,6 +33,7 @@ class Event:
 					event_match.start = match.start
 					self.rebuild_match_order()
 					self.rebuild_start_last()
+					self.dirty = True
 				if event_match.url != match.url:
 					log.info(f"Url updated for match: {event_match.url} : {match.url}")
 					event_match.url = match.url
