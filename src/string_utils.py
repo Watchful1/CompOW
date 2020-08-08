@@ -433,3 +433,10 @@ def render_reddit_prediction_thread(events, flairs):
 	bldr.append("* Submit your predictions\n\n")
 
 	return ''.join(bldr)
+
+
+def match_list_to_string(matches):
+	order_str = []
+	for match in matches:
+		order_str.append(match.__str__())
+	return ','.join(order_str)

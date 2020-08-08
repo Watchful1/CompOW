@@ -3,6 +3,7 @@ import bisect
 import discord_logging
 
 from classes.enums import GameState
+import string_utils
 
 log = discord_logging.get_logger()
 
@@ -30,6 +31,7 @@ class Event:
 				if event_match.start != match.start:
 					log.info(f"Updating match start in event: {match.id} : {event_match.start} : {match.start}")
 					event_match.start = match.start
+					self.rebuild_match_order()
 					self.rebuild_start_last()
 				if event_match.url != match.url:
 					log.info(f"Url updated for match: {event_match.url} : {match.url}")
@@ -58,6 +60,16 @@ class Event:
 		self.last = None
 		for match in self.matches:
 			self.add_match_time(match.start)
+
+	def rebuild_match_order(self):
+		new_matches = []
+		for match in self.matches:
+			bisect.insort(new_matches, match)
+		if self.matches != new_matches:
+			log.warning(f"Updating order for event: {self.__str__()}")
+			log.warning(f"Old order: {string_utils.match_list_to_string(self.matches)}")
+			log.warning(f"New order: {string_utils.match_list_to_string(new_matches)}")
+			self.matches = new_matches
 
 	def merge_match(self, match):
 		if match.stage not in self.stage_names:
