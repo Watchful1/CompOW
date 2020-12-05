@@ -24,6 +24,56 @@ def strip_string(value):
 	return value.strip().replace('\n', '').replace('\t', '')
 
 
+def parse_transfers(page_url):
+	try:
+		page_string = requests.get(page_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
+	except Exception:
+		log.warning(f"Unable to fetch match page: {page_url}")
+		log.warning(traceback.format_exc())
+		return None
+
+	tree = etree.fromstring(page_string, etree.HTMLParser())
+
+	fields = {}
+
+	paths = [
+		{'field': 'date', 'required': True,
+		 'path': ".//span[@class='txn-day-num']/text()"},
+		{'field': 'username', 'required': True,
+		 'path': ".//td[@class='txn-player']/a/div/div/div[1]/text()"},
+		{'field': 'action', 'required': True,
+		 'path': ".//td[@class='txn-action']/div/text()"},
+		{'field': 'team', 'required': True,
+		 'path': ".//td[@class='txn-team']/div/a/div/text()"},
+		{'field': 'role', 'required': True,
+		 'path': ".//td[@class='txn-team']/div/a/div/span/text()"},
+		{'field': 'team_from', 'required': False,
+		 'path': ".//td[@class='txn-team'][2]/div/a/div/text()"},
+		{'field': 'role_from', 'required': False,
+		 'path': ".//td[@class='txn-team'][2]/div/a/div/span/text()"},
+	]
+
+	for row in tree.xpath("//table[contains(@class, 'wf-table mod-transfers')]/tr"):
+		row_fields = {}
+		for path in paths:
+			try:
+				items = row.xpath(path['path'])
+			except Exception as err:
+				items = []
+			for item in items:
+				if item.strip() != "":
+					row_fields[path['field']] = strip_string(item)
+					break
+			if path['field'] not in row_fields:
+				if path['required']:
+					log.debug(f"Could not find {path['field']}")
+					return None
+				continue
+		log.info(f"{row_fields}")
+
+	return fields
+
+
 def parse_match(match_url, is_owl=False):
 	try:
 		page_string = requests.get(match_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
