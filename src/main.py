@@ -271,7 +271,7 @@ if __name__ == "__main__":
 		try:
 			if loop == 0:
 				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord, state['keys'])
-			check_messages(reddit, flairs)
+			#check_messages(reddit, flairs)
 		except prawcore.exceptions.ServerError as err:
 			log.warning("Caught praw ServerError")
 			log.info(traceback.format_exc())
