@@ -8,6 +8,21 @@ from classes.enums import DiscordType
 
 
 competitions = [
+	Competition(
+		name="Nexus Cup 2021",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["OWL-Notify", "here"],
+				channel="377127072243515393"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Overwatch League 2020 Season",
 	# 	discord=[
@@ -119,81 +134,6 @@ competitions = [
 	# 		)
 	# 	]
 	# ),
-	Competition(
-		name="Overwatch Contenders 2020 Gauntlet: South America",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["SAContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2020 Gauntlet: Europe",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["EUContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2020 Gauntlet: North America",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["NAContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2020 Gauntlet: Asia",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["CNContenders", "KRContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2020 Gauntlet: Showmatches",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["NAContenders", "EUContenders", "here"],
-				channel="420968531929071628"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
 ]
 stream_languages = [
 	"eng",
