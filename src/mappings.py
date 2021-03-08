@@ -8,21 +8,6 @@ from classes.enums import DiscordType
 
 
 competitions = [
-	Competition(
-		name="Nexus Cup 2021",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=["OWL-Notify", "here"],
-				channel="377127072243515393"
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
 	# Competition(
 	# 	name="Overwatch League 2020 Season",
 	# 	discord=[
@@ -44,21 +29,21 @@ competitions = [
 	# 	event_build_hours_ahead=96,
 	# 	spoiler_stages=["Countdown Cup: North America Grand Finals", "Countdown Cup: Asia Grand Finals"]
 	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 2: Australia",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["AUContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	Competition(
+		name="Overwatch Contenders 2021 Season 1: Australia",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=["AUContenders", "here"],
+				channel="420968531929071628"
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Overwatch Contenders 2020 Season 2: North America",
 	# 	discord=[
