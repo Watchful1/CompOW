@@ -224,6 +224,8 @@ def render_reddit_event(event, flairs):
 		bldr.append("\n")
 
 	bldr.append("\nIf there's a problem with the match thread, ping u/Watchful1 in the comments")
+	bldr.append("\n\nWe need help tracking match scores on over.gg, which the match bot pulls from. If you watch ")
+	bldr.append("a lot of overwatch and are interested in helping out, pm u/Watchful1")
 
 	return ''.join(bldr)
 
