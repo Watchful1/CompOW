@@ -6,6 +6,24 @@ from classes.enums import DiscordType
 #match-discussion 377127072243515393
 #ow-esports 348939546878017536
 
+cow_roles = {
+	'OWL-Notify': '<@&481314680665538569>',
+	'OWL-News': '<@&517000617290367016>',
+	'Game-News': '<@&517000502924279808>',
+	'Community-News': '<@&517000366735228929>',
+	'KRContenders': '<@&481315112993554433>',
+	'NAContenders': '<@&481315228529721344>',
+	'PACContenders': '<@&481315465340387328>',
+	'SAContenders': '<@&481315668721926144>',
+	'CNContenders': '<@&481315825802936320>',
+	'AUContenders': '<@&481315928865505280>',
+	'All-Matches': '<@&517000657111220229>',
+	'All-Notify': '<@&481316252661579786>',
+}
+cow_channels = {
+	'match-discussion': '377127072243515393',
+	'ow-esports': '348939546878017536',
+}
 
 competitions = [
 	# Competition(
@@ -14,13 +32,13 @@ competitions = [
 	# 		DiscordNotification(
 	# 			type=DiscordType.COW,
 	# 			minutes_ahead=15,
-	# 			roles=["OWL-Notify", "everyone"],
-	# 			channel="377127072243515393"
+	# 			roles=[cow_roles['OWL-Notify'], "@everyone"],
+	# 			channel=cow_channels['match-discussion']
 	# 		),
 	# 		DiscordNotification(
 	# 			type=DiscordType.THEOW,
 	# 			minutes_ahead=5,
-	# 			roles=["everyone"]
+	# 			roles=["@everyone"]
 	# 		)
 	# 	],
 	# 	post_match_threads=True,
@@ -35,8 +53,8 @@ competitions = [
 			DiscordNotification(
 				type=DiscordType.COW,
 				minutes_ahead=15,
-				roles=["AUContenders", "here"],
-				channel="420968531929071628"
+				roles=[cow_roles['AUContenders'], "@here"],
+				channel=cow_channels['ow-esports']
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
@@ -50,8 +68,8 @@ competitions = [
 	# 		DiscordNotification(
 	# 			type=DiscordType.COW,
 	# 			minutes_ahead=15,
-	# 			roles=["NAContenders", "here"],
-	# 			channel="420968531929071628"
+	# 			roles=[cow_roles['NAContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
 	# 		),
 	# 		DiscordNotification(
 	# 			type=DiscordType.THEOW,
@@ -65,23 +83,8 @@ competitions = [
 	# 		DiscordNotification(
 	# 			type=DiscordType.COW,
 	# 			minutes_ahead=15,
-	# 			roles=["EUContenders", "here"],
-	# 			channel="420968531929071628"
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2020 Season 2: South America",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=["SAContenders", "here"],
-	# 			channel="420968531929071628"
+	# 			roles=[cow_roles['EUContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
 	# 		),
 	# 		DiscordNotification(
 	# 			type=DiscordType.THEOW,
@@ -95,8 +98,8 @@ competitions = [
 			DiscordNotification(
 				type=DiscordType.COW,
 				minutes_ahead=15,
-				roles=["KRContenders", "here"],
-				channel="420968531929071628"
+				roles=[cow_roles['KRContenders'], "@here"],
+				channel=cow_channels['ow-esports']
 			),
 			DiscordNotification(
 				type=DiscordType.THEOW,
@@ -110,8 +113,8 @@ competitions = [
 	# 		DiscordNotification(
 	# 			type=DiscordType.COW,
 	# 			minutes_ahead=15,
-	# 			roles=["CNContenders", "here"],
-	# 			channel="420968531929071628"
+	# 			roles=[cow_roles['CNContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
 	# 		),
 	# 		DiscordNotification(
 	# 			type=DiscordType.THEOW,

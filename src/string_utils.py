@@ -253,8 +253,6 @@ def render_discord(event, flairs, discord_notification):
 	bldr = []
 
 	if discord_notification.type == DiscordType.COW:
-		bldr.append("~ping ")
-
 		bldr.append("**")
 		bldr.append(event.competition.name)
 		bldr.append(" - ")
@@ -275,7 +273,7 @@ def render_discord(event, flairs, discord_notification):
 		notifications.append("[All-Notify]")
 		notifications.append("[All-Matches]")
 		for role in discord_notification.roles:
-			notifications.append(f"[{role}]")
+			notifications.append(role)
 
 		bldr.append(' '.join(notifications))
 
@@ -359,7 +357,7 @@ def render_discord(event, flairs, discord_notification):
 
 		notifications = []
 		for role in discord_notification.roles:
-			notifications.append(f"@{role}")
+			notifications.append(role)
 
 		bldr.append(' '.join(notifications))
 
