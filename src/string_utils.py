@@ -3,6 +3,7 @@ import math
 import re
 
 import static
+from mappings import cow_roles
 from classes.enums import GameState
 from classes.enums import Winner
 from classes.enums import DiscordType
@@ -270,8 +271,8 @@ def render_discord(event, flairs, discord_notification):
 		bldr.append("\n")
 
 		notifications = []
-		notifications.append("[All-Notify]")
-		notifications.append("[All-Matches]")
+		notifications.append(cow_roles['All-Notify'])
+		notifications.append(cow_roles['All-Matches'])
 		for role in discord_notification.roles:
 			notifications.append(role)
 
