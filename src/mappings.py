@@ -14,6 +14,7 @@ cow_roles = {
 	'KRContenders': '<@&481315112993554433>',
 	'NAContenders': '<@&481315228529721344>',
 	'PACContenders': '<@&481315465340387328>',
+	'EUCContenders': '<@&481315364345479169>',
 	'SAContenders': '<@&481315668721926144>',
 	'CNContenders': '<@&481315825802936320>',
 	'AUContenders': '<@&481315928865505280>',
