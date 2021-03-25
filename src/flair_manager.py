@@ -68,16 +68,21 @@ class FlairManager:
 		self.update_flairs()
 		self.missing_flairs = set()
 
+	@staticmethod
+	def strip_name(name):
+		return ''.join(x for x in name.lower() if x.isalnum())
+
 	def get_flair(self, name):
 		if name == "TBD":
 			return ""
-		if name in self.flairs:
-			flair = self.flairs[name]
+		stripped_name = FlairManager.strip_name(name)
+		if stripped_name in self.flairs:
+			flair = self.flairs[stripped_name]
 			return f"[](#{flair.sheet}-c{flair.column}-r{flair.row})"
 		else:
-			if name not in self.missing_flairs:
-				self.missing_flairs.add(name)
-				log.warning(f"Could not find flair: {name}")
+			if stripped_name not in self.missing_flairs:
+				self.missing_flairs.add(stripped_name)
+				log.warning(f"Could not find flair: {stripped_name}")
 			return ""
 
 	def update_flairs(self):
@@ -106,7 +111,7 @@ class FlairManager:
 				flair_json['col'],
 				flair_json['sheet']
 			)
-			flairs[flair.name] = flair
+			flairs[FlairManager.strip_name(flair.name)] = flair
 
 		if len(flairs) > 20:
 			self.flairs = flairs
