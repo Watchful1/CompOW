@@ -27,27 +27,27 @@ cow_channels = {
 }
 
 competitions = [
-	# Competition(
-	# 	name="Overwatch League 2020 Season",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['OWL-Notify'], "@everyone"],
-	# 			channel=cow_channels['match-discussion']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5,
-	# 			roles=["@everyone"]
-	# 		)
-	# 	],
-	# 	post_match_threads=True,
-	# 	post_minutes_ahead=30,
-	# 	leave_thread_minutes=4 * 60,
-	# 	event_build_hours_ahead=96,
-	# 	spoiler_stages=["Countdown Cup: North America Grand Finals", "Countdown Cup: Asia Grand Finals"]
-	# ),
+	Competition(
+		name="Overwatch League 2021 Season",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['OWL-Notify'], "@everyone"],
+				channel=cow_channels['match-discussion']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5,
+				roles=["@everyone"]
+			)
+		],
+		post_match_threads=True,
+		post_minutes_ahead=30,
+		leave_thread_minutes=4 * 60,
+		event_build_hours_ahead=96,
+		spoiler_stages=[]
+	),
 	Competition(
 		name="Overwatch Contenders 2021 Season 1: Australia",
 		discord=[
