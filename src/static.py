@@ -10,7 +10,7 @@ WEBHOOK_THEOW = None
 
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
 FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/data/flairs.json"
-PREDICTION_URL = "https://lerhond.pl/predictor/owl-2020/"
+PREDICTION_URL = "https://pickem.overwatchleague.com/"
 JUKED_EVENT = "https://juked.gg/e/4252#overview"
 
 AUTHORIZED_USERS = ["Watchful1", "AkshonEsports"]
@@ -23,7 +23,8 @@ def get_webhook(discord_type):
 		return WEBHOOK_THEOW
 
 
-debug_now = datetime.utcnow()#datetime.strptime("02-26-20 20:00:00", '%m-%d-%y %H:%M:%S')
+#debug_now = None
+debug_now = datetime.strptime("04-30-21 09:00:00", '%m-%d-%y %H:%M:%S')
 
 
 def utcnow():

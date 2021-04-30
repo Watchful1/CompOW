@@ -236,6 +236,9 @@ def render_reddit_event_title(event):
 	bldr.append(event.competition.name)
 	bldr.append(" - ")
 	bldr.append(event.stages_name())
+	if event.is_owl():
+		bldr.append(" - ")
+		bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
 	return ''.join(bldr)
 
 
@@ -407,8 +410,8 @@ def render_reddit_prediction_thread_title(event):
 def render_reddit_prediction_thread(events, flairs):
 	bldr = []
 
-	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and also visit our ")
-	bldr.append("[Predictions Website](")
+	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and use the OWL ")
+	bldr.append("[Pick'Ems Website](")
 	bldr.append(static.PREDICTION_URL)
 	bldr.append(") to make your predictions.\n\n")
 
@@ -423,15 +426,6 @@ def render_reddit_prediction_thread(events, flairs):
 			bldr.append(match.away.name)
 
 			bldr.append("  \n")
-
-	bldr.append("\n\n")
-
-	bldr.append("#Predictions\n")
-	bldr.append("* Head to [our predictions website](")
-	bldr.append(static.PREDICTION_URL)
-	bldr.append(")\n")
-	bldr.append("* Authenticate your Reddit account\n")
-	bldr.append("* Submit your predictions\n\n")
 
 	return ''.join(bldr)
 

@@ -129,7 +129,7 @@ class Event:
 		return ' - '.join(bldr)
 
 	def is_owl(self):
-		return self.competition.name == "Overwatch League 2020 Season"
+		return self.competition.name == "Overwatch League 2021 Season"
 
 	def __str__(self):
 		return f"{self.competition} : {self.start} : {len(self.matches)} matches"

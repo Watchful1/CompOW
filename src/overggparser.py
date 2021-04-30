@@ -1,6 +1,7 @@
 import traceback
 from lxml import etree
 import bisect
+import json
 import discord_logging
 
 import requests
@@ -296,3 +297,27 @@ def get_upcoming_events(events):
 				)
 				event.add_match(match)
 				events.append(event)
+
+
+def get_week(n):
+	headers = {
+		'authority': 'wzavfvwgfk.execute-api.us-east-2.amazonaws.com',
+		'origin': 'https://overwatchleague.com',
+		'x-origin': 'overwatchleague.com',
+		'accept': '*/*',
+		'sec-fetch-site': 'cross-site',
+		'sec-fetch-mode': 'cors',
+		'referer': 'https://overwatchleague.com/en-us/schedule?stage=regular_season&week={}'.format(n),
+		'accept-encoding': 'gzip, deflate, br',
+		'accept-language': 'en-US,en;q=0.9',
+	}
+	params = (
+		('stage', 'regular_season'),
+		('page', '{}'.format(n)),
+		('season', '2021'),
+		('locale', 'en-us'),
+	)
+	response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
+	json_data = json.loads(response.text)
+	matches = json_data['content']['tableData']['events'][0]['matches']
+	return matches
