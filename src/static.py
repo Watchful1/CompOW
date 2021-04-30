@@ -23,8 +23,8 @@ def get_webhook(discord_type):
 		return WEBHOOK_THEOW
 
 
-#debug_now = None
-debug_now = datetime.strptime("04-30-21 09:00:00", '%m-%d-%y %H:%M:%S')
+debug_now = None
+#debug_now = datetime.strptime("04-30-21 09:00:00", '%m-%d-%y %H:%M:%S')
 
 
 def utcnow():
