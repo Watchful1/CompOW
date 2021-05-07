@@ -1,6 +1,7 @@
 import requests
 import json
 import discord_logging
+import traceback
 from datetime import datetime, timedelta
 
 
@@ -70,13 +71,17 @@ class ScheduleWeek:
 			('season', '2021'),
 			('locale', 'en-us'),
 		)
-		response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
-		json_data = json.loads(response.text)
-		matches = json_data['content']['tableData']['events'][0]['matches']
+		try:
+			response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
+			json_data = json.loads(response.text)
+			matches = json_data['content']['tableData']['events'][0]['matches']
 
-		self.matches = {}
-		for match in matches:
-			if not match['isEncore']:
-				self.matches[match['id']] = match
+			self.matches = {}
+			for match in matches:
+				if not match['isEncore']:
+					self.matches[match['id']] = match
+		except Exception as err:
+			log.warning(f"Failed to read overwatch api: {err}")
+			log.info(traceback.format_exc())
 
 		self.last_updated = datetime.utcnow()
