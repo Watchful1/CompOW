@@ -34,4 +34,8 @@ def load_state(reset=False):
 	if 'keys' not in state:
 		state['keys'] = {'prediction_thread': None}
 
+	for event in state['events']:
+		if not hasattr(event, 'creation_time'):
+			event.creation_time = static.utcnow()
+
 	return state

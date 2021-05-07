@@ -246,7 +246,7 @@ def merge_fields_into_match(fields, match):
 				match.dirty = True
 
 
-def populate_event(event, is_owl=False):
+def populate_event(event, overwatch_api, is_owl=False):
 	for match in event.matches:
 		fields = parse_match(match.url, is_owl)
 		if fields is None:
@@ -254,6 +254,11 @@ def populate_event(event, is_owl=False):
 			continue
 		merge_fields_into_match(fields, match)
 		event.merge_match(match)
+		if is_owl and match.owl_complete is None:
+			owl_match = overwatch_api.get_match(match)
+			if owl_match['status'] == "CONCLUDED":
+				match.owl_complete = datetime.utcnow()
+				log.info(f"Setting OWL status to complete for {match}")
 
 
 def get_upcoming_events(events):
@@ -297,27 +302,3 @@ def get_upcoming_events(events):
 				)
 				event.add_match(match)
 				events.append(event)
-
-
-def get_week(n):
-	headers = {
-		'authority': 'wzavfvwgfk.execute-api.us-east-2.amazonaws.com',
-		'origin': 'https://overwatchleague.com',
-		'x-origin': 'overwatchleague.com',
-		'accept': '*/*',
-		'sec-fetch-site': 'cross-site',
-		'sec-fetch-mode': 'cors',
-		'referer': 'https://overwatchleague.com/en-us/schedule?stage=regular_season&week={}'.format(n),
-		'accept-encoding': 'gzip, deflate, br',
-		'accept-language': 'en-US,en;q=0.9',
-	}
-	params = (
-		('stage', 'regular_season'),
-		('page', '{}'.format(n)),
-		('season', '2021'),
-		('locale', 'en-us'),
-	)
-	response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
-	json_data = json.loads(response.text)
-	matches = json_data['content']['tableData']['events'][0]['matches']
-	return matches

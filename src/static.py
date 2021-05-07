@@ -23,15 +23,9 @@ def get_webhook(discord_type):
 		return WEBHOOK_THEOW
 
 
-debug_now = None
-#debug_now = datetime.strptime("04-30-21 09:00:00", '%m-%d-%y %H:%M:%S')
-
-
 def utcnow():
-	if debug_now is not None:
-		return debug_now
-	else:
-		return datetime.utcnow()
+	#return datetime.strptime("21-05-07 01:00:00", '%y-%m-%d %H:%M:%S')
+	return datetime.utcnow()
 
 
 missing_competition = set()

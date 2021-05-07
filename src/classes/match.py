@@ -22,6 +22,9 @@ class Match:
 
 		self.post_thread = None
 
+		self.owl_id = None
+		self.owl_complete = None
+
 		self.dirty = False
 
 	def __str__(self):

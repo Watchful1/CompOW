@@ -2,6 +2,7 @@ from datetime import timedelta
 import bisect
 import discord_logging
 
+import static
 from classes.enums import GameState
 import string_utils
 
@@ -23,6 +24,8 @@ class Event:
 		self.streams = []
 		self.competition_url = None
 		self.completion_time = None
+
+		self.creation_time = static.utcnow()
 
 	def add_match(self, match):
 		found = False
@@ -130,6 +133,12 @@ class Event:
 
 	def is_owl(self):
 		return self.competition.name == "Overwatch League 2021 Season"
+
+	def get_start_time(self):
+		# if self.creation_time + timedelta(minutes=15) < static.utcnow():
+		# if self.creation_time < self.start < self.creation_time + timedelta(minutes=15):
+
+		return self.start
 
 	def __str__(self):
 		return f"{self.competition} : {self.start} : {len(self.matches)} matches"

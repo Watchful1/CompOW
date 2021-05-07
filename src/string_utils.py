@@ -90,9 +90,12 @@ def render_reddit_post_match(match, flairs):
 	return ''.join(bldr)
 
 
-def render_reddit_post_match_title(match, spoilers=False):
+def render_reddit_post_match_title(match, spoilers=False, match_num=None):
 	if spoilers:
-		return f"{match.competition} | {match.stage} | Post-Match Discussion"
+		if match_num is not None:
+			return f"{match.competition} | {match.stage} | Match {match_num} | Post-Match Discussion"
+		else:
+			return f"{match.competition} | {match.stage} | Post-Match Discussion"
 	else:
 		return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
 

@@ -7,6 +7,7 @@ import traceback
 import re
 import discord_logging
 import prawcore
+from datetime import datetime, timedelta
 import logging.handlers
 
 log = discord_logging.init_logging()
@@ -19,6 +20,7 @@ import reddit_class
 import file_utils
 import flair_manager
 import mappings
+import overwatch_api_parser
 from classes.enums import GameState
 
 
@@ -31,7 +33,7 @@ def minutes_to_start(start):
 		return 0
 
 
-def main(events, reddit, sticky, flairs, debug, no_discord, keys):
+def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api):
 	try:
 		overggparser.get_upcoming_events(events)
 	except Exception as err:
@@ -43,26 +45,31 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 	for event in events:
 		if event.thread is not None:
 			# log.info(f"Rechecking event: {event}")
-			overggparser.populate_event(event, event.is_owl())
+			overggparser.populate_event(event, overwatch_api, event.is_owl())
 
 			if event.competition.post_match_threads:
-				for match in event.matches:
-					if match.state == GameState.COMPLETE and match.post_thread is None:
-						log.info(f"Match complete, posting post match thread: {match}")
+				for i, match in enumerate(event.matches):
+					if match.post_thread is None:
+						if match.state == GameState.COMPLETE:
+							log.info(f"Match complete, posting post match thread: {match}")
 
-						thread_id = reddit.submit_self_post(
-							static.SUBREDDIT,
-							string_utils.render_reddit_post_match_title(match, spoilers=match.stage in event.competition.spoiler_stages),
-							string_utils.render_reddit_post_match(match, flairs)
-						)
+							thread_id = reddit.submit_self_post(
+								static.SUBREDDIT,
+								string_utils.render_reddit_post_match_title(match, spoilers=match.stage in event.competition.spoiler_stages, match_num=i),
+								string_utils.render_reddit_post_match(match, flairs)
+							)
 
-						reddit.match_thread_settings(thread_id, None)
+							reddit.match_thread_settings(thread_id, None)
 
-						match.post_thread = thread_id
+							match.post_thread = thread_id
 
-						comment_id = reddit.reply_thread(event.thread,
-														 string_utils.render_reddit_post_match_comment(match))
-						reddit.distinguish_comment(comment_id)
+							comment_id = reddit.reply_thread(
+								event.thread,
+								string_utils.render_reddit_post_match_comment(match))
+							reddit.distinguish_comment(comment_id)
+						elif match.owl_complete is not None and \
+								match.owl_complete + timedelta(minutes=2) < static.utcnow() < match.owl_complete + timedelta(minutes=5):
+							log.warning(f"Overwatch api says match is complete, but over.gg doesn't {match}")
 
 			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")
@@ -87,7 +94,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys):
 
 		if (minutes_to_start(event.start) < event.competition.post_minutes_ahead) and event.thread is None:
 			log.info(f"Populating event: {event}")
-			overggparser.populate_event(event, event.is_owl())
+			overggparser.populate_event(event, overwatch_api, event.is_owl())
 
 			if len(event.streams):
 				if event.is_owl() and keys['prediction_thread'] is not None:
@@ -260,6 +267,7 @@ if __name__ == "__main__":
 
 	sticky = sticky_manager.StickyManager(reddit, static.SUBREDDIT, state['stickies'])
 	flairs = flair_manager.FlairManager(state['flairs'])
+	overwatch_api = overwatch_api_parser.OverwatchAPI()
 	events = state['events']
 	for event in events:
 		rank, competition = mappings.get_competition(event.competition.name)
@@ -270,7 +278,7 @@ if __name__ == "__main__":
 	while True:
 		try:
 			if loop == 0:
-				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord, state['keys'])
+				loop_sleep = main(state['events'], reddit, sticky, flairs, debug, no_discord, state['keys'], overwatch_api)
 			#check_messages(reddit, flairs)
 		except prawcore.exceptions.ServerError as err:
 			log.warning("Caught praw ServerError")
