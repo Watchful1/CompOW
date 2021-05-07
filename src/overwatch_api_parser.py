@@ -49,8 +49,8 @@ class ScheduleWeek:
 		self.week_num = week_num
 		self.last_updated = None
 
-	def update_week(self):
-		if self.last_updated is not None and self.last_updated > datetime.utcnow() - timedelta(minutes=1):
+	def update_week(self, force=False):
+		if not force and self.last_updated is not None and self.last_updated > datetime.utcnow() - timedelta(minutes=1):
 			return
 
 		headers = {
@@ -76,6 +76,7 @@ class ScheduleWeek:
 
 		self.matches = {}
 		for match in matches:
-			self.matches[match['id']] = match
+			if not match['isEncore']:
+				self.matches[match['id']] = match
 
 		self.last_updated = datetime.utcnow()
