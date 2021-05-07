@@ -16,9 +16,9 @@ class OverwatchAPI:
 		log.info(f"Getting match: {match.id} : {match.owl_id} : {match.owl_week}")
 		if match.owl_id is not None and match.owl_week is not None:
 			week = self.get_week(match.owl_week)
-			for owl_match in week.matches:
-				if owl_match['id'] == match.owl_id:
-					return owl_match
+			for owl_match_id in week.matches:
+				if owl_match_id == match.owl_id:
+					return week.matches[owl_match_id]
 
 		for week_num in range(1, 20):
 			week = ScheduleWeek(week_num)
