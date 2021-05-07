@@ -14,9 +14,12 @@ class OverwatchAPI:
 		self.matches_weeks = {}
 
 	def get_match(self, match):
+		log.info(f"Getting match: {match.id} : {match.owl_id}")
 		if match.owl_id is not None and match.owl_id in self.matches_weeks:
 			week_num = self.matches_weeks[match.owl_id]
+			log.info(f"Found week num: {week_num}")
 			week = self.get_week(week_num)
+			week.update_week()
 			for owl_match in week:
 				if owl_match['id'] == match.owl_id:
 					return owl_match
