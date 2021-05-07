@@ -72,6 +72,7 @@ class ScheduleWeek:
 			('locale', 'en-us'),
 		)
 		try:
+			log.info(f"Querying overwatch api for week: {self.week_num}")
 			response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
 			json_data = json.loads(response.text)
 			matches = json_data['content']['tableData']['events'][0]['matches']
