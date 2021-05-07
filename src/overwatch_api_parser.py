@@ -81,7 +81,7 @@ class ScheduleWeek:
 				if not match['isEncore']:
 					self.matches[match['id']] = match
 		except Exception as err:
-			log.warning(f"Failed to read overwatch api: {err}")
+			log.warning(f"Failed to read overwatch api for week {self.week_num}: {err}")
 			log.info(traceback.format_exc())
 
 		self.last_updated = datetime.utcnow()
