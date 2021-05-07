@@ -38,4 +38,10 @@ def load_state(reset=False):
 		if not hasattr(event, 'creation_time'):
 			event.creation_time = static.utcnow()
 
+		for match in event.matches:
+			if not hasattr(match, 'owl_id'):
+				match.owl_id = None
+			if not hasattr(match, 'owl_complete'):
+				match.owl_complete = None
+
 	return state
