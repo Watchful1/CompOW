@@ -11,14 +11,11 @@ log = discord_logging.get_logger()
 class OverwatchAPI:
 	def __init__(self):
 		self.weeks_cache = {}
-		self.matches_weeks = {}
 
 	def get_match(self, match):
 		log.info(f"Getting match: {match.id} : {match.owl_id}")
-		if match.owl_id is not None and match.owl_id in self.matches_weeks:
-			week_num = self.matches_weeks[match.owl_id]
-			log.info(f"Found week num: {week_num}")
-			week = self.get_week(week_num)
+		if match.owl_id is not None and match.owl_week is not None:
+			week = self.get_week(match.owl_week)
 			for owl_match in week:
 				if owl_match['id'] == match.owl_id:
 					return owl_match
@@ -32,7 +29,7 @@ class OverwatchAPI:
 						match.away.name == owl_match['competitors'][1]['name'] and \
 						match.start - timedelta(hours=2) < datetime.utcfromtimestamp(owl_match['startDate'] / 1000) < match.start + timedelta(hours=2):
 					match.owl_id = owl_match['id']
-					self.matches_weeks[match.owl_id] = week_num
+					match.owl_week = week_num
 					return owl_match
 
 		return None

@@ -23,6 +23,7 @@ class Match:
 		self.post_thread = None
 
 		self.owl_id = None
+		self.owl_week = None
 		self.owl_complete = None
 
 		self.dirty = False
