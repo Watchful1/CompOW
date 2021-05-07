@@ -19,7 +19,6 @@ class OverwatchAPI:
 			week_num = self.matches_weeks[match.owl_id]
 			log.info(f"Found week num: {week_num}")
 			week = self.get_week(week_num)
-			week.update_week()
 			for owl_match in week:
 				if owl_match['id'] == match.owl_id:
 					return owl_match
@@ -33,6 +32,7 @@ class OverwatchAPI:
 						match.away.name == owl_match['competitors'][1]['name'] and \
 						match.start - timedelta(hours=2) < datetime.utcfromtimestamp(owl_match['startDate'] / 1000) < match.start + timedelta(hours=2):
 					match.owl_id = owl_match['id']
+					self.matches_weeks[match.owl_id] = week_num
 					return owl_match
 
 		return None
