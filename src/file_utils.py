@@ -43,5 +43,7 @@ def load_state(reset=False):
 				match.owl_id = None
 			if not hasattr(match, 'owl_complete'):
 				match.owl_complete = None
+			if not hasattr(match, 'owl_week'):
+				match.owl_week = None
 
 	return state
