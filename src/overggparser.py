@@ -256,7 +256,7 @@ def populate_event(event, overwatch_api, is_owl=False):
 		event.merge_match(match)
 		if is_owl and match.owl_complete is None:
 			owl_match = overwatch_api.get_match(match)
-			if owl_match['status'] == "CONCLUDED":
+			if owl_match is not None and owl_match['status'] == "CONCLUDED":
 				match.owl_complete = datetime.utcnow()
 				log.info(f"Setting OWL status to complete for {match}")
 
