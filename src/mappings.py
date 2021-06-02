@@ -23,7 +23,7 @@ cow_roles = {
 }
 cow_channels = {
 	'match-discussion': '377127072243515393',
-	'ow-esports': '348939546878017536',
+	'ow-esports': '420968531929071628',
 }
 
 competitions = [
