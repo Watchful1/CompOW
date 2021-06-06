@@ -46,7 +46,7 @@ competitions = [
 		post_minutes_ahead=60,
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=96,
-		spoiler_stages=["May Melee: West", "May Melee: East", "May Melee: Tournament"]
+		spoiler_stages=["June Joust: West", "June Joust: East", "June Joust: Tournament"]
 	),
 	Competition(
 		name="Overwatch Contenders 2021 Season 1: Australia",
