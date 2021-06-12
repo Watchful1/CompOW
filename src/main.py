@@ -50,7 +50,13 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 			if event.competition.post_match_threads:
 				for i, match in enumerate(event.matches):
 					if match.post_thread is None:
-						if match.state == GameState.COMPLETE:
+						owl_complete = False
+						if match.owl_complete is not None and \
+								match.owl_complete + timedelta(minutes=2) < static.utcnow() < match.owl_complete + timedelta(minutes=5):
+							log.warning(f"Overwatch api says match is complete, but over.gg doesn't {match}")
+							owl_complete = True
+
+						if match.state == GameState.COMPLETE or owl_complete:
 							log.info(f"Match complete, posting post match thread: {match}")
 
 							thread_id = reddit.submit_self_post(
@@ -67,9 +73,6 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 								event.thread,
 								string_utils.render_reddit_post_match_comment(match))
 							reddit.distinguish_comment(comment_id)
-						elif match.owl_complete is not None and \
-								match.owl_complete + timedelta(minutes=2) < static.utcnow() < match.owl_complete + timedelta(minutes=5):
-							log.warning(f"Overwatch api says match is complete, but over.gg doesn't {match}")
 
 			if event.dirty:
 				log.info(f"Event dirty, updating: {event}")

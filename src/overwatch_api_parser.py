@@ -13,7 +13,7 @@ class OverwatchAPI:
 		self.weeks_cache = {}
 
 	def get_match(self, match):
-		log.info(f"Getting match: {match.id} : {match.owl_id} : {match.owl_week}")
+		log.debug(f"Getting match: {match.id} : {match.owl_id} : {match.owl_week}")
 		if match.owl_id is not None and match.owl_week is not None:
 			week = self.get_week(match.owl_week)
 			for owl_match_id in week.matches:
@@ -72,7 +72,7 @@ class ScheduleWeek:
 			('locale', 'en-us'),
 		)
 		try:
-			log.info(f"Querying overwatch api for week: {self.week_num}")
+			log.debug(f"Querying overwatch api for week: {self.week_num}")
 			response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
 			json_data = json.loads(response.text)
 			matches = json_data['content']['tableData']['events'][0]['matches']
