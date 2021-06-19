@@ -1,7 +1,7 @@
 import traceback
 from lxml import etree
 import bisect
-import json
+import time
 import discord_logging
 
 import requests
@@ -265,9 +265,14 @@ def get_upcoming_events(events):
 	try:
 		data = requests.get(static.OVER_GG_API, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
 	except Exception as err:
-		log.warning("Unable to fetch overgg api page")
-		log.info(traceback.format_exc())
-		return False
+		time.sleep(5)
+		try:
+			data = requests.get(static.OVER_GG_API, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
+		except Exception as err:
+
+			log.warning("Unable to fetch overgg api page on second request")
+			log.info(traceback.format_exc())
+			return False
 
 	for match_table in data['matches']:
 		match = Match(
