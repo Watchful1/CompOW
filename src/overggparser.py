@@ -276,7 +276,9 @@ def retry_request(url, retries, sleep):
 
 
 def get_upcoming_events(events):
-	data = retry_request(static.OVER_GG_API, 3, 30)
+	data = retry_request(static.OVER_GG_API, 5, 30)
+	if data is None:
+		return False
 
 	for match_table in data['matches']:
 		match = Match(
