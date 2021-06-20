@@ -265,7 +265,7 @@ def get_upcoming_events(events):
 	try:
 		data = requests.get(static.OVER_GG_API, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
 	except Exception as err:
-		time.sleep(5)
+		time.sleep(30)
 		try:
 			data = requests.get(static.OVER_GG_API, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
 		except Exception as err:
