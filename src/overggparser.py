@@ -261,14 +261,15 @@ def populate_event(event, overwatch_api, is_owl=False):
 				log.info(f"Setting OWL status to complete for {match}")
 
 
-def retry_request(url, retries, sleep):
+def retry_request(url, retries, sleep, first=True):
 	try:
 		return requests.get(url, headers={'User-Agent': static.USER_AGENT}, timeout=5).json()
 	except Exception as err:
-		log.warning(f"Failed request, retrying {retries} times")
+		if not first:
+			log.warning(f"Failed request, retrying {retries} times")
 		if retries > 0:
 			time.sleep(sleep)
-			return retry_request(url, retries - 1, sleep)
+			return retry_request(url, retries - 1, sleep, False)
 		else:
 			log.warning("Failed final, returning")
 			log.info(traceback.format_exc())
@@ -276,7 +277,7 @@ def retry_request(url, retries, sleep):
 
 
 def get_upcoming_events(events):
-	data = retry_request(static.OVER_GG_API, 5, 30)
+	data = retry_request(static.OVER_GG_API, 5, 60)
 	if data is None:
 		return False
 
