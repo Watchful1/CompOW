@@ -49,7 +49,7 @@ competitions = [
 		spoiler_stages=["Summer Showdown: West", "Summer Showdown: East", "Summer Showdown: Tournament"]
 	),
 	Competition(
-		name="Overwatch Contenders 2021 Season 1: Australia",
+		name="Overwatch Contenders 2021 Season 2: Australia",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -94,7 +94,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2021 Season 1: Korea",
+		name="Overwatch Contenders 2021 Season 2: Korea",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
