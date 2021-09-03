@@ -46,7 +46,7 @@ competitions = [
 		post_minutes_ahead=60,
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=96,
-		spoiler_stages=["Countdown Cup: West", "Countdown Cup: East", "Countdown Cup: Tournament"]
+		spoiler_stages=["Playoffs: West Playins","Playoffs: East Playins"]
 	),
 	Competition(
 		name="Overwatch Contenders 2021 Season 2: Australia",
@@ -64,7 +64,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2021 Season 1: North America",
+		name="Overwatch Contenders 2021: North America",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -79,7 +79,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2021 Season 1: Europe",
+		name="Overwatch Contenders 2021: Europe",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
