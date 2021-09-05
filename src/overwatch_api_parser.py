@@ -20,7 +20,7 @@ class OverwatchAPI:
 				if owl_match_id == match.owl_id:
 					return week.matches[owl_match_id]
 
-		for week_num in range(1, 20):
+		for week_num in range(1, 28):
 			week = ScheduleWeek(week_num)
 			week.update_week()
 			for owl_id in week.matches:
