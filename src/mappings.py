@@ -123,6 +123,21 @@ competitions = [
 			)
 		]
 	),
+	Competition(
+		name="NetEase Esports - 2021 - Winter",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['CNContenders'], cow_roles['AUContenders'], cow_roles['KRContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 ]
 stream_languages = [
 	"eng",
