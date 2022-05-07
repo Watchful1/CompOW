@@ -28,7 +28,7 @@ cow_channels = {
 
 competitions = [
 	Competition(
-		name="Overwatch League 2021 Season",
+		name="Overwatch League 2022 Season",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
@@ -43,101 +43,101 @@ competitions = [
 			)
 		],
 		post_match_threads=True,
-		post_minutes_ahead=90,
+		post_minutes_ahead=150,
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=96,
 		spoiler_stages=["Playoffs: West Playins","Playoffs: East Playins"]
 	),
-	Competition(
-		name="Overwatch Contenders 2021 Season 2: Australia",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['AUContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2021: North America",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['NAContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2021: Europe",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['EUContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2021 Season 2: Korea",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['KRContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="Overwatch Contenders 2021 Season 2: China",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['CNContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
-	Competition(
-		name="NetEase Esports - 2021 - Winter",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['CNContenders'], cow_roles['AUContenders'], cow_roles['KRContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		]
-	),
+	# Competition(
+	# 	name="Overwatch Contenders 2021 Season 2: Australia",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['AUContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
+	# Competition(
+	# 	name="Overwatch Contenders 2021: North America",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['NAContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
+	# Competition(
+	# 	name="Overwatch Contenders 2021: Europe",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['EUContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
+	# Competition(
+	# 	name="Overwatch Contenders 2021 Season 2: Korea",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['KRContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
+	# Competition(
+	# 	name="Overwatch Contenders 2021 Season 2: China",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['CNContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
+	# Competition(
+	# 	name="NetEase Esports - 2021 - Winter",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['CNContenders'], cow_roles['AUContenders'], cow_roles['KRContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	]
+	# ),
 ]
 stream_languages = [
 	"eng",

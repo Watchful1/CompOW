@@ -24,7 +24,7 @@ def get_webhook(discord_type):
 
 
 def utcnow():
-	#return datetime.strptime("21-05-07 01:00:00", '%y-%m-%d %H:%M:%S')
+	#return datetime.strptime("22-05-05 18:00:00", '%y-%m-%d %H:%M:%S')
 	return datetime.utcnow()
 
 

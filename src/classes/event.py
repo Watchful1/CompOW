@@ -132,7 +132,7 @@ class Event:
 		return ' - '.join(bldr)
 
 	def is_owl(self):
-		return self.competition.name == "Overwatch League 2021 Season"
+		return self.competition.name == "Overwatch League 2022 Season"
 
 	def get_start_time(self):
 		# if self.creation_time + timedelta(minutes=15) < static.utcnow():

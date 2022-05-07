@@ -55,27 +55,16 @@ class ScheduleWeek:
 			return
 
 		headers = {
-			'authority': 'wzavfvwgfk.execute-api.us-east-2.amazonaws.com',
-			'origin': 'https://overwatchleague.com',
 			'x-origin': 'overwatchleague.com',
-			'accept': '*/*',
-			'sec-fetch-site': 'cross-site',
-			'sec-fetch-mode': 'cors',
-			'referer': 'https://overwatchleague.com/en-us/schedule?stage=regular_season&week={}'.format(self.week_num),
-			'accept-encoding': 'gzip, deflate, br',
-			'accept-language': 'en-US,en;q=0.9',
 		}
 		params = (
-			('stage', 'regular_season'),
-			('page', '{}'.format(self.week_num)),
-			('season', '2021'),
 			('locale', 'en-us'),
 		)
 		try:
 			log.debug(f"Querying overwatch api for week: {self.week_num}")
-			response = requests.get('https://wzavfvwgfk.execute-api.us-east-2.amazonaws.com/production/owl/paginator/schedule', headers=headers, params=params)
+			response = requests.get('https://pk0yccosw3.execute-api.us-east-2.amazonaws.com/production/v2/content-types/schedule/blt78de204ce428f00c/week/{}/team/allteams'.format(self.week_num), headers=headers, params=params)
 			json_data = json.loads(response.text)
-			matches = json_data['content']['tableData']['events'][0]['matches']
+			matches = json_data['data']['tableData']['events'][0]['matches']
 
 			self.matches = {}
 			for match in matches:

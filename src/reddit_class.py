@@ -35,7 +35,7 @@ class Reddit:
 			else:
 				log.error(f"{key['name']} key not in config")
 
-	def submit_self_post(self, subreddit, title, text, chat_post=False):
+	def submit_self_post(self, subreddit, title, text, chat_post=False, flair_id=None):
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
@@ -43,9 +43,9 @@ class Reddit:
 				thread_id = "test"
 			else:
 				if chat_post:
-					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT")
+					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
 				else:
-					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text)
+					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, flair_id=flair_id)
 				thread_id = thread.id
 			log.debug(f"Posted thread to r/{subreddit} - {thread_id}")
 			return thread_id
@@ -75,7 +75,7 @@ class Reddit:
 				comment_id = "test"
 			else:
 				submission = self.reddit.submission(id=thread_id)
-				comment_id = submission.reply(text)
+				comment_id = submission.reply(text).id
 			log.debug(f"Replied to thread {thread_id}")
 			return comment_id
 		except Exception as err:
@@ -196,9 +196,9 @@ class Reddit:
 
 	def distinguish_comment(self, comment_id):
 		try:
+			log.debug(f"Distinguishing comment: {comment_id}")
 			if not self.debug:
 				self.reddit.comment(comment_id).mod.distinguish(how='yes')
-			log.debug(f"Distinguishing comment: {comment_id}")
 			return None
 		except Exception as err:
 			log.warning(f"Unable to distinguish comment: {comment_id}")
