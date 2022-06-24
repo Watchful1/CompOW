@@ -29,7 +29,7 @@ def render_append_highlights(current_body, link, flairs):
 	return ''.join(bldr)
 
 
-def render_reddit_post_match(match, flairs):
+def render_reddit_post_match(match, flairs, owl_complete):
 	bldr = []
 
 	bldr.append(">#**")
@@ -86,6 +86,10 @@ def render_reddit_post_match(match, flairs):
 		bldr.append(")|")
 
 	bldr.append(">-")
+
+	if owl_complete:
+		bldr.append("\n\n")
+		bldr.append("This match has not been marked as complete on over.gg, so the map scores may be incorrect. If you want to help update map scores on over.gg, reach out to u/Watchful1")
 
 	return ''.join(bldr)
 

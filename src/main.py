@@ -62,8 +62,8 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 							thread_id = reddit.submit_self_post(
 								static.SUBREDDIT,
 								string_utils.render_reddit_post_match_title(match, spoilers=match.stage in event.competition.spoiler_stages, match_num=i + 1),
-								string_utils.render_reddit_post_match(match, flairs),
-								flair_id="dd4d4030-6c49-11e9-a08a-0e2a2817792e"
+								string_utils.render_reddit_post_match(match, flairs, owl_complete),
+								flair="match"
 							)
 
 							reddit.match_thread_settings(thread_id, None)
