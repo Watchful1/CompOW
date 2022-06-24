@@ -105,7 +105,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 					log.info("Unstickying prediction thread")
 					sticky.unsticky(keys['prediction_thread'])
 					reddit.lock(keys['prediction_thread'])
-					keys['prediction_thread'] = None
+					keys['prediction_thread'] = "posted"
 
 				thread_id = reddit.submit_self_post(
 					static.SUBREDDIT,
@@ -146,25 +146,34 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 					if not debug:
 						file_utils.save_state(events, sticky.get_save(), flairs.flairs, keys)
 
-		if event.is_owl() and minutes_to_start(event.start) < 72 * 60:
+		if event.is_owl() and minutes_to_start(event.start) < 4 * 24 * 60:
 			upcoming_owl_events.append(event)
 
 	for event in events_to_delete:
 		log.info(f"Event complete, removing: {event}")
 		events.remove(event)
 
-	if len(upcoming_owl_events) and keys['prediction_thread'] is None and static.utcnow().weekday() == 3 and static.utcnow().hour > 18:
-		log.info("Posting prediction thread")
-		thread_id = reddit.submit_self_post(
-			static.SUBREDDIT,
-			string_utils.render_reddit_prediction_thread_title(upcoming_owl_events[0]),
-			string_utils.render_reddit_prediction_thread(upcoming_owl_events, flairs),
-			flair="match"
-		)
-		keys['prediction_thread'] = thread_id
-		sticky.sticky(thread_id, upcoming_owl_events[0].competition, upcoming_owl_events[0].start)
+	if len(upcoming_owl_events) and keys['prediction_thread'] is None and static.utcnow().hour > 18:
+		owl_tomorrow = False
+		for owl_event in upcoming_owl_events:
+			if minutes_to_start(owl_event.start) < 24 * 60:
+				owl_tomorrow = True
+				break
+		if owl_tomorrow:
+			log.info("Posting prediction thread")
+			thread_id = reddit.submit_self_post(
+				static.SUBREDDIT,
+				string_utils.render_reddit_prediction_thread_title(upcoming_owl_events[0]),
+				string_utils.render_reddit_prediction_thread(upcoming_owl_events, flairs),
+				flair="match"
+			)
+			keys['prediction_thread'] = thread_id
+			sticky.sticky(thread_id, upcoming_owl_events[0].competition, upcoming_owl_events[0].start)
 
-		reddit.prediction_thread_settings(thread_id)
+			reddit.prediction_thread_settings(thread_id)
+
+	if len(upcoming_owl_events) == 0 and keys['prediction_thread'] == "posted":
+		keys['prediction_thread'] = None
 
 	if not debug:
 		file_utils.save_state(events, sticky.get_save(), flairs.flairs, keys)
