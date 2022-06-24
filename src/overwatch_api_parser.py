@@ -21,7 +21,7 @@ class OverwatchAPI:
 					return week.matches[owl_match_id]
 
 		for week_num in range(1, 24):
-			week = ScheduleWeek(week_num)
+			week = self.get_week(week_num)
 			week.update_week()
 			for owl_id in week.matches:
 				owl_match = week.matches[owl_id]
@@ -52,7 +52,9 @@ class ScheduleWeek:
 
 	def update_week(self, force=False):
 		if not force and self.last_updated is not None and self.last_updated > datetime.utcnow() - timedelta(minutes=1):
+			#log.debug(f"Skipping overwatch api query: {self.last_updated} > {datetime.utcnow() - timedelta(minutes=1)}")
 			return
+		#log.debug(f"Querying overwatch api: {force} : {self.last_updated} < {datetime.utcnow() - timedelta(minutes=1)}")
 
 		headers = {
 			'x-origin': 'overwatchleague.com',
