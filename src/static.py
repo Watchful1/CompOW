@@ -10,7 +10,7 @@ WEBHOOK_THEOW = None
 
 OVER_GG_API = "https://api.over.gg/matches/upcoming"
 FLAIR_LIST = "http://rcompetitiveoverwatch.com/static/data/flairs.json"
-PREDICTION_URL = "https://pickem.overwatchleague.com/"
+PREDICTION_URL = "https://pickem.overwatchleague.com/en-us/leaderboard/reddit-cow/2022/kickoff-clash"
 JUKED_EVENT = "https://juked.gg/e/4252#overview"
 
 AUTHORIZED_USERS = ["Watchful1", "AkshonEsports"]

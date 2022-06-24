@@ -413,10 +413,9 @@ def render_reddit_prediction_thread_title(event):
 def render_reddit_prediction_thread(events, flairs):
 	bldr = []
 
-	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and use the OWL ")
-	bldr.append("[Pick'Ems Website](")
+	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and [join our Pick'Ems leaderboard here](")
 	bldr.append(static.PREDICTION_URL)
-	bldr.append(") to make your predictions.\n\n")
+	bldr.append(") by clicking ""Join a leaderboard"" and putting in the code `reddit-cow`. We will have prizes after each week of games.\n\n")
 
 	for event in events:
 		for match in event.matches:
