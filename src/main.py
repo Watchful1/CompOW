@@ -250,6 +250,7 @@ if __name__ == "__main__":
 	debug = False
 	force = False
 	no_discord = False
+	owl_pred_posted = False
 	user = None
 	if len(sys.argv) >= 2:
 		user = sys.argv[1]
@@ -262,6 +263,8 @@ if __name__ == "__main__":
 				force = True
 			elif arg == 'no_discord':
 				no_discord = True
+			elif arg == 'owl_pred_posted':
+				owl_pred_posted = True
 	else:
 		log.error("No user specified, aborting")
 		sys.exit(0)
@@ -287,6 +290,10 @@ if __name__ == "__main__":
 	for event in events:
 		rank, competition = mappings.get_competition(event.competition.name)
 		event.competition = competition
+
+	if owl_pred_posted and state['keys']['prediction_thread'] is None:
+		state['keys']['prediction_thread'] = "posted"
+
 
 	loop = 0
 	loop_sleep = 0
