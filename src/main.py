@@ -111,7 +111,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 					static.SUBREDDIT,
 					string_utils.render_reddit_event_title(event),
 					string_utils.render_reddit_event(event, flairs),
-					flair_id="dd4d4030-6c49-11e9-a08a-0e2a2817792e"
+					flair="match"
 				)
 				reddit.match_thread_settings(thread_id, "new")
 
@@ -158,7 +158,8 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 		thread_id = reddit.submit_self_post(
 			static.SUBREDDIT,
 			string_utils.render_reddit_prediction_thread_title(upcoming_owl_events[0]),
-			string_utils.render_reddit_prediction_thread(upcoming_owl_events, flairs)
+			string_utils.render_reddit_prediction_thread(upcoming_owl_events, flairs),
+			flair="match"
 		)
 		keys['prediction_thread'] = thread_id
 		sticky.sticky(thread_id, upcoming_owl_events[0].competition, upcoming_owl_events[0].start)

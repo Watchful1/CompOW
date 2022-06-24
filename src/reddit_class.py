@@ -13,6 +13,7 @@ log = discord_logging.get_logger()
 class Reddit:
 	def __init__(self, user, debug=False):
 		self.debug = debug
+		self.flair_cache = {}
 		try:
 			self.reddit = praw.Reddit(
 				user,
@@ -35,13 +36,16 @@ class Reddit:
 			else:
 				log.error(f"{key['name']} key not in config")
 
-	def submit_self_post(self, subreddit, title, text, chat_post=False, flair_id=None):
+	def submit_self_post(self, subreddit, title, text, chat_post=False, flair=None):
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
 				log.info(f"Body: {text}")
 				thread_id = "test"
 			else:
+				flair_id = None
+				if flair is not None:
+					flair_id = self.get_flair_id(flair)
 				if chat_post:
 					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
 				else:
@@ -155,20 +159,22 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
-	def get_flair_id(self, thread_id, flair_name):
+	def get_flair_id(self, subreddit, flair_name):
 		try:
 			if self.debug:
 				return "test"
 			else:
-				flairs = self.reddit.submission(thread_id).flair.choices()
-				for flair in flairs:
-					if flair['flair_text'] == flair_name:
+				if flair_name in self.flair_cache:
+					return self.flair_cache[flair_name]
+				for flair in self.reddit.subreddit(subreddit).flair.link_templates.user_selectable():
+					if flair_name in flair['flair_text'].lower():
 						log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
+						self.flair_cache[flair_name] = flair['flair_template_id']
 						return flair['flair_template_id']
 				log.debug(f"Couldn't find template for flair: {flair_name}")
 				return None
 		except Exception as err:
-			log.warning(f"Unable to find template for flair: {thread_id}")
+			log.warning(f"Unable to find template for flair in r/{subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
@@ -221,16 +227,10 @@ class Reddit:
 		if sort is not None:
 			self.set_suggested_sort(thread_id, sort)
 		self.disable_inbox_replies(thread_id)
-		flair_template_id = self.get_flair_id(thread_id, "Matchthread")
-		if flair_template_id is not None:
-			self.set_flair(thread_id, flair_template_id)
 		self.approve(thread_id)
 
 	def prediction_thread_settings(self, thread_id):
 		self.disable_inbox_replies(thread_id)
-		flair_template_id = self.get_flair_id(thread_id, "Matchthread")
-		if flair_template_id is not None:
-			self.set_flair(thread_id, flair_template_id)
 		self.approve(thread_id)
 
 	def get_unread(self):
