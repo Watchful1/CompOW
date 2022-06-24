@@ -101,7 +101,7 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 			overggparser.populate_event(event, overwatch_api, event.is_owl())
 
 			if len(event.streams):
-				if event.is_owl() and keys['prediction_thread'] is not None:
+				if event.is_owl() and keys['prediction_thread'] is not None and keys['prediction_thread'] != "posted":
 					log.info("Unstickying prediction thread")
 					sticky.unsticky(keys['prediction_thread'])
 					reddit.lock(keys['prediction_thread'])
