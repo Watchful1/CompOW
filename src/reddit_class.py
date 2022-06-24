@@ -45,7 +45,7 @@ class Reddit:
 			else:
 				flair_id = None
 				if flair is not None:
-					flair_id = self.get_flair_id(flair)
+					flair_id = self.get_flair_id(subreddit, flair)
 				if chat_post:
 					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
 				else:
