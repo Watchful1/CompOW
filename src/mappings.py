@@ -46,7 +46,7 @@ competitions = [
 		post_minutes_ahead=150,
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=96,
-		spoiler_stages=["Kickoff Clash: West","Kickoff Clash: East"]
+		spoiler_stages=["Midseason Madness: Bracket"]
 	),
 	# Competition(
 	# 	name="Overwatch Contenders 2021 Season 2: Australia",
