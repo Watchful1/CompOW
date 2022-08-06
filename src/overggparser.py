@@ -172,8 +172,10 @@ def merge_field(object, field, value):
 def merge_fields_into_match(fields, match):
 	if match.home.name != fields['home']:
 		log.warning(f"Home team doesn't match: {match.home.name} to {fields['home']}")
+		match.home.name = fields['home']
 	if match.away.name != fields['away']:
 		log.warning(f"Away team doesn't match: {match.away.name} to {fields['away']}")
+		match.away.name = fields['away']
 
 	merge_field(match, "stage", fields['match_name'])
 	merge_field(match, "competition", fields['tournament'])
