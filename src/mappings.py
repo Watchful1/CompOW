@@ -136,7 +136,8 @@ competitions = [
 				type=DiscordType.THEOW,
 				minutes_ahead=5
 			)
-		]
+		],
+		leave_thread_minutes=4 * 60,
 	),
 ]
 stream_languages = [
