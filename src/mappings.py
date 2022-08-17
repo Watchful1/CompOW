@@ -63,36 +63,36 @@ competitions = [
 	# 		)
 	# 	]
 	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2021: North America",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['NAContenders'], "@here"],
-	# 			channel=cow_channels['ow-esports']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
-	# Competition(
-	# 	name="Overwatch Contenders 2021: Europe",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['EUContenders'], "@here"],
-	# 			channel=cow_channels['ow-esports']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	Competition(
+		name="Overwatch Contenders 2022 Summer Series: North America B-Sides",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['NAContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
+	Competition(
+		name="Overwatch Contenders 2022 Summer Series: Europe B-Sides",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['EUContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Overwatch Contenders 2021 Season 2: Korea",
 	# 	discord=[
