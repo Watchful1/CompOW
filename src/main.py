@@ -131,6 +131,10 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 						len(event.streams):
 					log.info(f"Posting announcement to discord: {event} : {discord_notification.type}")
 					discord_announcement = string_utils.render_discord(event, flairs, discord_notification)
+					if len(discord_announcement) > 2000:
+						discord_announcement = string_utils.render_discord(event, flairs, discord_notification, short=True)
+						if len(discord_announcement) > 2000:
+							log.warning(f"Discord notification length too long for {discord_notification.type}, {len(discord_announcement)}")
 					if debug or no_discord:
 						log.info(discord_announcement)
 					else:

@@ -260,7 +260,7 @@ def get_discord_flair(flairs, name, country, discord_type):
 			return ""
 
 
-def render_discord(event, flairs, discord_notification):
+def render_discord(event, flairs, discord_notification, short=False):
 	bldr = []
 
 	if discord_notification.type == DiscordType.COW:
@@ -291,41 +291,62 @@ def render_discord(event, flairs, discord_notification):
 		bldr.append("\n\n")
 
 		for i, match in enumerate(event.matches):
-			bldr.append("**__Match ")
-			bldr.append(str(i + 1))
-			bldr.append("__** - *")
+			if short:
+				bldr.append("*")
+				bldr.append(pytz.utc.localize(match.start).astimezone(pytz.timezone("US/Pacific")).strftime("%I:%M %p %Z"))
+				bldr.append("* ")
 
-			timezones = [
-				pytz.timezone("US/Pacific"),
-				pytz.timezone("US/Eastern"),
-				pytz.timezone("Europe/Paris"),
-				pytz.timezone("Australia/Sydney"),
-			]
-			match_time = pytz.utc.localize(match.start)
+				bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
 
-			time_names = []
-			for timezone in timezones:
-				time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
+				bldr.append(" **")
+				bldr.append(match.home.name)
+				bldr.append("**")
 
-			bldr.append(' / '.join(time_names))
+				bldr.append(" vs ")
 
-			bldr.append("*\n")
+				bldr.append("**")
+				bldr.append(match.away.name)
+				bldr.append("** ")
 
-			bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
+				bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
 
-			bldr.append(" **")
-			bldr.append(match.home.name)
-			bldr.append("**")
+				bldr.append("\n")
+			else:
+				bldr.append("**__Match ")
+				bldr.append(str(i + 1))
+				bldr.append("__** - *")
 
-			bldr.append(" vs ")
+				timezones = [
+					pytz.timezone("US/Pacific"),
+					pytz.timezone("US/Eastern"),
+					pytz.timezone("Europe/Paris"),
+					pytz.timezone("Australia/Sydney"),
+				]
+				match_time = pytz.utc.localize(match.start)
 
-			bldr.append("**")
-			bldr.append(match.away.name)
-			bldr.append("** ")
+				time_names = []
+				for timezone in timezones:
+					time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
 
-			bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
+				bldr.append(' / '.join(time_names))
 
-			bldr.append("\n\n")
+				bldr.append("*\n")
+
+				bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
+
+				bldr.append(" **")
+				bldr.append(match.home.name)
+				bldr.append("**")
+
+				bldr.append(" vs ")
+
+				bldr.append("**")
+				bldr.append(match.away.name)
+				bldr.append("** ")
+
+				bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
+
+				bldr.append("\n\n")
 
 		bldr.append(":tv:")
 		bldr.append("<")
