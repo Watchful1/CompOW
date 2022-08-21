@@ -48,21 +48,21 @@ competitions = [
 		event_build_hours_ahead=96,
 		spoiler_stages=["Midseason Madness: Bracket"]
 	),
-	# Competition(
-	# 	name="Overwatch Contenders 2021 Season 2: Australia",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['AUContenders'], "@here"],
-	# 			channel=cow_channels['ow-esports']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	Competition(
+		name="Overwatch Contenders 2022 Summer Series: North Australia B-Sides",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['AUContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	Competition(
 		name="Overwatch Contenders 2022 Summer Series: North America B-Sides",
 		discord=[
@@ -123,22 +123,22 @@ competitions = [
 	# 		)
 	# 	]
 	# ),
-	Competition(
-		name="Mayhem Summer Classic",
-		discord=[
-			DiscordNotification(
-				type=DiscordType.COW,
-				minutes_ahead=15,
-				roles=[cow_roles['NAContenders'], "@here"],
-				channel=cow_channels['ow-esports']
-			),
-			DiscordNotification(
-				type=DiscordType.THEOW,
-				minutes_ahead=5
-			)
-		],
-		leave_thread_minutes=4 * 60,
-	),
+	# Competition(
+	# 	name="Mayhem Summer Classic",
+	# 	discord=[
+	# 		DiscordNotification(
+	# 			type=DiscordType.COW,
+	# 			minutes_ahead=15,
+	# 			roles=[cow_roles['NAContenders'], "@here"],
+	# 			channel=cow_channels['ow-esports']
+	# 		),
+	# 		DiscordNotification(
+	# 			type=DiscordType.THEOW,
+	# 			minutes_ahead=5
+	# 		)
+	# 	],
+	# 	leave_thread_minutes=4 * 60,
+	# ),
 ]
 stream_languages = [
 	"eng",
