@@ -49,7 +49,7 @@ competitions = [
 		spoiler_stages=["Midseason Madness: Bracket"]
 	),
 	Competition(
-		name="Overwatch Contenders 2022 Summer Series: North Australia B-Sides",
+		name="Overwatch Contenders 2022 Summer Series: Australia B-Sides",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
