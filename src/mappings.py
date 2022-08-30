@@ -93,21 +93,21 @@ competitions = [
 			)
 		]
 	),
-	# Competition(
-	# 	name="Overwatch Contenders 2021 Season 2: Korea",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['KRContenders'], "@here"],
-	# 			channel=cow_channels['ow-esports']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	Competition(
+		name="Overwatch Contenders 2022 Summer Series: Korea B-Sides",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['KRContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Overwatch Contenders 2021 Season 2: China",
 	# 	discord=[
