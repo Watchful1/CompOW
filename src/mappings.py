@@ -108,21 +108,21 @@ competitions = [
 			)
 		]
 	),
-	# Competition(
-	# 	name="Overwatch Contenders 2021 Season 2: China",
-	# 	discord=[
-	# 		DiscordNotification(
-	# 			type=DiscordType.COW,
-	# 			minutes_ahead=15,
-	# 			roles=[cow_roles['CNContenders'], "@here"],
-	# 			channel=cow_channels['ow-esports']
-	# 		),
-	# 		DiscordNotification(
-	# 			type=DiscordType.THEOW,
-	# 			minutes_ahead=5
-	# 		)
-	# 	]
-	# ),
+	Competition(
+		name="Overwatch Contenders 2022 Summer Series: China B-Sides",
+		discord=[
+			DiscordNotification(
+				type=DiscordType.COW,
+				minutes_ahead=15,
+				roles=[cow_roles['CNContenders'], "@here"],
+				channel=cow_channels['ow-esports']
+			),
+			DiscordNotification(
+				type=DiscordType.THEOW,
+				minutes_ahead=5
+			)
+		]
+	),
 	# Competition(
 	# 	name="Mayhem Summer Classic",
 	# 	discord=[
