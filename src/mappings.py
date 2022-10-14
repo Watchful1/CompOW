@@ -46,7 +46,7 @@ competitions = [
 		post_minutes_ahead=150,
 		leave_thread_minutes=4 * 60,
 		event_build_hours_ahead=96,
-		spoiler_stages=["Summer Showdown: West", "Summer Showdown: East"]
+		spoiler_stages=["Play-ins: West", "Play-ins: East"]
 	),
 	Competition(
 		name="Overwatch Contenders 2022 Summer Series: Australia B-Sides",
