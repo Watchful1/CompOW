@@ -94,7 +94,7 @@ competitions = [
 		]
 	),
 	Competition(
-		name="Overwatch Contenders 2022 Summer Series: Korea B-Sides",
+		name="Overwatch Contenders 2022 Run It Back: Korea",
 		discord=[
 			DiscordNotification(
 				type=DiscordType.COW,
