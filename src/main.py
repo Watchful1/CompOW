@@ -21,7 +21,7 @@ import file_utils
 import flair_manager
 import mappings
 import overwatch_api_parser
-from classes.enums import GameState
+from classes_2.enums import GameState
 
 
 def minutes_to_start(start):

@@ -1,6 +1,6 @@
-from classes.competition import Competition
-from classes.competition import DiscordNotification
-from classes.enums import DiscordType
+from classes_2.competition import Competition
+from classes_2.competition import DiscordNotification
+from classes_2.enums import DiscordType
 
 #contenders 420968531929071628
 #match-discussion 377127072243515393

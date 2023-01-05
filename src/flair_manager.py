@@ -3,8 +3,8 @@ import requests
 import discord_logging
 
 import static
-from classes.flair_object import FlairObject
-from classes.enums import DiscordType
+from classes_2.flair_object import FlairObject
+from classes_2.enums import DiscordType
 
 
 log = discord_logging.get_logger()

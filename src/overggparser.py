@@ -9,13 +9,13 @@ from datetime import datetime
 from datetime import timedelta
 
 import static
-from classes.stream import Stream
-from classes.enums import GameState
-from classes.enums import Winner
-from classes.match import Match
-from classes.event import Event
-from classes.team import Team
-from classes.map import Map
+from classes_2.stream import Stream
+from classes_2.enums import GameState
+from classes_2.enums import Winner
+from classes_2.match import Match
+from classes_2.event import Event
+from classes_2.team import Team
+from classes_2.map import Map
 import mappings
 
 log = discord_logging.get_logger()

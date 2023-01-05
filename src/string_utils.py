@@ -4,9 +4,9 @@ import re
 
 import static
 from mappings import cow_roles
-from classes.enums import GameState
-from classes.enums import Winner
-from classes.enums import DiscordType
+from classes_2.enums import GameState
+from classes_2.enums import Winner
+from classes_2.enums import DiscordType
 
 
 def render_append_highlights(current_body, link, flairs):

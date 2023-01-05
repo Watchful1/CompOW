@@ -9,6 +9,7 @@ lxml = "*"
 praw = "*"
 pytz = "*"
 discord-logging = {git = "https://github.com/Watchful1/DiscordLogging.git"}
+jsons = "*"
 
 [dev-packages]
 pytest = "*"

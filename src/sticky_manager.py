@@ -1,7 +1,7 @@
 import bisect
 import discord_logging
 
-from classes.sticky import Sticky
+from classes_2.sticky import Sticky
 
 log = discord_logging.get_logger()
 

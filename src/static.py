@@ -1,4 +1,4 @@
-from classes.enums import DiscordType
+from classes_2.enums import DiscordType
 from datetime import datetime
 
 STATE_FILENAME = "state.pickle"

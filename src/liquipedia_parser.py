@@ -2,43 +2,16 @@ import traceback
 from lxml import etree
 import requests
 import discord_logging
-from datetime import datetime
+import static
+from classes import Game
+from datetime import datetime, timedelta
 
-log = discord_logging.init_logging()
-
-
-class Team:
-	def __init__(self):
-		self.name = None
-		self.score = None
-
-
-class Game:
-	def __init__(self):
-		self.home = Team()
-		self.away = Team()
-		self.complete = False
-		self.datetime = None
-
-	def status(self):
-		if self.complete:
-			return "Complete"
-		if self.home.score is not None or self.away.score is not None:
-			return "In-progress"
-		return "Not-started"
-
-	def render_datetime(self):
-		if self.datetime is None:
-			return "None"
-		return self.datetime.strftime('%Y-%m-%d %H:%M')
-
-	def __str__(self):
-		return f"{self.home.name} vs {self.away.name} : {self.home.score}-{self.away.score} : {self.status()} : {self.render_datetime()}"
+log = discord_logging.get_logger()
 
 
 def get_page_text(page_url):
 	try:
-		return requests.get(page_url, headers={'User-Agent': "u/watchful1 test agent"}, timeout=5).text
+		return requests.get(page_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
 	except Exception:
 		log.warning(f"Unable to fetch match page: {page_url}")
 		log.warning(traceback.format_exc())
@@ -53,20 +26,14 @@ def get_text_from_paths(base_node, paths):
 	return None
 
 
-if __name__ == "__main__":
-	#page_url = "https://liquipedia.net/overwatch/Calling_All_Heroes/Challengers_Cup"
-	#page_url = "https://liquipedia.net/overwatch/Overwatch_Contenders/2022/Run_It_Back/North_America"
-	#page_url = "https://liquipedia.net/dota2/Dota_Pro_Circuit/2023/1/North_America/Open_Qualifier/4"
-	page_url = "https://liquipedia.net/overwatch/Overwatch_League/Season_5/Regular_Season/Kickoff_Clash"
-
+def parse_event(page_url):
 	page_string = get_page_text(page_url)
-
 	tree = etree.fromstring(page_string, etree.HTMLParser())
 
-	title = None
 	title_node = tree.xpath("//div[@id='main-content']/h1[@class='firstHeading']/span/text()")
+	event_name = None
 	if len(title_node):
-		title = title_node[0]
+		event_name = title_node[0]
 
 	link_divs = tree.xpath("//div[@class='fo-nttax-infobox wiki-bordercolor-light']/div")
 	found_links = False
@@ -86,10 +53,6 @@ if __name__ == "__main__":
 				if text.lower() == "links":
 					found_links = True
 
-	log.info(title)
-	for stream in streams:
-		log.info(stream)
-
 	games = []
 
 	game_nodes = tree.xpath("//div[@class='brkts-popup brkts-match-info-popup']")
@@ -97,7 +60,6 @@ if __name__ == "__main__":
 		game_nodes = tree.xpath("//tr[@class='match-row']")
 	for node in game_nodes:
 		game = Game()
-
 		game.home.name = get_text_from_paths(node,
 			[".//div[contains(@class, 'brkts-popup-header-opponent-left')]/*/*/*/a/@title",
 			 ".//div[contains(@class, 'bracket-popup-header-left')]/*/*/a/@title",
@@ -137,6 +99,7 @@ if __name__ == "__main__":
 
 		games.append(game)
 
-	for game in games:
-		log.info(str(game))
+	games.sort(key=lambda game: game.datetime)
+
+	return games, event_name, streams
 
