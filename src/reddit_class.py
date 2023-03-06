@@ -4,6 +4,7 @@ import traceback
 import sys
 import time
 import discord_logging
+import jsons
 
 import static
 
@@ -277,15 +278,28 @@ class Reddit:
 				event_pages.append(page)
 		return event_pages
 
-	def extractTableFromMessage(self, message):
-		datatag = " [](#datatag"
-		datatagLocation = message.find(datatag)
-		if datatagLocation == -1:
+	def get_event_from_page(self, subreddit, page):
+		datatag = "[](#datatag"
+		wiki_content = self.reddit.subreddit(subreddit).wiki[page].content_md
+		datatag_location = wiki_content.find(datatag)
+		if datatag_location == -1:
 			return None
-		data = message[datatagLocation + len(datatag):-1].replace("%20", " ")
-		try:
-			table = json.loads(data, object_hook=as_enum)
-			return table
-		except Exception:
-			log.debug(traceback.format_exc())
-			return None
+		data = wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
+		# try:
+		return jsons.loads(data, cls=Event)
+		# except Exception as err:
+		# 	log.debug(err)
+		# 	log.debug(traceback.format_exc())
+		# 	return None
+
+	def create_page_from_event(self, subreddit, event):
+		self.reddit.subreddit(subreddit).wiki.create(
+			name=event.wiki_name(),
+			content=event.render_reddit(),
+			reason="Creating new event"
+		)
+
+	def update_page_from_event(self, subreddit, event):
+		event_wiki = self.reddit.subreddit(subreddit).wiki[event.wiki_name()]
+		event_wiki.edit(content=event.render_reddit())
+

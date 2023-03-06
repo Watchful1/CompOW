@@ -2,11 +2,10 @@ from typing import List
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import random
+import jsons
 import discord_logging
 
 log = discord_logging.get_logger()
-
-import liquipedia_parser
 
 
 def base36encode(integer: int) -> str:
@@ -114,7 +113,37 @@ class Event:
 	match_days: List[MatchDay] = field(default_factory=list)
 
 	def wiki_name(self):
-		return "events/"+self.name.replace(" ", "-").replace(":", "")
+		return "events/"+self.name.replace(" ", "-").replace("/", "-").replace(":", "").lower()
+
+	def render_reddit(self):
+		bldr = ["##", self.name, "\n\n"]
+		for match_day in self.match_days:
+			bldr.append("###")
+			bldr.append(str(match_day))
+			bldr.append("\n\n")
+			bldr.append(f"Approved | Pending\n---|---\n")
+			i = 0
+			while True:
+				if i < len(match_day.approved_games):
+					bldr.append(str(match_day.approved_games[i]))
+				bldr.append(" | ")
+				if i < len(match_day.pending_games):
+					bldr.append(str(match_day.pending_games[i]))
+				bldr.append("\n")
+				i += 1
+				if i >= len(match_day.approved_games) and i >= len(
+						match_day.pending_games):
+					break
+
+			bldr.append("\n\n")
+
+		event_string = str(jsons.dumps(self, cls=Event, strip_nulls=True))
+
+		bldr.append("[](#datatag")
+		bldr.append(event_string)
+		bldr.append(")")
+
+		return ''.join(bldr)
 
 	def add_game(self, game):
 		for match_day in self.match_days:
@@ -125,25 +154,17 @@ class Event:
 		self.match_days.append(match_day)
 		self.match_days.sort(key=lambda match_day: match_day.first_datetime)
 
-	def parse_from_url(self):
-		games, event_name, streams = liquipedia_parser.parse_event(self.url)
+	def log(self):
+		log.info(self.name)
+		for stream in self.streams:
+			log.info(stream)
+		log.info("")
 
-		if self.name is not None and event_name != self.name:
-			log.warning(f"Event name changed from `{self.name}` to `{event_name}`")
-		self.name = event_name
+		for match_day in self.match_days:
+			log.info(match_day)
+			for game in match_day.pending_games:
+				log.info(game)
+			log.info("")
 
-		changed = False
-		if len(self.streams) != 0:
-			if len(self.streams) != len(streams):
-				changed = True
-			else:
-				for i in range(len(streams)):
-					if self.streams[i] != streams[i]:
-						changed = True
-		if changed:
-			log.warning(f"Event {self.name} streams changed from `{'`, `'.join(self.streams)}` to `{'`, `'.join(streams)}`")
-		self.streams = streams
-
-		for game in games:
-			self.add_game(game)
-
+	def __str__(self):
+		return f"{self.name} - {len(self.match_days)} days"

@@ -15,6 +15,6 @@ if __name__ == "__main__":
 	event.log()
 
 	reddit = Reddit("OWMatchThreads")
-	reddit.create_page_from_event("competitiveoverwatch", event)
+	reddit.update_page_from_event("competitiveoverwatch", event)
 
-	log.info(f"Page created at https://www.reddit.com/r/Competitiveoverwatch/wiki/{event.wiki_name()}")
+	log.info(f"Page updated at https://www.reddit.com/r/Competitiveoverwatch/wiki/{event.wiki_name()}")

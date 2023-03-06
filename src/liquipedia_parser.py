@@ -3,6 +3,7 @@ from lxml import etree
 import requests
 import discord_logging
 import static
+import pytz
 from classes import Game
 from datetime import datetime, timedelta
 
@@ -22,7 +23,9 @@ def get_text_from_paths(base_node, paths):
 	for path in paths:
 		items = base_node.xpath(path)
 		if len(items):
-			return items[0].strip()
+			result = items[0].strip().encode('ascii', 'ignore').decode("utf-8")
+			if result:
+				return result
 	return None
 
 
@@ -92,7 +95,7 @@ def parse_event(page_url):
 		timestamp = get_text_from_paths(node,
 			[".//span[@class='timer-object']/@data-timestamp"])
 		if timestamp:
-			game.datetime = datetime.utcfromtimestamp(int(timestamp))
+			game.datetime = datetime.utcfromtimestamp(int(timestamp))#.replace(tzinfo=pytz.utc)
 
 		if game.home.name == "BYE" or game.away.name == "BYE":
 			continue
@@ -102,4 +105,27 @@ def parse_event(page_url):
 	games.sort(key=lambda game: game.datetime)
 
 	return games, event_name, streams
+
+
+def update_event(event):
+	games, event_name, streams = parse_event(event.url)
+
+	if event.name is not None and event_name != event.name:
+		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")
+	event.name = event_name
+
+	changed = False
+	if len(event.streams) != 0:
+		if len(event.streams) != len(streams):
+			changed = True
+		else:
+			for i in range(len(streams)):
+				if event.streams[i] != streams[i]:
+					changed = True
+	if changed:
+		log.warning(f"Event {event.name} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
+	event.streams = streams
+
+	for game in games:
+		event.add_game(game)
 
