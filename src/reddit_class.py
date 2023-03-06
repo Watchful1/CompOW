@@ -9,6 +9,8 @@ import static
 
 log = discord_logging.get_logger()
 
+from classes import Event
+
 
 class Reddit:
 	def __init__(self, user, debug=False):
@@ -266,4 +268,24 @@ class Reddit:
 		except Exception as err:
 			log.warning(f"Unable to fetch thread {thread_id}")
 			log.warning(traceback.format_exc())
+			return None
+
+	def list_event_pages(self, subreddit):
+		event_pages = []
+		for page in self.reddit.subreddit(subreddit).wiki:
+			if page.name.startswith("events/"):
+				event_pages.append(page)
+		return event_pages
+
+	def extractTableFromMessage(self, message):
+		datatag = " [](#datatag"
+		datatagLocation = message.find(datatag)
+		if datatagLocation == -1:
+			return None
+		data = message[datatagLocation + len(datatag):-1].replace("%20", " ")
+		try:
+			table = json.loads(data, object_hook=as_enum)
+			return table
+		except Exception:
+			log.debug(traceback.format_exc())
 			return None
