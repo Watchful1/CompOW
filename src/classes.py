@@ -31,7 +31,7 @@ class Game:
 	home: Team = field(default_factory=Team)
 	away: Team = field(default_factory=Team)
 	complete: bool = False
-	datetime: datetime = None
+	date_time: datetime = None
 
 	def status(self):
 		if self.complete:
@@ -41,18 +41,18 @@ class Game:
 		return "Not-started"
 
 	def matches(self, game):
-		return self.home.name == game.home.name and self.away.name == game.away.name and self.datetime == game.datetime
+		return self.home.name == game.home.name and self.away.name == game.away.name and self.date_time == game.date_time
 
 	def merge(self, game):
 		self.home = game.home
 		self.away = game.away
 		self.complete = game.complete
-		self.datetime = game.datetime
+		self.date_time = game.datetime
 
 	def render_datetime(self):
-		if self.datetime is None:
+		if self.date_time is None:
 			return "None"
-		return self.datetime.strftime('%Y-%m-%d %H:%M')
+		return self.date_time.strftime('%Y-%m-%d %H:%M')
 
 	def __str__(self):
 		return f"{self.id} : {self.home.name} vs {self.away.name} : {self.home.score}-{self.away.score} : {self.status()} : {self.render_datetime()}"
@@ -67,14 +67,14 @@ class MatchDay:
 
 	def add_game(self, game):
 		if self.first_datetime is not None and \
-				(game.datetime < self.first_datetime - timedelta(hours=4) or
-				game.datetime > self.last_datetime + timedelta(hours=4)):
+				(game.date_time < self.first_datetime - timedelta(hours=4) or
+				game.date_time > self.last_datetime + timedelta(hours=4)):
 			return False
 		self.pending_games.append(game)
-		if self.first_datetime is None or game.datetime < self.first_datetime:
-			self.first_datetime = game.datetime
-		if self.last_datetime is None or game.datetime > self.last_datetime:
-			self.last_datetime = game.datetime
+		if self.first_datetime is None or game.date_time < self.first_datetime:
+			self.first_datetime = game.date_time
+		if self.last_datetime is None or game.date_time > self.last_datetime:
+			self.last_datetime = game.date_time
 		return True
 
 	def is_complete(self):
@@ -99,8 +99,8 @@ class MatchDay:
 
 	def __str__(self):
 		return \
-			f"{self.first_datetime.strftime('%Y-%m-%d %H:%M')} - " \
-			f"{self.last_datetime.strftime('%Y-%m-%d %H:%M')} | " \
+			f"{(self.first_datetime.strftime('%Y-%m-%d %H:%M') if self.first_datetime else 'None')} - " \
+			f"{(self.last_datetime.strftime('%Y-%m-%d %H:%M') if self.last_datetime else 'None')} | " \
 			f"{len(self.pending_games)} games | " \
 			f"{('Complete' if self.is_complete() else 'Not-complete')}"
 
