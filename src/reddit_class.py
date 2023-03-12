@@ -285,12 +285,12 @@ class Reddit:
 		if datatag_location == -1:
 			return None
 		data = wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
-		# try:
-		return jsons.loads(data, cls=Event)
-		# except Exception as err:
-		# 	log.debug(err)
-		# 	log.debug(traceback.format_exc())
-		# 	return None
+		try:
+			return jsons.loads(data, cls=Event)
+		except Exception as err:
+			log.debug(err)
+			log.debug(traceback.format_exc())
+			return None
 
 	def create_page_from_event(self, subreddit, event):
 		self.reddit.subreddit(subreddit).wiki.create(

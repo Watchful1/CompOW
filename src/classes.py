@@ -8,6 +8,10 @@ import discord_logging
 log = discord_logging.get_logger()
 
 
+id_range_start = int("10000", 36)
+id_range_end = int("zzzzz", 36)
+
+
 def base36encode(integer: int) -> str:
 	chars = '0123456789abcdefghijklmnopqrstuvwxyz'
 	sign = '-' if integer < 0 else ''
@@ -19,6 +23,10 @@ def base36encode(integer: int) -> str:
 	return sign + result
 
 
+def get_random_id():
+	return base36encode(random.randrange(id_range_start, id_range_end))
+
+
 @dataclass
 class Team:
 	name: str = None
@@ -27,7 +35,7 @@ class Team:
 
 @dataclass
 class Game:
-	id: str = field(default_factory=lambda: base36encode(random.randrange(1679616,  60466176)))
+	id: str = field(default_factory=get_random_id)
 	home: Team = field(default_factory=Team)
 	away: Team = field(default_factory=Team)
 	complete: bool = False
@@ -47,7 +55,7 @@ class Game:
 		self.home = game.home
 		self.away = game.away
 		self.complete = game.complete
-		self.date_time = game.datetime
+		self.date_time = game.date_time
 
 	def render_datetime(self):
 		if self.date_time is None:
@@ -60,8 +68,10 @@ class Game:
 
 @dataclass
 class MatchDay:
+	id: str = field(default_factory=get_random_id)
 	approved_games: List[Game] = field(default_factory=list)
 	pending_games: List[Game] = field(default_factory=list)
+	loading_games: List[Game] = field(default_factory=list)
 	first_datetime: datetime = None
 	last_datetime: datetime = None
 
@@ -70,12 +80,55 @@ class MatchDay:
 				(game.date_time < self.first_datetime - timedelta(hours=4) or
 				game.date_time > self.last_datetime + timedelta(hours=4)):
 			return False
-		self.pending_games.append(game)
 		if self.first_datetime is None or game.date_time < self.first_datetime:
 			self.first_datetime = game.date_time
 		if self.last_datetime is None or game.date_time > self.last_datetime:
 			self.last_datetime = game.date_time
+		for approved_game in self.approved_games:
+			if approved_game.matches(game):
+				approved_game.merge(game)
+				return True
+		for pending_game in self.pending_games:
+			if pending_game.matches(game):
+				pending_game.merge(game)
+				self.loading_games.append(pending_game)
+				return True
+		self.loading_games.append(game)
 		return True
+
+	def sort_games(self):
+		self.approved_games.sort(key=lambda game: game.date_time)
+		if len(self.loading_games):
+			self.pending_games = self.loading_games
+			self.loading_games = []
+		self.pending_games.sort(key=lambda game: game.date_time)
+
+	def approve_game(self, source_id, target_id):
+		copy_pending = []
+		target_found = False
+		for pending_game in self.pending_games:
+			if pending_game.id == source_id:
+				if target_id is not None:
+					for approved_game in self.approved_games:
+						if approved_game.id == target_id:
+							approved_game.merge(pending_game)
+							log.info(f"Merged game {pending_game} into {approved_game}")
+							target_found = True
+					if not target_found:
+						log.warning(f"Target game not found when merging {pending_game}")
+						copy_pending.append(pending_game)
+				else:
+					self.approved_games.append(pending_game)
+					log.info(f"Approved game {pending_game}")
+			else:
+				copy_pending.append(pending_game)
+		self.pending_games = copy_pending
+
+	def approve_all_games(self):
+		self.approved_games.extend(self.pending_games)
+		log.info(f"Approved {len(self.pending_games)} games for {self}")
+		self.pending_games = []
+		self.approved_games.sort(key=lambda game: game.date_time)
 
 	def is_complete(self):
 		complete = True
@@ -84,21 +137,9 @@ class MatchDay:
 				complete = False
 		return complete
 
-	def merge_games(self):
-		unmatched_games = []
-		for pending_game in self.pending_games:
-			matched = False
-			for approved_game in self.approved_games:
-				if approved_game.matches(pending_game):
-					approved_game.merge(pending_game)
-					matched = True
-					break
-			if not matched:
-				unmatched_games.append(pending_game)
-		self.pending_games = unmatched_games
-
 	def __str__(self):
 		return \
+			f"{self.id} : " \
 			f"{(self.first_datetime.strftime('%Y-%m-%d %H:%M') if self.first_datetime else 'None')} - " \
 			f"{(self.last_datetime.strftime('%Y-%m-%d %H:%M') if self.last_datetime else 'None')} | " \
 			f"{len(self.pending_games)} games | " \
@@ -108,6 +149,7 @@ class MatchDay:
 @dataclass
 class Event:
 	url: str
+	id: str = field(default_factory=get_random_id)
 	name: str = None
 	streams: List[str] = field(default_factory=list)
 	match_days: List[MatchDay] = field(default_factory=list)
@@ -116,7 +158,7 @@ class Event:
 		return "events/"+self.name.replace(" ", "-").replace("/", "-").replace(":", "").lower()
 
 	def render_reddit(self):
-		bldr = ["##", self.name, "\n\n"]
+		bldr = ["##[", self.name, "](", self.url, ")\n\n"]
 		for match_day in self.match_days:
 			bldr.append("###")
 			bldr.append(str(match_day))
@@ -153,6 +195,14 @@ class Event:
 		match_day.add_game(game)
 		self.match_days.append(match_day)
 		self.match_days.sort(key=lambda match_day: match_day.first_datetime)
+
+	def sort_matches(self):
+		for match_day in self.match_days:
+			match_day.sort_games()
+
+	def approve_all_games(self):
+		for match_day in self.match_days:
+			match_day.approve_all_games()
 
 	def log(self):
 		log.info(self.name)

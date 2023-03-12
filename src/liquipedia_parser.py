@@ -95,14 +95,14 @@ def parse_event(page_url):
 		timestamp = get_text_from_paths(node,
 			[".//span[@class='timer-object']/@data-timestamp"])
 		if timestamp:
-			game.datetime = datetime.utcfromtimestamp(int(timestamp))#.replace(tzinfo=pytz.utc)
+			game.date_time = datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=pytz.utc)
 
 		if game.home.name == "BYE" or game.away.name == "BYE":
 			continue
 
 		games.append(game)
 
-	games.sort(key=lambda game: game.datetime)
+	games.sort(key=lambda game: game.date_time)
 
 	return games, event_name, streams
 
@@ -129,3 +129,4 @@ def update_event(event):
 	for game in games:
 		event.add_game(game)
 
+	event.sort_matches()

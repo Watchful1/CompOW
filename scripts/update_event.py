@@ -8,13 +8,13 @@ from reddit_class import Reddit
 
 
 if __name__ == "__main__":
-	page_url = "https://liquipedia.net/overwatch/Overwatch_League/Season_6/Pro-Am/Qualifier/North_America"
-
-	event = Event(page_url)
-	liquipedia_parser.update_event(event)
-	event.log()
+	event_wiki = "events/overwatch-league-2023---pro-am-north-america-qualifier"
 
 	reddit = Reddit("OWMatchThreads")
+	event = reddit.get_event_from_page("competitiveoverwatch", event_wiki)
+	liquipedia_parser.update_event(event)
+	log.info(f"{event}")
+
 	reddit.update_page_from_event("competitiveoverwatch", event)
 
 	log.info(f"Page updated at https://www.reddit.com/r/Competitiveoverwatch/wiki/{event.wiki_name()}")
