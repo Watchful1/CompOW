@@ -63,7 +63,7 @@ class Game:
 		return self.date_time.strftime('%Y-%m-%d %H:%M')
 
 	def __str__(self):
-		return f"{self.id} : {self.home.name} vs {self.away.name} : {self.home.score}-{self.away.score} : {self.status()} : {self.render_datetime()}"
+		return f"{self.id}: {self.home.name} vs {self.away.name} : {self.home.score}-{self.away.score} : {self.status()} : {self.render_datetime()}"
 
 
 @dataclass
@@ -132,17 +132,22 @@ class MatchDay:
 
 	def is_complete(self):
 		complete = True
-		for game in self.pending_games:
-			if not game.complete:
-				complete = False
+		if len(self.approved_games):
+			for game in self.approved_games:
+				if not game.complete:
+					complete = False
+		else:
+			for game in self.pending_games:
+				if not game.complete:
+					complete = False
 		return complete
 
 	def __str__(self):
 		return \
-			f"{self.id} : " \
+			f"{self.id}: " \
 			f"{(self.first_datetime.strftime('%Y-%m-%d %H:%M') if self.first_datetime else 'None')} - " \
 			f"{(self.last_datetime.strftime('%Y-%m-%d %H:%M') if self.last_datetime else 'None')} | " \
-			f"{len(self.pending_games)} games | " \
+			f"{len(self.approved_games)} games ({len(self.pending_games)}) | " \
 			f"{('Complete' if self.is_complete() else 'Not-complete')}"
 
 

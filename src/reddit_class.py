@@ -6,40 +6,37 @@ import time
 import discord_logging
 import jsons
 
-import static
-
 log = discord_logging.get_logger()
 
 from classes import Event
 
 
 class Reddit:
-	def __init__(self, user, debug=False):
+	def __init__(self, user, subreddit, debug=False):
+		self.subreddit = subreddit
 		self.debug = debug
 		self.flair_cache = {}
 		try:
 			self.reddit = praw.Reddit(
 				user,
-				user_agent=static.USER_AGENT)
+				user_agent="Liquipedia matchthreader (by u/Watchful1)")
 		except configparser.NoSectionError:
-			log.error("User "+user+" not in praw.ini, aborting")
+			log.error(f"User {user} not in praw.ini, aborting")
 			sys.exit(0)
 
-		static.ACCOUNT_NAME = str(self.reddit.user.me()).lower()
+		log.info(f"Logged into reddit as u/{self.reddit.user.me().name}")
+		#
+		# config_keys = [
+		# 	{'var': "WEBHOOK_COW", 'name': "webhook_cow"},
+		# 	{'var': "WEBHOOK_THEOW", 'name': "webhook_theow"},
+		# ]
+		# for key in config_keys:
+		# 	if self.reddit.config.CONFIG.has_option(user, key['name']):
+		# 		setattr(static, key['var'], self.reddit.config.CONFIG[user][key['name']])
+		# 	else:
+		# 		log.error(f"{key['name']} key not in config")
 
-		log.info("Logged into reddit as /u/" + static.ACCOUNT_NAME)
-
-		config_keys = [
-			{'var': "WEBHOOK_COW", 'name': "webhook_cow"},
-			{'var': "WEBHOOK_THEOW", 'name': "webhook_theow"},
-		]
-		for key in config_keys:
-			if self.reddit.config.CONFIG.has_option(user, key['name']):
-				setattr(static, key['var'], self.reddit.config.CONFIG[user][key['name']])
-			else:
-				log.error(f"{key['name']} key not in config")
-
-	def submit_self_post(self, subreddit, title, text, chat_post=False, flair=None):
+	def submit_self_post(self, title, text, chat_post=False, flair=None):
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
@@ -48,16 +45,16 @@ class Reddit:
 			else:
 				flair_id = None
 				if flair is not None:
-					flair_id = self.get_flair_id(subreddit, flair)
+					flair_id = self.get_flair_id(self.subreddit, flair)
 				if chat_post:
-					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
+					thread = self.reddit.subreddit(self.subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
 				else:
-					thread = self.reddit.subreddit(subreddit).submit(title=title, selftext=text, flair_id=flair_id)
+					thread = self.reddit.subreddit(self.subreddit).submit(title=title, selftext=text, flair_id=flair_id)
 				thread_id = thread.id
-			log.debug(f"Posted thread to r/{subreddit} - {thread_id}")
+			log.debug(f"Posted thread to r/{self.subreddit} - {thread_id}")
 			return thread_id
 		except Exception as err:
-			log.warning(f"Unable to post thread to r/{subreddit}")
+			log.warning(f"Unable to post thread to r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
@@ -90,18 +87,18 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
-	def get_stickied_threads(self, subreddit):
+	def get_stickied_threads(self):
 		try:
 			stickied = []
-			for submission in self.reddit.subreddit(subreddit).hot(limit=2):
+			for submission in self.reddit.subreddit(self.subreddit).hot(limit=2):
 				if submission.stickied:
 					stickied.append(submission.id)
 				else:
 					stickied.append(None)
-			log.debug(f"Found stickies in r/{subreddit} - {str(stickied)}")
+			log.debug(f"Found stickies in r/{self.subreddit} - {str(stickied)}")
 			return stickied
 		except Exception as err:
-			log.warning(f"Unable to find bottom sticky in r/{subreddit}")
+			log.warning(f"Unable to find bottom sticky in r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
@@ -162,14 +159,14 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
-	def get_flair_id(self, subreddit, flair_name):
+	def get_flair_id(self, flair_name):
 		try:
 			if self.debug:
 				return "test"
 			else:
 				if flair_name in self.flair_cache:
 					return self.flair_cache[flair_name]
-				for flair in self.reddit.subreddit(subreddit).flair.link_templates.user_selectable():
+				for flair in self.reddit.subreddit(self.subreddit).flair.link_templates.user_selectable():
 					if flair_name in flair['flair_text'].lower():
 						log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
 						self.flair_cache[flair_name] = flair['flair_template_id']
@@ -177,7 +174,7 @@ class Reddit:
 				log.debug(f"Couldn't find template for flair: {flair_name}")
 				return None
 		except Exception as err:
-			log.warning(f"Unable to find template for flair in r/{subreddit}")
+			log.warning(f"Unable to find template for flair in r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
@@ -271,16 +268,17 @@ class Reddit:
 			log.warning(traceback.format_exc())
 			return None
 
-	def list_event_pages(self, subreddit):
+	def list_event_pages(self):
 		event_pages = []
-		for page in self.reddit.subreddit(subreddit).wiki:
+		for page in self.reddit.subreddit(self.subreddit).wiki:
 			if page.name.startswith("events/"):
 				event_pages.append(page)
 		return event_pages
 
-	def get_event_from_page(self, subreddit, page):
+	def get_event_from_page(self, page):
+		log.debug(f"Loading event page: {page}")
 		datatag = "[](#datatag"
-		wiki_content = self.reddit.subreddit(subreddit).wiki[page].content_md
+		wiki_content = self.reddit.subreddit(self.subreddit).wiki[page].content_md
 		datatag_location = wiki_content.find(datatag)
 		if datatag_location == -1:
 			return None
@@ -292,14 +290,20 @@ class Reddit:
 			log.debug(traceback.format_exc())
 			return None
 
-	def create_page_from_event(self, subreddit, event):
-		self.reddit.subreddit(subreddit).wiki.create(
-			name=event.wiki_name(),
-			content=event.render_reddit(),
-			reason="Creating new event"
-		)
+	def create_page_from_event(self, event):
+		if self.debug:
+			log.info(f"Creating page: {event.wiki_name()}")
+		else:
+			self.reddit.subreddit(self.subreddit).wiki.create(
+				name=event.wiki_name(),
+				content=event.render_reddit(),
+				reason="Creating new event"
+			)
 
-	def update_page_from_event(self, subreddit, event):
-		event_wiki = self.reddit.subreddit(subreddit).wiki[event.wiki_name()]
-		event_wiki.edit(content=event.render_reddit())
+	def update_page_from_event(self, event):
+		if self.debug:
+			log.info(f"Updating page: {event.wiki_name()}")
+		else:
+			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
+			event_wiki.edit(content=event.render_reddit())
 

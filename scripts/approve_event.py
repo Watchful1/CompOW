@@ -15,11 +15,8 @@ if __name__ == "__main__":
 
 	log.info(f"{event}")
 
-	source_id = "x9bqt"
-	target_id = "w9nad"
-
 	for match_day in event.match_days:
-		match_day.approve_game(source_id, target_id)
+		match_day.approve_all_games()
 
 	reddit.update_page_from_event("competitiveoverwatch", event)
 
