@@ -294,6 +294,7 @@ class Reddit:
 		if self.debug:
 			log.info(f"Creating page: {event.wiki_name()}")
 		else:
+			log.debug(f"Creating page: {event.wiki_name()}")
 			self.reddit.subreddit(self.subreddit).wiki.create(
 				name=event.wiki_name(),
 				content=event.render_reddit(),
@@ -304,6 +305,14 @@ class Reddit:
 		if self.debug:
 			log.info(f"Updating page: {event.wiki_name()}")
 		else:
+			log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			event_wiki.edit(content=event.render_reddit())
 
+	def hide_page_from_event(self, event):
+		if self.debug:
+			log.info(f"Hiding page: {event.wiki_name()}")
+		else:
+			log.debug(f"Hiding page: {event.wiki_name()}")
+			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
+			event_wiki.mod.update(listed=False)

@@ -57,6 +57,9 @@ if __name__ == "__main__":
 		if parse_messages:
 			messages.parse_messages(reddit, events)
 
+		if update_events:
+			
+
 		if args.once:
 			break
 		time.sleep(15)

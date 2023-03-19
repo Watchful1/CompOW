@@ -75,6 +75,11 @@ class MatchDay:
 	first_datetime: datetime = None
 	last_datetime: datetime = None
 
+	predictions_thread: str = None
+	match_thread: str = None
+	post_match_thread: str = None
+	discord_posted: bool = False
+
 	def add_game(self, game):
 		if self.first_datetime is not None and \
 				(game.date_time < self.first_datetime - timedelta(hours=4) or
