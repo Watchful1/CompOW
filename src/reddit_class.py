@@ -1,4 +1,5 @@
 import praw
+import prawcore
 import configparser
 import traceback
 import sys
@@ -8,33 +9,33 @@ import jsons
 
 log = discord_logging.get_logger()
 
-from classes import Event
+import utils
+import string_utils
+from classes import Event, Settings
 
 
 class Reddit:
 	def __init__(self, user, subreddit, debug=False):
 		self.subreddit = subreddit
+		self.user = user
 		self.debug = debug
 		self.flair_cache = {}
+		self.webhook_cache = {}
 		try:
-			self.reddit = praw.Reddit(
-				user,
-				user_agent="Liquipedia matchthreader (by u/Watchful1)")
+			self.reddit = praw.Reddit(user, user_agent=utils.USER_AGENT)
 		except configparser.NoSectionError:
 			log.error(f"User {user} not in praw.ini, aborting")
 			sys.exit(0)
 
 		log.info(f"Logged into reddit as u/{self.reddit.user.me().name}")
-		#
-		# config_keys = [
-		# 	{'var': "WEBHOOK_COW", 'name': "webhook_cow"},
-		# 	{'var': "WEBHOOK_THEOW", 'name': "webhook_theow"},
-		# ]
-		# for key in config_keys:
-		# 	if self.reddit.config.CONFIG.has_option(user, key['name']):
-		# 		setattr(static, key['var'], self.reddit.config.CONFIG[user][key['name']])
-		# 	else:
-		# 		log.error(f"{key['name']} key not in config")
+
+	def get_webhook(self, key):
+		if key not in self.webhook_cache:
+			if self.reddit.config.CONFIG.has_option(self.user, f"webhook_{key}"):
+				self.webhook_cache[key] = self.reddit.config.CONFIG[self.user][f"webhook_{key}"]
+			else:
+				return None
+		return self.webhook_cache[key]
 
 	def submit_self_post(self, title, text, chat_post=False, flair=None):
 		try:
@@ -45,7 +46,7 @@ class Reddit:
 			else:
 				flair_id = None
 				if flair is not None:
-					flair_id = self.get_flair_id(self.subreddit, flair)
+					flair_id = self.get_flair_id(flair)
 				if chat_post:
 					thread = self.reddit.subreddit(self.subreddit).submit(title=title, selftext=text, discussion_type="CHAT", flair_id=flair_id)
 				else:
@@ -93,14 +94,12 @@ class Reddit:
 			for submission in self.reddit.subreddit(self.subreddit).hot(limit=2):
 				if submission.stickied:
 					stickied.append(submission.id)
-				else:
-					stickied.append(None)
 			log.debug(f"Found stickies in r/{self.subreddit} - {str(stickied)}")
 			return stickied
 		except Exception as err:
 			log.warning(f"Unable to find bottom sticky in r/{self.subreddit}")
 			log.warning(traceback.format_exc())
-			return None
+			return []
 
 	def sticky_thread(self, thread_id):
 		try:
@@ -272,11 +271,11 @@ class Reddit:
 		event_pages = []
 		for page in self.reddit.subreddit(self.subreddit).wiki:
 			if page.name.startswith("events/"):
-				event_pages.append(page)
+				event_pages.append(page.name)
 		return event_pages
 
 	def get_event_from_page(self, page):
-		log.debug(f"Loading event page: {page}")
+		#log.debug(f"Loading event page: {page}")
 		datatag = "[](#datatag"
 		wiki_content = self.reddit.subreddit(self.subreddit).wiki[page].content_md
 		datatag_location = wiki_content.find(datatag)
@@ -286,8 +285,8 @@ class Reddit:
 		try:
 			return jsons.loads(data, cls=Event)
 		except Exception as err:
-			log.debug(err)
-			log.debug(traceback.format_exc())
+			log.info(err)
+			log.info(traceback.format_exc())
 			return None
 
 	def create_page_from_event(self, event):
@@ -297,7 +296,7 @@ class Reddit:
 			log.debug(f"Creating page: {event.wiki_name()}")
 			self.reddit.subreddit(self.subreddit).wiki.create(
 				name=event.wiki_name(),
-				content=event.render_reddit(),
+				content=string_utils.render_event_wiki(event, self.user),
 				reason="Creating new event"
 			)
 
@@ -305,9 +304,9 @@ class Reddit:
 		if self.debug:
 			log.info(f"Updating page: {event.wiki_name()}")
 		else:
-			log.debug(f"Updating page: {event.wiki_name()}")
+			#log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
-			event_wiki.edit(content=event.render_reddit())
+			event_wiki.edit(content=event.render_wiki())
 
 	def hide_page_from_event(self, event):
 		if self.debug:
@@ -316,3 +315,24 @@ class Reddit:
 			log.debug(f"Hiding page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			event_wiki.mod.update(listed=False)
+
+	def save_settings(self, settings):
+		if self.debug:
+			log.info(f"Updating settings: {settings}")
+		else:
+			#log.debug(f"Updating page: {event.wiki_name()}")
+			settings_wiki = self.reddit.subreddit(self.subreddit).wiki["events/settings"]
+			settings_wiki.edit(content=str(jsons.dumps(settings, cls=Settings, strip_nulls=True)))
+
+	def get_settings(self):
+		try:
+			wiki_content = self.reddit.subreddit(self.subreddit).wiki["events/settings"].content_md
+			return jsons.loads(wiki_content, cls=Event)
+		except prawcore.exceptions.NotFound as err:
+			log.info(f"No settings wiki found, returning blank")
+			return Settings()
+		except Exception as err:
+			log.warning(f"Couldn't load settings, unknown error: {err}")
+			log.warning(traceback.format_exc())
+			return Settings()
+

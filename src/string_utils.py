@@ -1,39 +1,138 @@
 import pytz
 import math
 import re
+import discord_logging
+import jsons
+import urllib.parse
+
+log = discord_logging.get_logger()
 
 import static
-from mappings import cow_roles
-from classes_2.enums import GameState
-from classes_2.enums import Winner
-from classes_2.enums import DiscordType
+import utils
+from classes import Event
 
 
-def render_append_highlights(current_body, link, flairs):
-	if not re.findall(r'(>-$)', current_body):
-		return None
+cow_roles = {
+	'OWL-Notify': '<@&481314680665538569>',
+	'OWL-News': '<@&517000617290367016>',
+	'Game-News': '<@&517000502924279808>',
+	'Community-News': '<@&517000366735228929>',
+	'KRContenders': '<@&481315112993554433>',
+	'NAContenders': '<@&481315228529721344>',
+	'PAContenders': '<@&481315465340387328>',
+	'EUContenders': '<@&481315364345479169>',
+	'SAContenders': '<@&481315668721926144>',
+	'CNContenders': '<@&481315825802936320>',
+	'AUContenders': '<@&481315928865505280>',
+	'All-Matches': '<@&517000657111220229>',
+	'All-Notify': '<@&481316252661579786>',
+	'here': '@here',
+	'everyone': '@everyone'
+}
+cow_channels = {
+	'match-discussion': '377127072243515393',
+	'ow-esports': '420968531929071628',
+}
 
-	bldr = [current_body]
 
-	bldr.append("\n")
-	bldr.append("|Highlights|")
-	bldr.append("\n")
-	bldr.append("|-|")
-	bldr.append("\n")
-	bldr.append("|")
-	bldr.append(flairs.get_flair("YouTube"))
-	bldr.append("[Akshon Esports Highlights](")
-	bldr.append(link)
-	bldr.append(")|")
+def html_encode(message):
+	return urllib.parse.quote(message, safe='')
+
+
+def build_message_link(recipient, subject, content=None):
+	base = "https://www.reddit.com/message/compose/?"
+	bldr = []
+	bldr.append(f"to={recipient}")
+	bldr.append(f"subject={html_encode(subject)}")
+	if content is not None:
+		bldr.append(f"message={html_encode(content)}")
+
+	return base + '&'.join(bldr)
+
+
+def render_event_wiki(event, username):
+	bldr = ["##[", event.name, "](", event.url, ")\n\n"]
+
+	settings_fields = [
+		f"post_match_threads:{event.post_match_threads}",
+		f"match_thread_minutes_before:{event.match_thread_minutes_before}",
+		f"leave_thread_minutes_after:{event.leave_thread_minutes_after}",
+		f"use_pending_changes:{event.use_pending_changes}",
+		f"discord_key:{event.discord_key}",
+		f"discord_minutes_before:{event.discord_minutes_before}",
+		f"discord_roles:{','.join(event.discord_roles)}",
+	]
+
+	bldr.append("Setting | Value\n")
+	bldr.append("---|---\n")
+	bldr.append('\n'.join([field.replace(":", "|") for field in settings_fields]))
+	bldr.append("\n\n")
+
+	bldr.append("[Update settings](")
+	bldr.append(build_message_link(
+		username,
+		f"{event.id}:update settings",
+		'\n'.join([f"settings:{field}" for field in settings_fields])
+	))
+	bldr.append(")\n\n")
+	bldr.append("[Delete event](")
+	bldr.append(build_message_link(
+		username,
+		f"{event.id}:delete event",
+		f"deleteevent"
+	))
+	bldr.append(")\n\n")
+	bldr.append("[Approve all matches](")
+	bldr.append(build_message_link(
+		username,
+		f"{event.id}:approve event",
+		f"approveevent"
+	))
+	bldr.append(")\n\n")
+	for stream in event.streams:
+		bldr.append(stream)
+		bldr.append("\n")
+	for match_day in event.match_days:
+		bldr.append("###")
+		bldr.append(str(match_day))
+		bldr.append("\n\n")
+		bldr.append("[Approve matchday](")
+		bldr.append(build_message_link(
+			username,
+			f"{event.id}:approve matchday",
+			f"approveday:{match_day.id}"
+		))
+		bldr.append(")\n\n")
+		bldr.append(f"Approved | Pending\n---|---\n")
+		i = 0
+		while True:
+			if i < len(match_day.approved_games):
+				bldr.append(str(match_day.approved_games[i]))
+			bldr.append(" | ")
+			if i < len(match_day.pending_games):
+				bldr.append(str(match_day.pending_games[i]))
+			bldr.append("\n")
+			i += 1
+			if i >= len(match_day.approved_games) and i >= len(
+					match_day.pending_games):
+				break
+
+		bldr.append("\n\n")
+
+	event_string = str(jsons.dumps(event, cls=Event, strip_nulls=True))
+
+	bldr.append("[](#datatag")
+	bldr.append(event_string)
+	bldr.append(")")
 
 	return ''.join(bldr)
 
 
-def render_reddit_post_match(match, flairs, owl_complete):
+def render_reddit_post_match(event, match_day, game, flairs):
 	bldr = []
 
 	bldr.append(">#**")
-	bldr.append(match.competition)
+	bldr.append(event.name)
 	bldr.append("**\n")
 	bldr.append(">####")
 
@@ -44,83 +143,82 @@ def render_reddit_post_match(match, flairs, owl_complete):
 	bldr.append("|-:|-|:-:|-|:-|\n")
 
 	bldr.append("|")
-	bldr.append(match.home.name)
+	bldr.append(game.home.name)
 	bldr.append("|")
-	bldr.append(flairs.get_flair(match.home.name))
+	bldr.append(flairs.get_flair(game.home.name))
 	bldr.append("|")
-	bldr.append(str(match.home_score))
+	bldr.append(str(game.home.score))
 	bldr.append("-")
-	bldr.append(str(match.away_score))
+	bldr.append(str(game.away.score))
 	bldr.append("|")
-	bldr.append(flairs.get_flair(match.away.name))
+	bldr.append(flairs.get_flair(game.away.name))
 	bldr.append("|")
-	bldr.append(match.away.name)
+	bldr.append(game.away.name)
 	bldr.append("|")
 	bldr.append("\n")
 
-	for map_obj in match.maps:
-		bldr.append("|")
-		if map_obj.winner == Winner.HOME:
-			bldr.append("Winner")
-		elif map_obj.winner == Winner.TIED:
-			bldr.append("TIED")
-		bldr.append("||")
-		bldr.append(map_obj.name)
-		bldr.append("||")
-		if map_obj.winner == Winner.AWAY:
-			bldr.append("Winner")
-		elif map_obj.winner == Winner.TIED:
-			bldr.append("TIED")
-		bldr.append("|\n")
+	# TODO parse and include maps in post game thread
+	# for map_obj in match.maps:
+	# 	bldr.append("|")
+	# 	if map_obj.winner == Winner.HOME:
+	# 		bldr.append("Winner")
+	# 	elif map_obj.winner == Winner.TIED:
+	# 		bldr.append("TIED")
+	# 	bldr.append("||")
+	# 	bldr.append(map_obj.name)
+	# 	bldr.append("||")
+	# 	if map_obj.winner == Winner.AWAY:
+	# 		bldr.append("Winner")
+	# 	elif map_obj.winner == Winner.TIED:
+	# 		bldr.append("TIED")
+	# 	bldr.append("|\n")
 
-	if match.vod is not None:
-		bldr.append(">\n")
-		bldr.append("|VOD|")
-		bldr.append("\n")
-		bldr.append("|-|")
-		bldr.append("\n")
-		bldr.append("|")
-		bldr.append(flairs.get_flair("Twitch"))
-		bldr.append("[VOD](")
-		bldr.append(match.vod)
-		bldr.append(")|")
+	# TODO parse and include vod in post game thread
+	# if match.vod is not None:
+	# 	bldr.append(">\n")
+	# 	bldr.append("|VOD|")
+	# 	bldr.append("\n")
+	# 	bldr.append("|-|")
+	# 	bldr.append("\n")
+	# 	bldr.append("|")
+	# 	bldr.append(flairs.get_flair("Twitch"))
+	# 	bldr.append("[VOD](")
+	# 	bldr.append(match.vod)
+	# 	bldr.append(")|")
 
 	bldr.append(">-")
-
-	if owl_complete:
-		bldr.append("\n\n")
-		bldr.append("This match has not been marked as complete on over.gg, so the map scores may be incorrect. If you want to help update map scores on over.gg, reach out to u/Watchful1")
 
 	return ''.join(bldr)
 
 
-def render_reddit_post_match_title(match, spoilers=False, match_num=None):
+def render_reddit_post_match_title(event, match_day, game, spoilers=False, match_num=None):
 	if spoilers:
 		if match_num is not None:
-			return f"{match.competition} | {match.stage} | Match {match_num} | Post-Match Discussion"
+			return f"{event.get_name()} | Match {match_num} | Post-Match Discussion"
 		else:
-			return f"{match.competition} | {match.stage} | Post-Match Discussion"
+			return f"{event.get_name()} | Post-Match Discussion"
 	else:
-		return f"{match.home.name} vs {match.away.name} | {match.competition} | {match.stage} | Post-Match Discussion"
+		return f"{game.home.name} vs {game.away.name} | {event.name} | Post-Match Discussion"
 
 
-def render_reddit_post_match_comment(match):
-	return f"Post match thread: [{match.home} vs {match.away}]({thread_link(static.SUBREDDIT, match.post_thread)})."
+def render_reddit_post_match_comment(game, subreddit):
+	return f"Post match thread: [{game.home.name} vs {game.away.name}]({thread_link(subreddit, game.post_thread_id)})."
 
 
 def thread_link(subreddit, thread_id):
 	return f"https://www.reddit.com/r/{subreddit}/comments/{thread_id}/"
 
 
-def render_reddit_event(event, flairs):
+def render_reddit_event(match_day, event, flairs, subreddit):
 	bldr = []
 
 	bldr.append("> ## **")
-	bldr.append(event.competition.name)
+	bldr.append(event.name)
 	bldr.append("**\n")
 
 	bldr.append(">####")
-	bldr.append(event.stages_name())
+	# TODO
+	bldr.append("_")
 
 	bldr.append("\n>\n")
 
@@ -128,49 +226,37 @@ def render_reddit_event(event, flairs):
 	streamBldr = []
 	for stream in event.streams:
 		streamInner = []
-		if "twitch.tv" in stream.url:
-			streamInner.append(flairs.get_flair("Twitch"))
+		# TODO
+		# if "twitch.tv" in stream:
+		# 	streamInner.append(flairs.get_flair("Twitch"))
 		streamInner.append("[")
-		streamInner.append(stream.name)
+		streamInner.append(stream)
 		streamInner.append("](")
-		streamInner.append(stream.url)
+		streamInner.append(stream)
 		streamInner.append(")")
 		streamBldr.append(''.join(streamInner))
 
 	bldr.append('  \n'.join(streamBldr))
 	bldr.append('  \n')
 	bldr.append('[Reddit-stream](')
-	if event.thread is not None:
+	if match_day.thread_id is not None:
 		bldr.append('https://reddit-stream.com/comments/')
-		bldr.append(event.thread)
+		bldr.append(match_day.thread_id)
 	else:
 		bldr.append('https://reddit-stream.com/comments/auto')
 	bldr.append(')')
 
 	bldr.append("\n>\n")
 
-	bldr.append(">> *Tournament*  \n")
-	bldr.append(flairs.get_flair("over.gg"))
-	bldr.append("[")
-	bldr.append(event.competition.name)
-	bldr.append("](")
-	bldr.append(event.competition_url)
-	bldr.append(")")
+	# bldr.append(">> *Tournament*  \n")
+	# bldr.append(flairs.get_flair("over.gg"))
+	# bldr.append("[")
+	# bldr.append(event.competition.name)
+	# bldr.append("](")
+	# bldr.append(event.competition_url)
+	# bldr.append(")")
 
 	bldr.append("\n>\n")
-
-	if event.is_owl():
-		bldr.append(">> *Juked*  \n")
-		bldr.append("[Juked.gg](")
-		bldr.append(static.JUKED_EVENT)
-		bldr.append(")")
-		bldr.append("\n>\n")
-
-		bldr.append(">> *Predictions*  \n")
-		bldr.append("[Predictions Website](")
-		bldr.append(static.PREDICTION_URL)
-		bldr.append(")")
-		bldr.append("\n>\n")
 
 	bldr.append(">---\n")
 	bldr.append(">---\n")
@@ -180,77 +266,75 @@ def render_reddit_event(event, flairs):
 	bldr.append(">>| |  |   |   |   |  | |   |\n")
 	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
 	bldr.append(">>|Time|Team 1||||Team 2||Match Page|\n")
-	for match in event.matches:
+	for game in match_day.approved_games:
 		bldr.append(">>|")
 
 		bldr.append("[")
-		bldr.append(match.start.strftime("%H:%M"))
+		bldr.append(game.date_time.strftime("%H:%M"))
 		bldr.append("](")
 		bldr.append("http://www.thetimezoneconverter.com/?t=")
-		bldr.append(match.start.strftime("%H:%M"))
+		bldr.append(game.date_time.strftime("%H:%M"))
 		bldr.append("&tz=UTC)")
 		bldr.append("|")
 
-		bldr.append(match.home.name)
+		bldr.append(game.home.get_name())
 		bldr.append("|")
 
-		bldr.append(flairs.get_flair(match.home.name))
+		bldr.append(flairs.get_flair(game.home.name))
 		bldr.append("|")
 
-		if match.state != GameState.PENDING:
+		if game.home.score is not None or game.away.score is not None:
 			bldr.append(">!")
-			bldr.append(str(match.home_score))
+			bldr.append(str(game.home.score))
 			bldr.append("-")
-			bldr.append(str(match.away_score))
+			bldr.append(str(game.away.score))
 			bldr.append("!<")
 
 		bldr.append("|")
 
-		bldr.append(flairs.get_flair(match.away.name))
+		bldr.append(flairs.get_flair(game.away.name))
 		bldr.append("|")
 
-		bldr.append(match.away.name)
-		bldr.append("|")
-		bldr.append("|")
-
-		bldr.append(flairs.get_flair("over.gg"))
-		bldr.append(" - [Match](")
-		bldr.append(match.url)
-		bldr.append(")")
-
-		if event.competition.post_match_threads and match.post_thread is not None:
-			bldr.append(" [Post Match](")
-			bldr.append(thread_link(static.SUBREDDIT, match.post_thread))
+		bldr.append(game.away.get_name())
+		bldr.append("||")
+		if game.post_thread_id is not None:
+			bldr.append("[Post Match](")
+			bldr.append(thread_link(subreddit, game.post_thread_id))
 			bldr.append(")")
 
-		if match.vod is not None:
-			bldr.append(" [VOD](")
-			bldr.append(match.vod)
-			bldr.append(")")
+		# bldr.append(flairs.get_flair("over.gg"))
+		# bldr.append(" - [Match](")
+		# bldr.append(game.url)
+		# bldr.append(")")
+
+		# if event.competition.post_match_threads and game.post_thread is not None:
+		# 	bldr.append(" [Post Match](")
+		# 	bldr.append(thread_link(static.SUBREDDIT, game.post_thread))
+		# 	bldr.append(")")
+		#
+		# if game.vod is not None:
+		# 	bldr.append(" [VOD](")
+		# 	bldr.append(match.vod)
+		# 	bldr.append(")")
 
 		bldr.append("|")
 		bldr.append("\n")
 
-	bldr.append("\nIf there's a problem with the match thread, ping u/Watchful1 in the comments")
-	bldr.append("\n\nWe need help tracking match scores on over.gg, which the match bot pulls from. If you watch ")
-	bldr.append("a lot of overwatch and are interested in helping out, pm u/Watchful1")
+	bldr.append("\nOver.gg died, this thread is from a completely rebuilt match thread bot pulling data from liquipedia. ")
+	bldr.append("If something is wrong or missing please ping u/Watchful1 in the comments")
 
 	return ''.join(bldr)
 
 
 def render_reddit_event_title(event):
 	bldr = []
-	bldr.append(event.competition.name)
-	bldr.append(" - ")
-	bldr.append(event.stages_name())
-	if event.is_owl():
-		bldr.append(" - ")
-		bldr.append(event.start.astimezone(pytz.timezone('US/Pacific')).strftime('%A'))
+	bldr.append(event.name)
+	# TODO add matchday name
 	return ''.join(bldr)
 
 
-def get_discord_flair(flairs, name, country, discord_type):
-	flair = flairs.get_static_flair(name, discord_type)
+def get_discord_flair(flairs, name, country):
+	flair = flairs.get_static_flair(name)
 	if flair is not None:
 		return f"{flair} "
 	else:
@@ -260,172 +344,116 @@ def get_discord_flair(flairs, name, country, discord_type):
 			return ""
 
 
-def render_discord(event, flairs, discord_notification, short=False):
+def render_discord(event, match_day, flairs, short=False):
 	bldr = []
+	bldr.append("**")
+	bldr.append(event.name)
+	#TODO bldr.append(event.stages_name())
+	bldr.append("**")
 
-	if discord_notification.type == DiscordType.COW:
-		bldr.append("**")
-		bldr.append(event.competition.name)
-		bldr.append(" - ")
-		bldr.append(event.stages_name())
-		bldr.append("**")
+	minutes_difference = math.ceil((match_day.approved_start_datetime - utils.utcnow()).seconds / 60)
+	if 60 > minutes_difference > 0:
+		bldr.append(" begins in ")
+		bldr.append(str(minutes_difference))
+		bldr.append(" minutes!")
+	else:
+		bldr.append(" begins soon!")
 
-		minutes_difference = math.ceil((event.start - static.utcnow()).seconds / 60)
-		if 60 > minutes_difference > 0:
-			bldr.append(" begins in ")
-			bldr.append(str(minutes_difference))
-			bldr.append(" minutes!")
+	bldr.append("\n")
+
+	notifications = []
+	for role in event.discord_roles:
+		if role in cow_roles:
+			notifications.append(cow_roles[role])
 		else:
-			bldr.append(" begins soon!")
+			log.warning(f"Role not in dict: {role}")
+	bldr.append(' '.join(notifications))
 
-		bldr.append("\n")
+	bldr.append("\n\n")
 
-		notifications = []
-		notifications.append(cow_roles['All-Notify'])
-		notifications.append(cow_roles['All-Matches'])
-		for role in discord_notification.roles:
-			notifications.append(role)
+	for i, game in enumerate(match_day.approved_games):
+		if short:
+			bldr.append("*")
+			bldr.append(pytz.utc.localize(game.date_time).astimezone(pytz.timezone("US/Pacific")).strftime("%I:%M %p %Z"))
+			bldr.append("* ")
 
-		bldr.append(' '.join(notifications))
-
-		bldr.append("\n\n")
-
-		for i, match in enumerate(event.matches):
-			if short:
-				bldr.append("*")
-				bldr.append(pytz.utc.localize(match.start).astimezone(pytz.timezone("US/Pacific")).strftime("%I:%M %p %Z"))
-				bldr.append("* ")
-
-				bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
-
-				bldr.append(" **")
-				bldr.append(match.home.name)
-				bldr.append("**")
-
-				bldr.append(" vs ")
-
-				bldr.append("**")
-				bldr.append(match.away.name)
-				bldr.append("** ")
-
-				bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
-
-				bldr.append("\n")
-			else:
-				bldr.append("**__Match ")
-				bldr.append(str(i + 1))
-				bldr.append("__** - *")
-
-				timezones = [
-					pytz.timezone("US/Pacific"),
-					pytz.timezone("US/Eastern"),
-					pytz.timezone("Europe/Paris"),
-					pytz.timezone("Australia/Sydney"),
-				]
-				match_time = pytz.utc.localize(match.start)
-
-				time_names = []
-				for timezone in timezones:
-					time_names.append(match_time.astimezone(timezone).strftime("%I:%M %p %Z"))
-
-				bldr.append(' / '.join(time_names))
-
-				bldr.append("*\n")
-
-				bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
-
-				bldr.append(" **")
-				bldr.append(match.home.name)
-				bldr.append("**")
-
-				bldr.append(" vs ")
-
-				bldr.append("**")
-				bldr.append(match.away.name)
-				bldr.append("** ")
-
-				bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
-
-				bldr.append("\n\n")
-
-		bldr.append(":tv:")
-		bldr.append("<")
-		bldr.append(event.streams[0].url)
-		bldr.append(">\n")
-
-		bldr.append(":information_source:")
-		bldr.append("<")
-		bldr.append(event.competition_url)
-		bldr.append(">\n")
-
-		if event.is_owl():
-			bldr.append(":information_source:")
-			bldr.append("<")
-			bldr.append(static.JUKED_EVENT)
-			bldr.append(">\n")
-
-		bldr.append(":keyboard:")
-		bldr.append("Discuss in <#")
-		bldr.append(discord_notification.channel)
-		bldr.append(">")
-		if event.thread is not None:
-			bldr.append(" or in this thread: ")
-			bldr.append("<https://redd.it/")
-			bldr.append(event.thread)
-			bldr.append(">")
-
-	elif discord_notification.type == DiscordType.THEOW:
-		bldr.append("**")
-		bldr.append(event.competition.name)
-		bldr.append("**")
-
-		minutes_difference = math.ceil((event.start - static.utcnow()).seconds / 60)
-		if 60 > minutes_difference > 0:
-			bldr.append(" is going live in ")
-			bldr.append(str(minutes_difference))
-			bldr.append(" minutes! ")
-		else:
-			bldr.append(" begins soon! ")
-
-		notifications = []
-		for role in discord_notification.roles:
-			notifications.append(role)
-
-		bldr.append(' '.join(notifications))
-
-		bldr.append("\n\n")
-
-		bldr.append("__")
-		bldr.append(event.stages_name())
-		bldr.append("__")
-
-		bldr.append("\n")
-
-		for i, match in enumerate(event.matches):
-			bldr.append(get_discord_flair(flairs, match.home.name, match.home.country, discord_notification.type))
+			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 
 			bldr.append(" **")
-			bldr.append(match.home.name)
+			bldr.append(game.home.get_name())
 			bldr.append("**")
 
 			bldr.append(" vs ")
 
 			bldr.append("**")
-			bldr.append(match.away.name)
+			bldr.append(game.away.get_name())
 			bldr.append("** ")
 
-			bldr.append(get_discord_flair(flairs, match.away.name, match.away.country, discord_notification.type))
+			bldr.append(get_discord_flair(flairs, game.away.name, "TBD"))
 
 			bldr.append("\n")
+		else:
+			bldr.append("**__Match ")
+			bldr.append(str(i + 1))
+			bldr.append("__** - *")
 
-		bldr.append("\n")
+			timezones = [
+				pytz.timezone("US/Pacific"),
+				pytz.timezone("US/Eastern"),
+				pytz.timezone("Europe/Paris"),
+				pytz.timezone("Australia/Sydney"),
+			]
 
-		bldr.append(":tv:")
-		bldr.append("<")
-		bldr.append(event.streams[0].url)
-		bldr.append(">\n")
+			time_names = []
+			for timezone in timezones:
+				time_names.append(game.date_time.astimezone(timezone).strftime("%I:%M %p %Z"))
 
-	return ''.join(bldr)
+			bldr.append(' / '.join(time_names))
+
+			bldr.append("*\n")
+
+			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
+			bldr.append(" **")
+			bldr.append(game.home.get_name())
+			bldr.append("**")
+
+			bldr.append(" vs ")
+
+			bldr.append("**")
+			bldr.append(game.away.get_name())
+			bldr.append("** ")
+			bldr.append(get_discord_flair(flairs, game.away.name, "TBD"))
+
+			bldr.append("\n\n")
+
+	bldr.append(":tv:")
+	bldr.append("<")
+	bldr.append(event.streams[0])
+	bldr.append(">\n")
+
+	# bldr.append(":information_source:")
+	# bldr.append("<")
+	# bldr.append(event.competition_url)
+	# bldr.append(">\n")
+
+	bldr.append(":keyboard:")
+	bldr.append("Discuss in <#")
+	bldr.append(cow_channels['match-discussion'])
+	bldr.append(">")
+	if match_day.thread_id is not None:
+		bldr.append(" or in this thread: ")
+		bldr.append("<https://redd.it/")
+		bldr.append(match_day.thread_id)
+		bldr.append(">")
+
+	result_str = ''.join(bldr)
+	if len(result_str) > 2000:
+		if short:
+			log.warning(f"Discord notification length too long {len(result_str)}")
+			return None
+		return render_discord(event, match_day, flairs, short=True)
+
+	return result_str
 
 
 def render_reddit_prediction_thread_title(event):

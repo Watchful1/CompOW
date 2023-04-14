@@ -5,15 +5,17 @@ import logging.handlers
 import praw
 import jsons
 import argparse
+import traceback
 from datetime import datetime, timedelta
 from collections import defaultdict
 
 log = discord_logging.init_logging()
 
-import liquipedia_parser
+import flair_manager
+import event_manager
 import messages
 import utils
-from reddit_class import Reddit
+from reddit_class import Reddit, Settings
 from classes import Team, Game, MatchDay, Event
 
 
@@ -35,7 +37,8 @@ if __name__ == "__main__":
 	if args.run_timestamp:
 		utils.DEBUG_NOW = args.run_timestamp
 
-	reddit = Reddit(args.user, args.subreddit, args.debug)
+	reddit = Reddit(args.user, args.subreddit, args.no_post)
+	flairs = flair_manager.FlairManager()
 
 	# sticky = sticky_manager.StickyManager(reddit, static.SUBREDDIT, state['stickies'])
 	# flairs = flair_manager.FlairManager(state['flairs'])
@@ -45,20 +48,34 @@ if __name__ == "__main__":
 	while True:
 		events = {}
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
+		parse_messages = False
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
 
 		if parse_messages or update_events:
 			event_pages = reddit.list_event_pages()
-			log.debug(f"Loading {len(event_pages)} events")
+			#log.debug(f"Loading {len(event_pages)} events")
 			for event_page in event_pages:
 				event = reddit.get_event_from_page(event_page)
 				events[event.id] = event
 
-		if parse_messages:
-			messages.parse_messages(reddit, events)
+		# if parse_messages:
+		# 	messages.parse_messages(reddit, events)
 
-		if update_events:
-			
+		try:
+			if update_events:
+				timestamps["events"] = event_manager.update_events(reddit, events, flairs)
+		except Exception as err:
+			transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			if not transient:
+				raise
+
+		Settings.settings = None
+
+		# TODO update sidebar
+		# TODO update calendar
+		# TODO post in discord when there's pending matches
+		# TODO create an archive page of events
+		# TODO add metrics
 
 		if args.once:
 			break

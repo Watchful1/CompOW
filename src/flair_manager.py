@@ -2,12 +2,9 @@ import json
 import requests
 import discord_logging
 
-import static
-from classes_2.flair_object import FlairObject
-from classes_2.enums import DiscordType
-
-
 log = discord_logging.get_logger()
+
+import utils
 
 
 static_flairs_cow = {
@@ -36,35 +33,17 @@ static_flairs_cow = {
 }
 
 
-static_flairs_theow = {
-	'Atlanta Reign': '<:AtlantaReign:522397819747958786>',
-	'Boston Uprising': '<:BostonUprising:464517062170116097>',
-	'Chengdu Hunters': '<:ChengduHunters:522397670128746498>',
-	'Dallas Fuel': '<:DallasFuel:464517062350340106>',
-	'Florida Mayhem': '<:FloridaMayhem:464517063768145941>',
-	'Guangzhou Charge': '<:GuangzhouCharge:522397679343370261>',
-	'Hangzhou Spark': '<:HangzhouSpark:545919246673117204>',
-	'Houston Outlaws': '<:HoustonOutlaws:464517064187707395>',
-	'London Spitfire': '<:LondonSpitfire:464517066733387806>',
-	'Los Angeles Gladiators': '<:LosAngelesGladiators:464517074396381198>',
-	'Los Angeles Valiant': '<:LosAngelesValiant:464517071787655198>',
-	'New York Excelsior': '<:NewYorkExcelsior:464517068608503858>',
-	'Paris Eternal': '<:ParisEternal:522397696103940124>',
-	'Philadelphia Fusion': '<:PhiladelphiaFusion:464517073771560979>',
-	'San Francisco Shock': '<:SanFranciscoShock:464517069791166464>',
-	'Seoul Dynasty': '<:SeoulDynasty:464517074245648404>',
-	'Shanghai Dragons': '<:ShanghaiDragons:464517072903471115>',
-	'Toronto Defiant': '<:TorontoDefiant:522397789594976257>',
-	'Vancouver Titans': '<:VancouverTitans:522397797907955714>',
-	'Washington Justice': '<:WashingtonJustice:522397807617769472>',
-	'Overwatch League': '<:OWL:376550786622291968>',
-	'Overwatch Contenders': '<:Contenders:408733969102798848>',
-}
+class FlairObject:
+	def __init__(self, name, row, column, sheet):
+		self.name = name
+		self.row = row
+		self.column = column
+		self.sheet = sheet
 
 
 class FlairManager:
-	def __init__(self, flairs):
-		self.flairs = flairs
+	def __init__(self):
+		self.flairs = {}
 		self.update_flairs()
 		self.missing_flairs = set()
 
@@ -73,7 +52,7 @@ class FlairManager:
 		return ''.join(x for x in name.lower() if x.isalnum())
 
 	def get_flair(self, name):
-		if name == "TBD":
+		if name is None or name == "TBD":
 			return ""
 		stripped_name = FlairManager.strip_name(name)
 		if stripped_name in self.flairs:
@@ -86,10 +65,11 @@ class FlairManager:
 			return ""
 
 	def update_flairs(self):
+		log.info(f"Updating flair list from site")
 		try:
-			response = requests.get(url=static.FLAIR_LIST, headers={'User-Agent': static.USER_AGENT}, timeout=5)
+			response = requests.get(url="http://rcompetitiveoverwatch.com/static/data/flairs.json", headers={'User-Agent': utils.USER_AGENT}, timeout=5)
 		except Exception as err:
-			log.warning("Flair load request failed")
+			log.warning(f"Flair load request failed {err}")
 			return
 
 		if response.status_code != 200:
@@ -99,7 +79,7 @@ class FlairManager:
 		try:
 			json_data = json.loads(response.text)
 		except Exception as err:
-			log.warning("Failed to load flair json")
+			log.warning(f"Failed to load flair json {err}")
 			return
 
 		flairs = {}
@@ -118,11 +98,7 @@ class FlairManager:
 		else:
 			log.info(f"Only found {len(flairs)} flairs, not updating")
 
-	def get_static_flair(self, name, discord_type):
-		if discord_type == DiscordType.COW:
-			if name in static_flairs_cow:
-				return static_flairs_cow[name]
-		elif discord_type == DiscordType.THEOW:
-			if name in static_flairs_theow:
-				return static_flairs_theow[name]
+	def get_static_flair(self, name):
+		if name in static_flairs_cow:
+			return static_flairs_cow[name]
 		return None

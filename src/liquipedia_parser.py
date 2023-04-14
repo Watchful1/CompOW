@@ -13,10 +13,9 @@ log = discord_logging.get_logger()
 def get_page_text(page_url):
 	try:
 		return requests.get(page_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
-	except Exception:
-		log.warning(f"Unable to fetch match page: {page_url}")
-		log.warning(traceback.format_exc())
-		return None
+	except Exception as err:
+		log.warning(f"Unable to fetch match page: {err} : {page_url}")
+		raise
 
 
 def get_text_from_paths(base_node, paths):
@@ -29,16 +28,11 @@ def get_text_from_paths(base_node, paths):
 	return None
 
 
-def parse_event(page_url):
-	page_string = get_page_text(page_url)
-	tree = etree.fromstring(page_string, etree.HTMLParser())
+def extract_details(tree):
+	link_divs = tree.xpath("//div[@class='fo-nttax-infobox']/div")
+	# if len(link_divs) == 0:
+	# 	link_divs = tree.xpath("//div[@class='fo-nttax-infobox wiki-bordercolor-light']/div")
 
-	title_node = tree.xpath("//div[@id='main-content']/h1[@class='firstHeading']/span/text()")
-	event_name = None
-	if len(title_node):
-		event_name = title_node[0]
-
-	link_divs = tree.xpath("//div[@class='fo-nttax-infobox wiki-bordercolor-light']/div")
 	found_links = False
 	streams = []
 	for div in link_divs:
@@ -56,6 +50,30 @@ def parse_event(page_url):
 				if text.lower() == "links":
 					found_links = True
 
+	return streams
+
+
+def parse_details_page(page_url):
+	page_string = get_page_text(page_url)
+	tree = etree.fromstring(page_string, etree.HTMLParser())
+
+	streams = extract_details(tree)
+
+	return streams
+
+
+def parse_event(page_url):
+	# TODO parse out the match day and bracket levels
+	page_string = get_page_text(page_url)
+	tree = etree.fromstring(page_string, etree.HTMLParser())
+
+	title_node = tree.xpath("//div[@id='main-content']/h1[@class='firstHeading']/span/text()")
+	event_name = None
+	if len(title_node):
+		event_name = str(title_node[0])
+
+	streams = extract_details(tree)
+
 	games = []
 
 	game_nodes = tree.xpath("//div[@class='brkts-popup brkts-match-info-popup']")
@@ -72,20 +90,20 @@ def parse_event(page_url):
 			 ".//div[contains(@class, 'bracket-popup-header-right')]/*/*/a/@title",
 			 ".//div[contains(@class, 'brkts-popup-header-opponent-right')]/div[@class='brkts-opponent-block-literal']/text()"])
 
-		game.home.score = get_text_from_paths(node,
-			[".//div[contains(@class, 'brkts-popup-header-opponent-score-left')]/*/text()"])
+		game.home.set_score(get_text_from_paths(node,
+			[".//div[contains(@class, 'brkts-popup-header-opponent-score-left')]/*/text()"]))
 		if game.home.score is None:
-			game.home.score = get_text_from_paths(node,
+			game.home.set_score(get_text_from_paths(node,
 				[".//div[contains(@class, 'brkts-popup-header-opponent-score-left')]/text()",
-				 ".//td[@align='center'][1]/text()"])
+				 ".//td[@align='center'][1]/text()"]))
 		else:
 			game.complete = True
-		game.away.score = get_text_from_paths(node,
-			[".//div[contains(@class, 'brkts-popup-header-opponent-score-right')]/*/text()"])
+		game.away.set_score(get_text_from_paths(node,
+			[".//div[contains(@class, 'brkts-popup-header-opponent-score-right')]/*/text()"]))
 		if game.away.score is None:
-			game.away.score = get_text_from_paths(node,
+			game.away.set_score(get_text_from_paths(node,
 				[".//div[contains(@class, 'brkts-popup-header-opponent-score-right')]/text()",
-				 ".//td[@align='center'][2]/text()"])
+				 ".//td[@align='center'][2]/text()"]))
 		else:
 			game.complete = True
 		if not game.complete:
@@ -108,7 +126,15 @@ def parse_event(page_url):
 
 
 def update_event(event):
-	games, event_name, streams = parse_event(event.url)
+	url = event.url
+	if event.use_pending_changes:
+		url = url + "?stable=0"
+	games, event_name, streams = parse_event(url)
+	if event.details_url is not None:
+		details_streams = parse_details_page(event.details_url)
+		for stream in details_streams:
+			if stream not in streams:
+				streams.append(stream)
 
 	if event.name is not None and event_name != event.name:
 		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")
@@ -124,6 +150,7 @@ def update_event(event):
 					changed = True
 	if changed:
 		log.warning(f"Event {event.name} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
+		event.dirty = True
 	event.streams = streams
 
 	for game in games:

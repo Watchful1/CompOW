@@ -32,6 +32,23 @@ class Team:
 	name: str = None
 	score: int = None
 
+	def set_score(self, score):
+		if score is not None:
+			self.score = int(score)
+
+	def get_name(self):
+		if self.name is None:
+			return "TBD"
+		return self.name
+
+	def __eq__(self, other):
+		if not isinstance(other, Team):
+			return False
+		return self.name == other.name and self.score == other.score
+
+	def __str__(self):
+		return f"{self.name}: {self.score}"
+
 
 @dataclass
 class Game:
@@ -41,6 +58,9 @@ class Game:
 	complete: bool = False
 	date_time: datetime = None
 
+	post_thread_id: str = None
+	dirty: bool = False
+
 	def status(self):
 		if self.complete:
 			return "Complete"
@@ -49,13 +69,27 @@ class Game:
 		return "Not-started"
 
 	def matches(self, game):
-		return self.home.name == game.home.name and self.away.name == game.away.name and self.date_time == game.date_time
+		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
+			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
+			self.date_time == game.date_time
 
 	def merge(self, game):
-		self.home = game.home
-		self.away = game.away
-		self.complete = game.complete
-		self.date_time = game.date_time
+		if self.home != game.home:
+			log.debug(f"dirty home {self.id}: {self.home} != {game.home}")
+			self.dirty = True
+			self.home = game.home
+		if self.away != game.away:
+			log.debug(f"dirty away {self.id}: {self.away} != {game.away}")
+			self.dirty = True
+			self.away = game.away
+		if self.complete is not game.complete:
+			log.debug(f"dirty complete {self.id}: {self.complete} != {game.complete}")
+			self.dirty = True
+			self.complete = game.complete
+		if self.date_time != game.date_time:
+			log.debug(f"dirty date_time {self.id}: {self.date_time} != {game.date_time}")
+			self.dirty = True
+			self.date_time = game.date_time
 
 	def render_datetime(self):
 		if self.date_time is None:
@@ -72,13 +106,17 @@ class MatchDay:
 	approved_games: List[Game] = field(default_factory=list)
 	pending_games: List[Game] = field(default_factory=list)
 	loading_games: List[Game] = field(default_factory=list)
+	approved_start_datetime: datetime = None
 	first_datetime: datetime = None
 	last_datetime: datetime = None
+	dirty: bool = False
+
+	thread_id: str = None
 
 	predictions_thread: str = None
 	match_thread: str = None
-	post_match_thread: str = None
 	discord_posted: bool = False
+	spoiler_prevention: bool = False
 
 	def add_game(self, game):
 		if self.first_datetime is not None and \
@@ -103,6 +141,8 @@ class MatchDay:
 
 	def sort_games(self):
 		self.approved_games.sort(key=lambda game: game.date_time)
+		if len(self.approved_games):
+			self.approved_start_datetime = self.approved_games[0].date_time
 		if len(self.loading_games):
 			self.pending_games = self.loading_games
 			self.loading_games = []
@@ -129,11 +169,29 @@ class MatchDay:
 				copy_pending.append(pending_game)
 		self.pending_games = copy_pending
 
+	def delete_game(self, game_id):
+		new_approved_games = []
+		for approved_game in self.approved_games:
+			if approved_game.id == game_id:
+				log.info(f"Deleted game {approved_game}")
+			else:
+				new_approved_games.append(approved_game)
+		self.approved_games = new_approved_games
+		new_pending_games = []
+		for pending_games in self.pending_games:
+			if pending_games.id == game_id:
+				log.info(f"Deleted game {pending_games}")
+			else:
+				new_pending_games.append(pending_games)
+		self.pending_games = new_pending_games
+
 	def approve_all_games(self):
+		games_approved = len(self.pending_games) > 0
 		self.approved_games.extend(self.pending_games)
 		log.info(f"Approved {len(self.pending_games)} games for {self}")
 		self.pending_games = []
 		self.approved_games.sort(key=lambda game: game.date_time)
+		return games_approved
 
 	def is_complete(self):
 		complete = True
@@ -146,6 +204,19 @@ class MatchDay:
 				if not game.complete:
 					complete = False
 		return complete
+
+	def is_dirty(self):
+		if self.dirty:
+			return True
+		for game in self.approved_games:
+			if game.dirty:
+				return True
+		return False
+
+	def clean(self):
+		self.dirty = False
+		for game in self.approved_games:
+			game.dirty = False
 
 	def __str__(self):
 		return \
@@ -163,39 +234,30 @@ class Event:
 	name: str = None
 	streams: List[str] = field(default_factory=list)
 	match_days: List[MatchDay] = field(default_factory=list)
+	wiki_dirty: bool = False
+
+	post_match_threads: bool = False
+	match_thread_minutes_before: int = 15
+	leave_thread_minutes_after: int = None
+	use_pending_changes: bool = False
+
+	discord_key: str = None
+	discord_minutes_before: int = 15
+	discord_roles: List[str] = field(default_factory=lambda: ['All-Notify', 'All-Matches', 'here'])
+
+	details_url: str = None
 
 	def wiki_name(self):
 		return "events/"+self.name.replace(" ", "-").replace("/", "-").replace(":", "").lower()
 
-	def render_reddit(self):
-		bldr = ["##[", self.name, "](", self.url, ")\n\n"]
+	def get_name(self):
+		return self.name
+
+	def get_match_day(self, match_day_id):
 		for match_day in self.match_days:
-			bldr.append("###")
-			bldr.append(str(match_day))
-			bldr.append("\n\n")
-			bldr.append(f"Approved | Pending\n---|---\n")
-			i = 0
-			while True:
-				if i < len(match_day.approved_games):
-					bldr.append(str(match_day.approved_games[i]))
-				bldr.append(" | ")
-				if i < len(match_day.pending_games):
-					bldr.append(str(match_day.pending_games[i]))
-				bldr.append("\n")
-				i += 1
-				if i >= len(match_day.approved_games) and i >= len(
-						match_day.pending_games):
-					break
-
-			bldr.append("\n\n")
-
-		event_string = str(jsons.dumps(self, cls=Event, strip_nulls=True))
-
-		bldr.append("[](#datatag")
-		bldr.append(event_string)
-		bldr.append(")")
-
-		return ''.join(bldr)
+			if match_day.id == match_day_id:
+				return match_day
+		return None
 
 	def add_game(self, game):
 		for match_day in self.match_days:
@@ -212,7 +274,7 @@ class Event:
 
 	def approve_all_games(self):
 		for match_day in self.match_days:
-			match_day.approve_all_games()
+			self.wiki_dirty = self.wiki_dirty or match_day.approve_all_games()
 
 	def log(self):
 		log.info(self.name)
@@ -228,3 +290,24 @@ class Event:
 
 	def __str__(self):
 		return f"{self.name} - {len(self.match_days)} days"
+
+
+@dataclass
+class Settings:
+	stickies: List[str] = field(default_factory=list)
+
+	# class var
+	settings = None
+
+	@classmethod
+	def get_settings(cls, reddit):
+		if cls.settings is None:
+			cls.settings = reddit.get_settings()
+		return cls.settings
+
+	def save(self, reddit):
+		reddit.save_settings(self)
+
+	def __str__(self):
+		return f"stickies: {(','.join(self.stickies) if self.stickies else 'None')}"
+

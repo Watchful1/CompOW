@@ -1,4 +1,5 @@
 import discord_logging
+import re
 
 log = discord_logging.get_logger()
 
@@ -7,9 +8,9 @@ import liquipedia_parser
 from classes import Event
 
 
-def add_event(body, reddit, events):
+def add_event(line, reddit, events):
 	log.debug("Adding event from message")
-	words = body.split(" ")
+	words = line.split(" ")
 	if len(words) < 2:
 		return "No link found in message"
 	page_url = words[1]
@@ -24,61 +25,129 @@ def add_event(body, reddit, events):
 	return f"Event created at https://www.reddit.com/r/Competitiveoverwatch/wiki/{event.wiki_name()}"
 
 
-def delete_event(body, reddit, events):
-	log.debug("Deleting event from message")
-	words = body.split(" ")
-	if len(words) < 2:
-		return "No id found in message"
-	event_id = words[1]
-	if len(event_id) != 5:
-		return f"Invalid event id: {event_id}"
-	if event_id not in events:
-		return f"Event not found: {event_id}"
-	event = events[event_id]
+def delete_event(line, event, reddit, events):
+	log.debug(f"Deleting event from message: {event}")
+	if event is None:
+		return "Event not found"
+
 	reddit.hide_page_from_event(event)
-	del events[event_id]
+	del events[event.id]
 	return f"Event deleted: {event.id}"
+
+
+def approve_event(line, event):
+	log.debug(f"Approving event from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	event.approve_all_games()
+
+	return f"Event approved: {event.id}"
+
+
+def approve_match_day(line, event):
+	log.debug(f"Approving match day from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	parts = line.split(":")
+	if not len(parts) >= 2:
+		return f"match day id not found: {line}"
+	match_day_id = parts[1]
+
+	match_day = event.get_match_day(match_day_id)
+	if match_day is None:
+		return f"Match day not found: {match_day_id}"
+
+	games_approved = match_day.approve_all_games()
+
+	return f"{games_approved} games approved in match day: {event.id}:{match_day_id}"
+
+
+def update_settings(line, event):
+	log.debug(f"Updating settings from message: {event}")
+	if event is None:
+		return "No event found"
+	parts = line.split(":")
+	key = parts[1]
+	value = parts[2]
+	bool_val = None
+	int_val = None
+	result = None
+	if value == "True":
+		bool_val = True
+	elif value == "False":
+		bool_val = False
+	else:
+		try:
+			int_val = int(value)
+		except ValueError:
+			pass
+
+	if key == "post_match_threads" and bool_val is not None and event.post_match_threads is not bool_val:
+		result = f"post_match_threads from {event.post_match_threads} to {bool_val}"
+		event.post_match_threads = bool_val
+	elif key == "match_thread_minutes_before" and int_val is not None and event.match_thread_minutes_before != int_val:
+		result = f"match_thread_minutes_before from {event.match_thread_minutes_before} to {int_val}"
+		event.match_thread_minutes_before = int_val
+	elif key == "leave_thread_minutes_after" and int_val is not None and event.leave_thread_minutes_after != int_val:
+		result = f"leave_thread_minutes_after from {event.leave_thread_minutes_after} to {int_val}"
+		event.leave_thread_minutes_after = int_val
+	elif key == "use_pending_changes" and bool_val is not None and event.use_pending_changes is not bool_val:
+		result = f"use_pending_changes from {event.use_pending_changes} to {bool_val}"
+		event.use_pending_changes = bool_val
+	elif key == "discord_key" and event.discord_key != value:
+		result = f"discord_key from {event.discord_key} to {value}"
+		event.discord_key = value
+	elif key == "discord_minutes_before" and int_val is not None and event.discord_minutes_before != int_val:
+		result = f"discord_minutes_before from {event.discord_minutes_before} to {int_val}"
+		event.discord_minutes_before = int_val
+	elif key == "discord_roles" and ','.join(event.discord_roles) != value:
+		result = f"discord_roles from {','.join(event.discord_roles)} to {value}"
+		event.discord_roles = value.split(",")
+	if result is not None:
+		event.wiki_dirty = True
+		return result
+	return f"settings line not parsed: {line}"
 
 
 def process_message(message, reddit, events):
 	log.debug(f"Processing message {message.id} from u/{message.author.name}")
+
+	event = None
+	event_id_results = re.findall(r'^\w{5}', message.subject)
+	if len(event_id_results) and event_id_results[0] in events:
+		event = events[event_id_results[0]]
+
 	line_results = []
 	for line in message.body.splitlines():
-		if line.startswith("approvematch"):
+		line = line.strip()
+		if line.startswith("settings"):
+			line_result = update_settings(line, event)
+		elif line.startswith("approvematch"):
+			# TODO implement approve match message
 			line_result = method()
 		elif line.startswith("approveday"):
-			line_result = method()
+			line_result = approve_match_day(line, event)
 		elif line.startswith("approveevent"):
-			line_result = method()
+			line_result = approve_event(line, event)
 		elif line.startswith("deletematch"):
+			# TODO implement delete match message
 			line_result = method()
 		elif line.startswith("deleteevent"):
-			line_result = delete_event(message.body, reddit, events)
+			line_result = delete_event(message.body, event, reddit, events)
 		elif line.startswith("addevent"):
 			line_result = add_event(message.body, reddit, events)
 		else:
 			line_result = "No command found for line"
 		log.info(line_result)
 		line_results.append(line_result)
-
-			# name = "Overwatch League 2022 Season",
-			# discord = [
-			# 	DiscordNotification(
-			# 		type=DiscordType.COW,
-			# 		minutes_ahead=15,
-			# 		roles=[cow_roles['OWL-Notify'], "@everyone"],
-			# 		channel=cow_channels['match-discussion']
-			# 	),
-			# 	DiscordNotification(
-			# 		type=DiscordType.THEOW,
-			# 		minutes_ahead=5,
-			# 		roles=["@everyone"]
-			# 	)
-			# ],
-			# post_match_threads = True,
-			# post_minutes_ahead = 150,
-			# leave_thread_minutes = 4 * 60,
-			# spoiler_stages = ["Play-offs: Upper bracket","Play-offs: Lower Bracket"]
+		# TODO
+		# details url (auto-lookup without extension)
+		# override name
+		# turn on spoilers for match day
+		# set discord roles
+		# set discord channel
 
 
 def parse_messages(reddit, events):
