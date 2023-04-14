@@ -5,7 +5,7 @@ log = discord_logging.get_logger()
 
 import utils
 import liquipedia_parser
-from classes import Event
+from classes.event import Event
 
 
 def add_event(line, reddit, events):

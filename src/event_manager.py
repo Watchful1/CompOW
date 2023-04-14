@@ -7,7 +7,7 @@ log = discord_logging.get_logger()
 import utils
 import liquipedia_parser
 import string_utils
-from classes import Event, Settings
+from classes.settings import Settings
 
 
 def update_events(reddit, events, flairs):

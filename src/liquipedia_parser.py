@@ -2,17 +2,18 @@ import traceback
 from lxml import etree
 import requests
 import discord_logging
-import static
 import pytz
-from classes import Game
 from datetime import datetime, timedelta
 
 log = discord_logging.get_logger()
 
+import utils
+from classes.game import Game
+
 
 def get_page_text(page_url):
 	try:
-		return requests.get(page_url, headers={'User-Agent': static.USER_AGENT}, timeout=5).text
+		return requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5).text
 	except Exception as err:
 		log.warning(f"Unable to fetch match page: {err} : {page_url}")
 		raise

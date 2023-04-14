@@ -11,7 +11,8 @@ log = discord_logging.get_logger()
 
 import utils
 import string_utils
-from classes import Event, Settings
+from classes.event import Event
+from classes.settings import Settings
 
 
 class Reddit:
