@@ -17,6 +17,7 @@ def update_events(reddit, events, flairs):
 
 		for match_day in event.match_days:
 			# post initial thread
+			new_thread_posted = False
 			if match_day.thread_id is None and \
 					not match_day.is_complete() and \
 					utils.minutes_to_start(match_day.approved_start_datetime) < event.match_thread_minutes_before:
@@ -48,7 +49,7 @@ def update_events(reddit, events, flairs):
 					log.warning(f"Got {len(stickied_threads)} stickied threads")
 
 				match_day.thread_id = thread_id
-				match_day.clean()
+				new_thread_posted = True
 
 			# post match thread if game is done
 			if event.post_match_threads and match_day.thread_id is not None:
@@ -83,15 +84,13 @@ def update_events(reddit, events, flairs):
 							reddit.distinguish_comment(comment_id)
 
 			# update thread if dirty
-			if match_day.thread_id is not None and \
-					(match_day.is_dirty() or event.dirty):
+			if not new_thread_posted and match_day.thread_id is not None and match_day.is_thread_dirty():
 				log.info(f"Match day dirty, updating thread: {event.id}:{match_day.id} : {match_day.thread_id}")
 
 				reddit.edit_thread(
 					match_day.thread_id,
 					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit)
 				)
-				match_day.clean()
 
 			# post discord announcement
 			if event.discord_key is not None and \
@@ -119,9 +118,6 @@ def update_events(reddit, events, flairs):
 			if not match_day.is_complete() and \
 					utils.minutes_to_start(match_day.approved_start_datetime) < (event.match_thread_minutes_before + 15):
 				active_event = True
-
-		event.dirty = False
-		reddit.update_page_from_event(event)
 
 	if active_event:
 		return utils.utcnow(offset=60*1)  # scan every 1 minute while active

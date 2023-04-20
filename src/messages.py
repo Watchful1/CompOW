@@ -18,7 +18,7 @@ def add_event(line, reddit, events):
 		return f"Not a liquipedia url: {page_url}"
 
 	event = Event(page_url)
-	liquipedia_parser.update_event(event)
+	liquipedia_parser.update_event(event, approve_complete=True)
 	reddit.create_page_from_event(event)
 	events[event.id] = event
 
@@ -64,6 +64,50 @@ def approve_match_day(line, event):
 	return f"{games_approved} games approved in match day: {event.id}:{match_day_id}"
 
 
+def approve_match(line, event):
+	log.debug(f"Approving match from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	parts = line.split(":")
+	if not len(parts) >= 2:
+		return f"match id not found: {line}"
+	pending_match_id = parts[1]
+	if len(parts) >= 3:
+		approved_match_id = parts[2]
+	else:
+		approved_match_id = None
+
+	match_day = event.get_match_day_from_match_id(pending_match_id)
+	if match_day is None:
+		return f"Match day not found from match id: {pending_match_id}"
+
+	if match_day.approve_game(pending_match_id, approved_match_id):
+		return f"game approved in match day: {event.id}:{match_day.id} : {pending_match_id}:{approved_match_id}"
+	else:
+		return f"approval failed in match day: {event.id}:{match_day.id} : {pending_match_id}:{approved_match_id}"
+
+
+def delete_match(line, event):
+	log.debug(f"Deleting match from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	parts = line.split(":")
+	if not len(parts) >= 2:
+		return f"match id not found: {line}"
+	match_id = parts[1]
+
+	match_day = event.get_match_day_from_match_id(match_id)
+	if match_day is None:
+		return f"Match day not found from match id: {match_id}"
+
+	if match_day.delete_game(match_id):
+		return f"game deleted in match day: {event.id}:{match_day.id} : {match_id}"
+	else:
+		return f"deletion failed in match day: {event.id}:{match_day.id} : {match_id}"
+
+
 def update_settings(line, event):
 	log.debug(f"Updating settings from message: {event}")
 	if event is None:
@@ -106,7 +150,7 @@ def update_settings(line, event):
 		result = f"discord_roles from {','.join(event.discord_roles)} to {value}"
 		event.discord_roles = value.split(",")
 	if result is not None:
-		event.wiki_dirty = True
+		event.dirty = True
 		return result
 	return f"settings line not parsed: {line}"
 
@@ -125,15 +169,13 @@ def process_message(message, reddit, events):
 		if line.startswith("settings"):
 			line_result = update_settings(line, event)
 		elif line.startswith("approvematch"):
-			# TODO implement approve match message
-			line_result = method()
+			line_result = approve_match(line, event)
 		elif line.startswith("approveday"):
 			line_result = approve_match_day(line, event)
 		elif line.startswith("approveevent"):
 			line_result = approve_event(line, event)
 		elif line.startswith("deletematch"):
-			# TODO implement delete match message
-			line_result = method()
+			line_result = delete_match(line, event)
 		elif line.startswith("deleteevent"):
 			line_result = delete_event(message.body, event, reddit, events)
 		elif line.startswith("addevent"):
@@ -142,21 +184,24 @@ def process_message(message, reddit, events):
 			line_result = "No command found for line"
 		log.info(line_result)
 		line_results.append(line_result)
-		# TODO
-		# details url (auto-lookup without extension)
-		# override name
-		# turn on spoilers for match day
-		# set discord roles
-		# set discord channel
+		# TODO details url (auto-lookup without extension)
+		# TODO override name
+		# TODO turn on spoilers for match day
+		# TODO set discord channel
+		# TODO mark matchday as dirty
 
 
 def parse_messages(reddit, events):
+	processed_message = False
 	for message in reddit.get_unread():
 		if reddit.is_message(message):
 			if message.author is None:
 				log.info(f"Message {message.id} is a system notification")
 			elif message.author.name not in utils.AUTHORIZED_USERS:
-				log.info(f"Message {message.id} is from u/{message.author.name}, skipping")
+				log.info(f"Message {message.id} is from u/{message.author.name}, not authorized")
 			else:
 				process_message(message, reddit, events)
 		reddit.mark_read(message)
+		processed_message = True
+
+	return processed_message

@@ -8,7 +8,7 @@ import random
 log = discord_logging.get_logger()
 
 USER_AGENT = "r/CompetitiveOverwatch bot (by u/Watchful1)"
-AUTHORIZED_USERS = set("Watchful1")
+AUTHORIZED_USERS = {"Watchful1"}
 DEBUG_NOW = None
 
 
@@ -44,6 +44,7 @@ def get_random_id():
 	id_range_start = int("10000", 36)
 	id_range_end = int("zzzzz", 36)
 	return base36encode(random.randrange(id_range_start, id_range_end))
+
 
 def utcnow(offset=0, use_debug=True):
 	if use_debug and DEBUG_NOW is not None:

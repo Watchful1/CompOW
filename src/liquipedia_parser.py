@@ -126,7 +126,7 @@ def parse_event(page_url):
 	return games, event_name, streams
 
 
-def update_event(event):
+def update_event(event, approve_complete=False):
 	url = event.url
 	if event.use_pending_changes:
 		url = url + "?stable=0"
@@ -139,6 +139,7 @@ def update_event(event):
 
 	if event.name is not None and event_name != event.name:
 		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")
+		event.dirty = True
 	event.name = event_name
 
 	changed = False
@@ -157,4 +158,4 @@ def update_event(event):
 	for game in games:
 		event.add_game(game)
 
-	event.sort_matches()
+	event.sort_matches(approve_complete)

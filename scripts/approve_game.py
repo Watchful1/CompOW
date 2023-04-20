@@ -3,7 +3,7 @@ import discord_logging
 log = discord_logging.init_logging()
 
 import liquipedia_parser
-from classes import Event
+from classes.event import Event
 from reddit_class import Reddit
 
 

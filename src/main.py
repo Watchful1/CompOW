@@ -2,12 +2,9 @@ import time
 
 import discord_logging
 import logging.handlers
-import praw
-import jsons
 import argparse
 import traceback
 from datetime import datetime, timedelta
-from collections import defaultdict
 
 log = discord_logging.init_logging()
 
@@ -34,21 +31,21 @@ if __name__ == "__main__":
 	if args.debug:
 		discord_logging.set_level(logging.DEBUG)
 
+	discord_logging.init_discord_logging(args.user, logging.WARNING, 1)
+
 	if args.run_timestamp:
 		utils.DEBUG_NOW = args.run_timestamp
 
 	reddit = Reddit(args.user, args.subreddit, args.no_post)
+	# TODO cache flairs locally
 	flairs = flair_manager.FlairManager()
 
-	# sticky = sticky_manager.StickyManager(reddit, static.SUBREDDIT, state['stickies'])
-	# flairs = flair_manager.FlairManager(state['flairs'])
 	# overwatch_api = overwatch_api_parser.OverwatchAPI()
 
 	timestamps = {}
 	while True:
 		events = {}
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
-		parse_messages = False
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
 
 		if parse_messages or update_events:
@@ -58,8 +55,19 @@ if __name__ == "__main__":
 				event = reddit.get_event_from_page(event_page)
 				events[event.id] = event
 
-		# if parse_messages:
-		# 	messages.parse_messages(reddit, events)
+		try:
+			if parse_messages:
+				processed_message = messages.parse_messages(reddit, events)
+				if processed_message:
+					timestamps["last_message"] = utils.utcnow()
+				if "last_message" in timestamps and timestamps["last_message"] > utils.utcnow(-60*10):
+					timestamps["messages"] = utils.utcnow(10)  # if we processed a message in the last 10 minutes, check every next
+				else:
+					timestamps["messages"] = utils.utcnow(60*2)  # otherwise check every 2 minutes
+		except Exception as err:
+			transient = utils.process_error(f"Error processing messages", err, traceback.format_exc())
+			if not transient:
+				raise
 
 		try:
 			if update_events:
@@ -70,6 +78,12 @@ if __name__ == "__main__":
 				raise
 
 		Settings.settings = None
+
+		if parse_messages or update_events:
+			for event in events.values():
+				if event.is_dirty():
+					event.clean()
+					reddit.update_page_from_event(event)
 
 		# TODO update sidebar
 		# TODO update calendar
@@ -82,4 +96,3 @@ if __name__ == "__main__":
 		if args.once:
 			break
 		time.sleep(15)
-

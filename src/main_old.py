@@ -81,7 +81,6 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 					event.thread,
 					string_utils.render_reddit_event(event, flairs)
 				)
-				event.clean()
 
 			if event.game_state() == GameState.COMPLETE:
 				if event.competition.leave_thread_minutes is not None:
@@ -118,7 +117,6 @@ def main(events, reddit, sticky, flairs, debug, no_discord, keys, overwatch_api)
 				sticky.sticky(thread_id, event.competition, event.start)
 
 				event.thread = thread_id
-				event.clean()
 
 			if event.game_state() == GameState.COMPLETE:
 				log.info(f"Non-posted event complete, removing: {event}")

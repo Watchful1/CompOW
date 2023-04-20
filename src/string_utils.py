@@ -7,9 +7,8 @@ import urllib.parse
 
 log = discord_logging.get_logger()
 
-import static
 import utils
-from classes import Event
+from classes.event import Event
 
 
 cow_roles = {
@@ -320,8 +319,8 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append("|")
 		bldr.append("\n")
 
-	bldr.append("\nOver.gg died, this thread is from a completely rebuilt match thread bot pulling data from liquipedia. ")
-	bldr.append("If something is wrong or missing please ping u/Watchful1 in the comments")
+	bldr.append(f"\nThis thread pulls match data from [this liquipedia page]({event.url}). If the thread is out of data, you can help ")
+	bldr.append(f"by updating that page. If something is wrong or missing please ping u/Watchful1 in the comments.")
 
 	return ''.join(bldr)
 
@@ -467,7 +466,7 @@ def render_reddit_prediction_thread(events, flairs):
 	bldr = []
 
 	bldr.append("How do you think this weekend's games will play out? You can leave a comment below and [join our Pick'Ems leaderboard here](")
-	bldr.append(static.PREDICTION_URL)
+	bldr.append(utils.PREDICTION_URL)
 	bldr.append(") by clicking ""Join a leaderboard"" and putting in the code `reddit-cow`. We will have prizes after each week of games.\n\n")
 
 	for event in events:

@@ -307,7 +307,7 @@ class Reddit:
 		else:
 			#log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
-			event_wiki.edit(content=event.render_wiki())
+			event_wiki.edit(content=string_utils.render_event_wiki(event, self.user))
 
 	def hide_page_from_event(self, event):
 		if self.debug:
@@ -315,7 +315,7 @@ class Reddit:
 		else:
 			log.debug(f"Hiding page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
-			event_wiki.mod.update(listed=False)
+			event_wiki.mod.update(listed=False, permlevel=0)
 
 	def save_settings(self, settings):
 		if self.debug:

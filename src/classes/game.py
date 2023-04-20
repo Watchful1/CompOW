@@ -6,7 +6,7 @@ import discord_logging
 log = discord_logging.get_logger()
 
 from utils import get_random_id
-from team import Team
+from classes.team import Team
 
 
 @dataclass
