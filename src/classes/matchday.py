@@ -40,6 +40,7 @@ class MatchDay:
 			if approved_game.matches(game):
 				approved_game.merge(game)
 				return True
+		self.dirty = True
 		for pending_game in self.pending_games:
 			if pending_game.matches(game):
 				pending_game.merge(game)
@@ -108,6 +109,8 @@ class MatchDay:
 			else:
 				new_pending_games.append(pending_games)
 		self.pending_games = new_pending_games
+		if target_found:
+			self.dirty = True
 		return target_found
 
 	def approve_all_games(self):

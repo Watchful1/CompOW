@@ -73,19 +73,23 @@ def render_event_wiki(event, username):
 		f"{event.id}:update settings",
 		'\n'.join([f"settings:{field}" for field in settings_fields])
 	))
-	bldr.append(")\n\n")
-	bldr.append("[Delete event](")
+	bldr.append(") : [Delete event](")
 	bldr.append(build_message_link(
 		username,
 		f"{event.id}:delete event",
 		f"deleteevent"
 	))
-	bldr.append(")\n\n")
-	bldr.append("[Approve all matches](")
+	bldr.append(") : [Approve all matches](")
 	bldr.append(build_message_link(
 		username,
 		f"{event.id}:approve event",
 		f"approveevent"
+	))
+	bldr.append(") : [Re-render wiki](")
+	bldr.append(build_message_link(
+		username,
+		f"{event.id}:render wiki",
+		f"renderwiki"
 	))
 	bldr.append(")\n\n")
 	for stream in event.streams:
@@ -95,25 +99,40 @@ def render_event_wiki(event, username):
 		bldr.append("###")
 		bldr.append(str(match_day))
 		bldr.append("\n\n")
-		bldr.append("[Approve matchday](")
-		bldr.append(build_message_link(
-			username,
-			f"{event.id}:approve matchday",
-			f"approveday:{match_day.id}"
-		))
-		bldr.append(")\n\n")
+		if len(match_day.pending_games):
+			bldr.append("[Approve matchday](")
+			bldr.append(build_message_link(
+				username,
+				f"{event.id}:approve matchday",
+				f"approveday:{match_day.id}"
+			))
+			bldr.append(")\n\n")
 		bldr.append(f"Approved | Pending\n---|---\n")
 		i = 0
 		while True:
 			if i < len(match_day.approved_games):
 				bldr.append(str(match_day.approved_games[i]))
+				bldr.append(" [del](")
+				bldr.append(build_message_link(
+					username,
+					f"{event.id}:delete match",
+					f"deletematch:{match_day.approved_games[i].id}"
+				))
+				bldr.append(")")
 			bldr.append(" | ")
 			if i < len(match_day.pending_games):
 				bldr.append(str(match_day.pending_games[i]))
+
+				bldr.append(" [app](")
+				bldr.append(build_message_link(
+					username,
+					f"{event.id}:approve match",
+					f"approvematch:{match_day.pending_games[i].id}"
+				))
+				bldr.append(")")
 			bldr.append("\n")
 			i += 1
-			if i >= len(match_day.approved_games) and i >= len(
-					match_day.pending_games):
+			if i >= len(match_day.approved_games) and i >= len(match_day.pending_games):
 				break
 
 		bldr.append("\n\n")

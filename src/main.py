@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
 	timestamps = {}
 	while True:
-		events = {}
+		event_dict = {}
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
 
@@ -53,11 +53,11 @@ if __name__ == "__main__":
 			#log.debug(f"Loading {len(event_pages)} events")
 			for event_page in event_pages:
 				event = reddit.get_event_from_page(event_page)
-				events[event.id] = event
+				event_dict[event.id] = event
 
 		try:
 			if parse_messages:
-				processed_message = messages.parse_messages(reddit, events)
+				processed_message = messages.parse_messages(reddit, event_dict)
 				if processed_message:
 					timestamps["last_message"] = utils.utcnow()
 				if "last_message" in timestamps and timestamps["last_message"] > utils.utcnow(-60*10):
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
 		try:
 			if update_events:
-				timestamps["events"] = event_manager.update_events(reddit, events, flairs)
+				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs)
 		except Exception as err:
 			transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
 			if not transient:
@@ -80,7 +80,7 @@ if __name__ == "__main__":
 		Settings.settings = None
 
 		if parse_messages or update_events:
-			for event in events.values():
+			for event in event_dict.values():
 				if event.is_dirty():
 					event.clean()
 					reddit.update_page_from_event(event)

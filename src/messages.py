@@ -180,6 +180,9 @@ def process_message(message, reddit, events):
 			line_result = delete_event(message.body, event, reddit, events)
 		elif line.startswith("addevent"):
 			line_result = add_event(message.body, reddit, events)
+		elif line.startswith("renderwiki"):
+			event.dirty = True
+			line_result = "rebuilt wiki page"
 		else:
 			line_result = "No command found for line"
 		log.info(line_result)
@@ -189,6 +192,7 @@ def process_message(message, reddit, events):
 		# TODO turn on spoilers for match day
 		# TODO set discord channel
 		# TODO mark matchday as dirty
+	return '  \n'.join(line_results)
 
 
 def parse_messages(reddit, events):
@@ -200,7 +204,8 @@ def parse_messages(reddit, events):
 			elif message.author.name not in utils.AUTHORIZED_USERS:
 				log.info(f"Message {message.id} is from u/{message.author.name}, not authorized")
 			else:
-				process_message(message, reddit, events)
+				result_message = process_message(message, reddit, events)
+				reddit.reply_message(message, result_message)
 		reddit.mark_read(message)
 		processed_message = True
 

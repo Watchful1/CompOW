@@ -271,7 +271,7 @@ class Reddit:
 	def list_event_pages(self):
 		event_pages = []
 		for page in self.reddit.subreddit(self.subreddit).wiki:
-			if page.name.startswith("events/"):
+			if page.name.startswith("events/") and page.name != "events/settings":
 				event_pages.append(page.name)
 		return event_pages
 
