@@ -114,11 +114,13 @@ class MatchDay:
 		return target_found
 
 	def approve_all_games(self):
-		games_approved = len(self.pending_games) > 0
+		games_approved = len(self.pending_games)
 		self.approved_games.extend(self.pending_games)
 		log.info(f"Approved {len(self.pending_games)} games for {self}")
 		self.pending_games = []
-		self.approved_games.sort(key=lambda game: game.date_time)
+		self.sort_games()
+		if games_approved > 0:
+			self.dirty = True
 		return games_approved
 
 	def is_complete(self):

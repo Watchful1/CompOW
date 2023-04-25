@@ -48,12 +48,16 @@ if __name__ == "__main__":
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
 
-		if parse_messages or update_events:
-			event_pages = reddit.list_event_pages()
-			#log.debug(f"Loading {len(event_pages)} events")
-			for event_page in event_pages:
-				event = reddit.get_event_from_page(event_page)
-				event_dict[event.id] = event
+		try:
+			if parse_messages or update_events:
+				event_pages = reddit.list_event_pages()
+				for event_page in event_pages:
+					event = reddit.get_event_from_page(event_page)
+					event_dict[event.id] = event
+		except Exception as err:
+			transient = utils.process_error(f"Error loading pages", err, traceback.format_exc())
+			if not transient:
+				raise
 
 		try:
 			if parse_messages:

@@ -136,6 +136,14 @@ def update_event(event, approve_complete=False):
 		for stream in details_streams:
 			if stream not in streams:
 				streams.append(stream)
+	elif not len(streams):
+		last_slash = event.url.rfind('/')
+		if last_slash > 0:
+			details_streams = parse_details_page(event.url[:last_slash])
+			for stream in details_streams:
+				if stream not in streams:
+					streams.append(stream)
+
 
 	if event.name is not None and event_name != event.name:
 		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")

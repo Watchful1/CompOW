@@ -8,7 +8,7 @@ from reddit_class import Reddit
 
 
 if __name__ == "__main__":
-	page_url = "https://liquipedia.net/overwatch/Overwatch_League/Season_6/Spring_Stage/Opens"
+	page_url = "https://liquipedia.net/overwatch/Overwatch_Contenders/2023/Spring_Series/Europe/Group_Stage"
 
 	event = Event(page_url)
 	liquipedia_parser.update_event(event, approve_complete=True)
