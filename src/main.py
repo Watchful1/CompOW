@@ -86,7 +86,7 @@ if __name__ == "__main__":
 		if parse_messages or update_events:
 			for event in event_dict.values():
 				if event.is_dirty():
-					event.clean()
+					log.debug(f"Updating event page {event.id}")
 					reddit.update_page_from_event(event)
 
 		# TODO update sidebar

@@ -4,9 +4,11 @@ import discord_logging
 
 log = discord_logging.get_logger()
 
+from classes.settings import Dirtiable
+
 
 @dataclass
-class Team:
+class Team(Dirtiable):
 	name: str = None
 	score: int = None
 

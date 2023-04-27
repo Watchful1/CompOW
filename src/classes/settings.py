@@ -6,6 +6,22 @@ log = discord_logging.get_logger()
 
 
 @dataclass
+class Dirtiable:
+	_dirty: bool = False
+
+	log = True
+
+	def __setattr__(self, attr, value):
+		if not attr.startswith("_") and \
+				hasattr(self, attr) and \
+				self.__getattribute__(attr) != value:
+			super().__setattr__("_dirty", True)
+			if Dirtiable.log:
+				log.debug(f"dirty : {attr}:{value}")
+		super().__setattr__(attr, value)
+
+
+@dataclass
 class Settings:
 	stickies: List[str] = field(default_factory=list)
 

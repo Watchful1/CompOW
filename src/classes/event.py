@@ -6,16 +6,16 @@ log = discord_logging.get_logger()
 
 from utils import get_random_id
 from classes.matchday import MatchDay
+from classes.settings import Dirtiable
 
 
 @dataclass
-class Event:
-	url: str
+class Event(Dirtiable):
+	url: str = None
 	id: str = field(default_factory=get_random_id)
 	name: str = None
 	streams: List[str] = field(default_factory=list)
 	match_days: List[MatchDay] = field(default_factory=list)
-	dirty: bool = False
 
 	post_match_threads: bool = False
 	match_thread_minutes_before: int = 15
@@ -29,7 +29,7 @@ class Event:
 	details_url: str = None
 
 	def is_dirty(self):
-		if self.dirty:
+		if self._dirty:
 			return True
 		for match_day in self.match_days:
 			if match_day.is_dirty():
@@ -37,7 +37,7 @@ class Event:
 		return False
 
 	def clean(self):
-		self.dirty = False
+		self._dirty = False
 		for match_day in self.match_days:
 			match_day.clean()
 
@@ -80,8 +80,6 @@ class Event:
 		matches_approved = 0
 		for match_day in self.match_days:
 			matches_approved += match_day.approve_all_games()
-		if matches_approved > 0:
-			self.dirty = True
 
 	def log(self):
 		log.info(self.name)

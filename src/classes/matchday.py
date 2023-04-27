@@ -7,18 +7,18 @@ log = discord_logging.get_logger()
 
 from utils import get_random_id
 from classes.game import Game
+from classes.settings import Dirtiable
 
 
 @dataclass
-class MatchDay:
+class MatchDay(Dirtiable):
 	id: str = field(default_factory=get_random_id)
 	approved_games: List[Game] = field(default_factory=list)
 	pending_games: List[Game] = field(default_factory=list)
-	loading_games: List[Game] = field(default_factory=list)
+	_loading_games: List[Game] = field(default_factory=list)
 	approved_start_datetime: datetime = None
 	first_datetime: datetime = None
 	last_datetime: datetime = None
-	dirty: bool = False
 
 	thread_id: str = None
 
@@ -38,28 +38,29 @@ class MatchDay:
 			self.last_datetime = game.date_time
 		for approved_game in self.approved_games:
 			if approved_game.matches(game):
+				game._dirty = True
 				approved_game.merge(game)
 				return True
-		self.dirty = True
 		for pending_game in self.pending_games:
 			if pending_game.matches(game):
+				game._dirty = True
 				pending_game.merge(game)
-				self.loading_games.append(pending_game)
+				self._loading_games.append(pending_game)
 				return True
-		self.loading_games.append(game)
+		self._loading_games.append(game)
 		return True
 
 	def sort_games(self, approve_complete=False):
-		if len(self.loading_games):
+		if len(self._loading_games):
 			if approve_complete:
-				for game in self.loading_games:
+				for game in self._loading_games:
 					if game.complete:
 						self.approved_games.append(game)
 					else:
 						self.pending_games.append(game)
 			else:
-				self.pending_games = self.loading_games
-			self.loading_games = []
+				self.pending_games = self._loading_games
+			self._loading_games = []
 		self.pending_games.sort(key=lambda game: game.date_time)
 		self.approved_games.sort(key=lambda game: game.date_time)
 		if len(self.approved_games):
@@ -80,15 +81,13 @@ class MatchDay:
 						log.warning(f"Target game not found when merging {pending_game}")
 						copy_pending.append(pending_game)
 				else:
-					pending_game.dirty = True
+					pending_game._dirty = True
 					self.approved_games.append(pending_game)
 					log.info(f"Approved game {pending_game}")
 					target_found = True
 			else:
 				copy_pending.append(pending_game)
 		self.pending_games = copy_pending
-		if target_found:
-			self.dirty = True
 		return target_found
 
 	def delete_game(self, game_id):
@@ -110,17 +109,17 @@ class MatchDay:
 				new_pending_games.append(pending_games)
 		self.pending_games = new_pending_games
 		if target_found:
-			self.dirty = True
+			self._dirty = True
 		return target_found
 
 	def approve_all_games(self):
 		games_approved = len(self.pending_games)
+		for game in self.pending_games:
+			game._dirty = True
 		self.approved_games.extend(self.pending_games)
 		log.info(f"Approved {len(self.pending_games)} games for {self}")
 		self.pending_games = []
 		self.sort_games()
-		if games_approved > 0:
-			self.dirty = True
 		return games_approved
 
 	def is_complete(self):
@@ -136,30 +135,30 @@ class MatchDay:
 		return complete
 
 	def is_dirty(self):
-		if self.dirty:
+		if self._dirty:
 			return True
 		for game in self.approved_games:
-			if game.dirty:
+			if game.is_dirty():
 				return True
 		for game in self.pending_games:
-			if game.dirty:
+			if game.is_dirty():
 				return True
 		return False
 
 	def is_thread_dirty(self):
-		if self.dirty:
+		if self._dirty:
 			return True
 		for game in self.approved_games:
-			if game.dirty:
+			if game.is_dirty():
 				return True
 		return False
 
 	def clean(self):
-		self.dirty = False
+		self._dirty = False
 		for game in self.approved_games:
-			game.dirty = False
+			game.clean()
 		for game in self.pending_games:
-			game.dirty = False
+			game.clean()
 
 	def __str__(self):
 		return \

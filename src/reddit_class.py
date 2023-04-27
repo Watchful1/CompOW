@@ -12,7 +12,7 @@ log = discord_logging.get_logger()
 import utils
 import string_utils
 from classes.event import Event
-from classes.settings import Settings
+from classes.settings import Settings, Dirtiable
 
 
 class Reddit:
@@ -284,7 +284,11 @@ class Reddit:
 			return None
 		data = wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
 		try:
-			return jsons.loads(data, cls=Event)
+			Dirtiable.log = False
+			event = jsons.loads(data, cls=Event)
+			event.clean()
+			Dirtiable.log = True
+			return event
 		except Exception as err:
 			log.info(err)
 			log.info(traceback.format_exc())
@@ -302,6 +306,7 @@ class Reddit:
 			)
 
 	def update_page_from_event(self, event):
+		event.clean()
 		if self.debug:
 			log.info(f"Updating page: {event.wiki_name()}")
 		else:

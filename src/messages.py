@@ -17,7 +17,7 @@ def add_event(line, reddit, events):
 	if "liquipedia.net" not in page_url:
 		return f"Not a liquipedia url: {page_url}"
 
-	event = Event(page_url)
+	event = Event(url=page_url)
 	liquipedia_parser.update_event(event, approve_complete=True)
 	reddit.create_page_from_event(event)
 	events[event.id] = event
@@ -150,7 +150,6 @@ def update_settings(line, event):
 		result = f"discord_roles from {','.join(event.discord_roles)} to {value}"
 		event.discord_roles = value.split(",")
 	if result is not None:
-		event.dirty = True
 		return result
 	return f"settings line not parsed: {line}"
 
@@ -181,7 +180,7 @@ def process_message(message, reddit, events):
 		elif line.startswith("addevent"):
 			line_result = add_event(message.body, reddit, events)
 		elif line.startswith("renderwiki"):
-			event.dirty = True
+			event._dirty = True
 			line_result = "rebuilt wiki page"
 		else:
 			line_result = "No command found for line"

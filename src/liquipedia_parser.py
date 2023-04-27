@@ -9,6 +9,7 @@ log = discord_logging.get_logger()
 
 import utils
 from classes.game import Game
+from classes.settings import Dirtiable
 
 
 def get_page_text(page_url):
@@ -75,6 +76,7 @@ def parse_event(page_url):
 
 	streams = extract_details(tree)
 
+	Dirtiable.log = False
 	games = []
 
 	game_nodes = tree.xpath("//div[@class='brkts-popup brkts-match-info-popup']")
@@ -122,6 +124,7 @@ def parse_event(page_url):
 		games.append(game)
 
 	games.sort(key=lambda game: game.date_time)
+	Dirtiable.log = True
 
 	return games, event_name, streams
 
@@ -144,10 +147,8 @@ def update_event(event, approve_complete=False):
 				if stream not in streams:
 					streams.append(stream)
 
-
 	if event.name is not None and event_name != event.name:
 		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")
-		event.dirty = True
 	event.name = event_name
 
 	changed = False
@@ -160,7 +161,6 @@ def update_event(event, approve_complete=False):
 					changed = True
 	if changed:
 		log.warning(f"Event {event.name} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
-		event.dirty = True
 	event.streams = streams
 
 	for game in games:
