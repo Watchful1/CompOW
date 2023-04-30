@@ -7,11 +7,11 @@ log = discord_logging.get_logger()
 
 from utils import get_random_id
 from classes.game import Game
-from classes.settings import Dirtiable
+from classes.settings import DirtyMixin
 
 
 @dataclass
-class MatchDay(Dirtiable):
+class MatchDay(DirtyMixin):
 	id: str = field(default_factory=get_random_id)
 	approved_games: List[Game] = field(default_factory=list)
 	pending_games: List[Game] = field(default_factory=list)

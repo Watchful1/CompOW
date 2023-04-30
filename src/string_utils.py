@@ -9,6 +9,7 @@ log = discord_logging.get_logger()
 
 import utils
 from classes.event import Event
+from classes.settings import Settings
 
 
 cow_roles = {
@@ -50,7 +51,7 @@ def build_message_link(recipient, subject, content=None):
 
 
 def render_event_wiki(event, username):
-	bldr = ["##[", event.name, "](", event.url, ")\n\n"]
+	bldr = ["##[", event.get_name(), "](", event.url, ") : ", event.id, "\n\n"]
 
 	settings_fields = [
 		f"post_match_threads:{event.post_match_threads}",
@@ -60,6 +61,7 @@ def render_event_wiki(event, username):
 		f"discord_key:{event.discord_key}",
 		f"discord_minutes_before:{event.discord_minutes_before}",
 		f"discord_roles:{','.join(event.discord_roles)}",
+		f"override_name:{(event.override_name.replace(':', '?') if event.override_name else event.override_name)}",
 	]
 
 	bldr.append("Setting | Value\n")
@@ -92,9 +94,10 @@ def render_event_wiki(event, username):
 		f"renderwiki"
 	))
 	bldr.append(")\n\n")
+	bldr.append("Streams:\n\n")
 	for stream in event.streams:
 		bldr.append(stream)
-		bldr.append("\n")
+		bldr.append("\n\n")
 	for match_day in event.match_days:
 		bldr.append("###")
 		bldr.append(str(match_day))
@@ -106,7 +109,16 @@ def render_event_wiki(event, username):
 				f"{event.id}:approve matchday",
 				f"approveday:{match_day.id}"
 			))
+			bldr.append(")  ")
+		if not match_day.is_complete():
+			bldr.append(f"[{('Disable' if match_day.spoiler_prevention else 'Enable')} spoilers](")
+			bldr.append(build_message_link(
+				username,
+				f"{event.id}:enable spoilers",
+				f"enablespoilers:{match_day.id}:{not match_day.spoiler_prevention}"
+			))
 			bldr.append(")\n\n")
+		bldr.append("\n\n")
 		bldr.append(f"Approved | Pending\n---|---\n")
 		i = 0
 		while True:
@@ -146,11 +158,32 @@ def render_event_wiki(event, username):
 	return ''.join(bldr)
 
 
+def render_settings_wiki(settings, username, events=None):
+	bldr = []
+	bldr.append("[Add event](")
+	bldr.append(build_message_link(
+		username,
+		f"add event",
+		f"addevent "
+	))
+	bldr.append(")")
+
+	bldr.append("\n\n")
+
+	settings_string = str(jsons.dumps(settings, cls=Settings, strip_nulls=True))
+
+	bldr.append("[](#datatag")
+	bldr.append(settings_string)
+	bldr.append(")")
+
+	return ''.join(bldr)
+
+
 def render_reddit_post_match(event, match_day, game, flairs):
 	bldr = []
 
 	bldr.append(">#**")
-	bldr.append(event.name)
+	bldr.append(event.get_name())
 	bldr.append("**\n")
 	bldr.append(">####")
 
@@ -231,7 +264,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 	bldr = []
 
 	bldr.append("> ## **")
-	bldr.append(event.name)
+	bldr.append(event.get_name())
 	bldr.append("**\n")
 
 	bldr.append(">####")
@@ -301,7 +334,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append(flairs.get_flair(game.home.name))
 		bldr.append("|")
 
-		if game.home.score is not None or game.away.score is not None:
+		if game.home.score or game.away.score:
 			bldr.append(">!")
 			bldr.append(str(game.home.score))
 			bldr.append("-")
@@ -320,16 +353,6 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 			bldr.append(thread_link(subreddit, game.post_thread_id))
 			bldr.append(")")
 
-		# bldr.append(flairs.get_flair("over.gg"))
-		# bldr.append(" - [Match](")
-		# bldr.append(game.url)
-		# bldr.append(")")
-
-		# if event.competition.post_match_threads and game.post_thread is not None:
-		# 	bldr.append(" [Post Match](")
-		# 	bldr.append(thread_link(static.SUBREDDIT, game.post_thread))
-		# 	bldr.append(")")
-		#
 		# if game.vod is not None:
 		# 	bldr.append(" [VOD](")
 		# 	bldr.append(match.vod)
@@ -346,7 +369,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 
 def render_reddit_event_title(event):
 	bldr = []
-	bldr.append(event.name)
+	bldr.append(event.get_name())
 	# TODO add matchday name
 	return ''.join(bldr)
 
@@ -365,7 +388,7 @@ def get_discord_flair(flairs, name, country):
 def render_discord(event, match_day, flairs, short=False):
 	bldr = []
 	bldr.append("**")
-	bldr.append(event.name)
+	bldr.append(event.get_name())
 	#TODO bldr.append(event.stages_name())
 	bldr.append("**")
 

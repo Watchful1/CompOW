@@ -4,11 +4,11 @@ import discord_logging
 
 log = discord_logging.get_logger()
 
-from classes.settings import Dirtiable
+from classes.settings import DirtyMixin
 
 
 @dataclass
-class Team(Dirtiable):
+class Team(DirtyMixin):
 	name: str = None
 	score: int = None
 

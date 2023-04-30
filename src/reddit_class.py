@@ -12,7 +12,7 @@ log = discord_logging.get_logger()
 import utils
 import string_utils
 from classes.event import Event
-from classes.settings import Settings, Dirtiable
+from classes.settings import Settings, DirtyMixin
 
 
 class Reddit:
@@ -22,6 +22,7 @@ class Reddit:
 		self.debug = debug
 		self.flair_cache = {}
 		self.webhook_cache = {}
+		self.settings = None
 		try:
 			self.reddit = praw.Reddit(user, user_agent=utils.USER_AGENT)
 		except configparser.NoSectionError:
@@ -275,19 +276,24 @@ class Reddit:
 				event_pages.append(page.name)
 		return event_pages
 
-	def get_event_from_page(self, page):
-		#log.debug(f"Loading event page: {page}")
+	def get_data_string_from_wiki(self, page):
 		datatag = "[](#datatag"
 		wiki_content = self.reddit.subreddit(self.subreddit).wiki[page].content_md
 		datatag_location = wiki_content.find(datatag)
 		if datatag_location == -1:
 			return None
-		data = wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
+		return wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
+
+	def get_event_from_page(self, page):
+		#log.debug(f"Loading event page: {page}")
+		data = self.get_data_string_from_wiki(page)
+		if data is None:
+			return None
 		try:
-			Dirtiable.log = False
+			DirtyMixin.log = False
 			event = jsons.loads(data, cls=Event)
 			event.clean()
-			Dirtiable.log = True
+			DirtyMixin.log = True
 			return event
 		except Exception as err:
 			log.info(err)
@@ -295,6 +301,18 @@ class Reddit:
 			return None
 
 	def create_page_from_event(self, event):
+		wiki_page = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
+		try:
+			wiki_page._fetch()
+			if wiki_page.mod.settings()['listed']:
+				log.info(f"Wiki page already exists when creating, calling update instead")
+				self.update_page_from_event(event)
+			else:
+				log.info(f"Wiki page exists, but is not listed")
+				self.toggle_page_from_event(event, True)
+		except prawcore.exceptions.NotFound:
+			pass
+
 		if self.debug:
 			log.info(f"Creating page: {event.wiki_name()}")
 		else:
@@ -310,35 +328,39 @@ class Reddit:
 		if self.debug:
 			log.info(f"Updating page: {event.wiki_name()}")
 		else:
-			#log.debug(f"Updating page: {event.wiki_name()}")
+			log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			event_wiki.edit(content=string_utils.render_event_wiki(event, self.user))
 
-	def hide_page_from_event(self, event):
+	def toggle_page_from_event(self, event, show):
 		if self.debug:
-			log.info(f"Hiding page: {event.wiki_name()}")
+			log.info(f"{('Showing' if show else 'Hiding')} page: {event.wiki_name()}")
 		else:
-			log.debug(f"Hiding page: {event.wiki_name()}")
+			log.debug(f"{('Showing' if show else 'Hiding')} page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
-			event_wiki.mod.update(listed=False, permlevel=0)
+			event_wiki.mod.update(listed=show, permlevel=0)
 
 	def save_settings(self, settings):
 		if self.debug:
-			log.info(f"Updating settings: {settings}")
+			log.info(f"Saving settings: {settings}")
 		else:
-			#log.debug(f"Updating page: {event.wiki_name()}")
+			log.debug(f"Saving settings: {settings}")
 			settings_wiki = self.reddit.subreddit(self.subreddit).wiki["events/settings"]
-			settings_wiki.edit(content=str(jsons.dumps(settings, cls=Settings, strip_nulls=True)))
+			settings_wiki.edit(content=string_utils.render_settings_wiki(settings, self.user))
 
 	def get_settings(self):
-		try:
-			wiki_content = self.reddit.subreddit(self.subreddit).wiki["events/settings"].content_md
-			return jsons.loads(wiki_content, cls=Event)
-		except prawcore.exceptions.NotFound as err:
-			log.info(f"No settings wiki found, returning blank")
+		if self.settings is None:
+			try:
+				data = self.get_data_string_from_wiki("events/settings")
+				self.settings = jsons.loads(data, cls=Settings)
+			except prawcore.exceptions.NotFound as err:
+				log.info(f"No settings wiki found, returning blank")
+			except Exception as err:
+				log.warning(f"Couldn't load settings, unknown error: {err}")
+				log.warning(traceback.format_exc())
+
+		if self.settings is None:
 			return Settings()
-		except Exception as err:
-			log.warning(f"Couldn't load settings, unknown error: {err}")
-			log.warning(traceback.format_exc())
-			return Settings()
+		else:
+			return self.settings
 

@@ -28,6 +28,8 @@ static_flairs_cow = {
 	'Toronto Defiant': '<:OWLTorontoDefiant:590633797628985345>',
 	'Vancouver Titans': '<:OWLVancouverTitans:590633798153011221>',
 	'Washington Justice': '<:OWLWashingtonJustice:590633798178439195>',
+	'Vegas Eternal': '<:OWLVegasEternal:1061664007754358784>',
+	'Seoul Infernal': '<:OWLSeoulInfernal:1061664061751836795>',
 	'Overwatch League': '<:OWC:634068549970690063>',
 	'Overwatch Contenders': '<:OWL:634068184856657930>',
 }

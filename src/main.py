@@ -6,7 +6,7 @@ import argparse
 import traceback
 from datetime import datetime, timedelta
 
-log = discord_logging.init_logging()
+log = discord_logging.init_logging(add_trace=True)
 
 import flair_manager
 import event_manager
@@ -24,12 +24,15 @@ if __name__ == "__main__":
 	parser.add_argument(
 		"--no_post", help="Print out reddit actions instead of posting to reddit", action='store_const', const=True,
 		default=False)
+	parser.add_argument('--verbose', '-v', help="Increase the log level", action='count', default=0)
 	parser.add_argument("--debug", help="Set the log level to debug", action='store_const', const=True, default=False)
 	parser.add_argument("--run_timestamp", help="Set the current time to this value for debugging (23-01-01 14:36)", type=lambda s: datetime.strptime(s, '%y-%m-%d %H:%M'))
 	args = parser.parse_args()
 
-	if args.debug:
+	if args.verbose == 1:
 		discord_logging.set_level(logging.DEBUG)
+	elif args.verbose == 2:
+		discord_logging.set_level(logging.TRACE)
 
 	discord_logging.init_discord_logging(args.user, logging.WARNING, 1)
 
@@ -43,6 +46,7 @@ if __name__ == "__main__":
 	# overwatch_api = overwatch_api_parser.OverwatchAPI()
 
 	timestamps = {}
+	first_loop = True
 	while True:
 		event_dict = {}
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
@@ -62,7 +66,7 @@ if __name__ == "__main__":
 		try:
 			if parse_messages:
 				processed_message = messages.parse_messages(reddit, event_dict)
-				if processed_message:
+				if processed_message or first_loop:
 					timestamps["last_message"] = utils.utcnow()
 				if "last_message" in timestamps and timestamps["last_message"] > utils.utcnow(-60*10):
 					timestamps["messages"] = utils.utcnow(10)  # if we processed a message in the last 10 minutes, check every next
@@ -81,7 +85,7 @@ if __name__ == "__main__":
 			if not transient:
 				raise
 
-		Settings.settings = None
+		reddit.settings = None
 
 		if parse_messages or update_events:
 			for event in event_dict.values():
@@ -96,7 +100,9 @@ if __name__ == "__main__":
 		# TODO add metrics
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread
+		# TODO watch overwatch api for match completions
 
 		if args.once:
 			break
+		first_loop = False
 		time.sleep(15)

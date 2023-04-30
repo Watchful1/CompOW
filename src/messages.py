@@ -6,6 +6,7 @@ log = discord_logging.get_logger()
 import utils
 import liquipedia_parser
 from classes.event import Event
+from classes.settings import DirtyMixin
 
 
 def add_event(line, reddit, events):
@@ -18,7 +19,9 @@ def add_event(line, reddit, events):
 		return f"Not a liquipedia url: {page_url}"
 
 	event = Event(url=page_url)
+	DirtyMixin.log = False
 	liquipedia_parser.update_event(event, approve_complete=True)
+	DirtyMixin.log = True
 	reddit.create_page_from_event(event)
 	events[event.id] = event
 
@@ -30,7 +33,7 @@ def delete_event(line, event, reddit, events):
 	if event is None:
 		return "Event not found"
 
-	reddit.hide_page_from_event(event)
+	reddit.toggle_page_from_event(event, False)
 	del events[event.id]
 	return f"Event deleted: {event.id}"
 
@@ -62,6 +65,33 @@ def approve_match_day(line, event):
 	games_approved = match_day.approve_all_games()
 
 	return f"{games_approved} games approved in match day: {event.id}:{match_day_id}"
+
+
+def enable_spoilers_match_day(line, event):
+	log.debug(f"Enabling spoilers for match day from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	parts = line.split(":")
+	if not len(parts) >= 2:
+		return f"match day id not found: {line}"
+	match_day_id = parts[1]
+	if not len(parts) >= 3:
+		return f"true/false not found: {line}"
+	if parts[2] == "True":
+		enabled = True
+	elif parts[2] == "False":
+		enabled = False
+	else:
+		return f"value not True/False: {parts[2]}"
+
+	match_day = event.get_match_day(match_day_id)
+	if match_day is None:
+		return f"Match day not found: {match_day_id}"
+
+	match_day.spoiler_prevention = enabled
+
+	return f"match day spoilers set to {enabled}: {event.id}:{match_day_id}"
 
 
 def approve_match(line, event):
@@ -108,7 +138,7 @@ def delete_match(line, event):
 		return f"deletion failed in match day: {event.id}:{match_day.id} : {match_id}"
 
 
-def update_settings(line, event):
+def update_settings(line, event, reddit):
 	log.debug(f"Updating settings from message: {event}")
 	if event is None:
 		return "No event found"
@@ -149,9 +179,19 @@ def update_settings(line, event):
 	elif key == "discord_roles" and ','.join(event.discord_roles) != value:
 		result = f"discord_roles from {','.join(event.discord_roles)} to {value}"
 		event.discord_roles = value.split(",")
+	elif key == "override_name":
+		if value == "None":
+			value = None
+		else:
+			value = value.replace("?", ":")
+		if event.override_name != value:
+			result = f"override_name from {event.override_name} to {value}"
+			reddit.toggle_page_from_event(event, False)
+			event.override_name = value
+			reddit.create_page_from_event(event)
 	if result is not None:
 		return result
-	return f"settings line not parsed: {line}"
+	return f"settings line no changes/not parsed: {line}"
 
 
 def process_message(message, reddit, events):
@@ -166,7 +206,7 @@ def process_message(message, reddit, events):
 	for line in message.body.splitlines():
 		line = line.strip()
 		if line.startswith("settings"):
-			line_result = update_settings(line, event)
+			line_result = update_settings(line, event, reddit)
 		elif line.startswith("approvematch"):
 			line_result = approve_match(line, event)
 		elif line.startswith("approveday"):
@@ -179,6 +219,8 @@ def process_message(message, reddit, events):
 			line_result = delete_event(message.body, event, reddit, events)
 		elif line.startswith("addevent"):
 			line_result = add_event(message.body, reddit, events)
+		elif line.startswith("enablespoilers"):
+			line_result = enable_spoilers_match_day(line, event)
 		elif line.startswith("renderwiki"):
 			event._dirty = True
 			line_result = "rebuilt wiki page"

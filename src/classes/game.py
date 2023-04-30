@@ -7,11 +7,11 @@ log = discord_logging.get_logger()
 
 from utils import get_random_id
 from classes.team import Team
-from classes.settings import Dirtiable
+from classes.settings import DirtyMixin
 
 
 @dataclass
-class Game(Dirtiable):
+class Game(DirtyMixin):
 	id: str = field(default_factory=get_random_id)
 	home: Team = field(default_factory=Team)
 	away: Team = field(default_factory=Team)
