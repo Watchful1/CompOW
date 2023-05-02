@@ -7,6 +7,12 @@ from classes.settings import Settings
 
 if __name__ == "__main__":
 	reddit = Reddit("OWMatchThreads", "CompetitiveOverwatch")
+
+	events = []
+	for event_page in reddit.list_event_pages():
+		event = reddit.get_event_from_page(event_page)
+		events.append(event)
+
 	settings = reddit.get_settings()
-	settings.stickies.append("test")
-	reddit.save_settings(settings)
+	settings.stickies = []
+	reddit.save_settings(settings, events)

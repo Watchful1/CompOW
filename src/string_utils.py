@@ -158,7 +158,7 @@ def render_event_wiki(event, username):
 	return ''.join(bldr)
 
 
-def render_settings_wiki(settings, username, events=None):
+def render_settings_wiki(settings, username, events):
 	bldr = []
 	bldr.append("[Add event](")
 	bldr.append(build_message_link(
@@ -169,6 +169,28 @@ def render_settings_wiki(settings, username, events=None):
 	bldr.append(")")
 
 	bldr.append("\n\n")
+
+	bldr.append("Event | Next match\n")
+	bldr.append("---|---\n")
+	for event in events:
+		bldr.append("[")
+		bldr.append(event.get_name())
+		bldr.append("](https://www.reddit.com/r/Competitiveoverwatch/wiki/")
+		bldr.append(event.wiki_name())
+		bldr.append(")|")
+		found_pending_matches = False
+		for game in event.get_approved_games():
+			if game.complete:
+				continue
+			found_pending_matches = True
+			bldr.append(str(game.date_time))
+			break
+		if not found_pending_matches:
+			bldr.append("No approved matches")
+
+		bldr.append("\n")
+
+	bldr.append("\n")
 
 	settings_string = str(jsons.dumps(settings, cls=Settings, strip_nulls=True))
 

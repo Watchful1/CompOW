@@ -42,9 +42,8 @@ def update_events(reddit, events, flairs):
 					log.info(f"Stickying first, moving {stickied_threads[0]} down, saving {stickied_threads[1]}")
 					reddit.unsticky_thread(stickied_threads[0])
 					reddit.sticky_thread(stickied_threads[0])
-					# settings = Settings.get_settings(reddit)
-					# settings.stickies.insert(0, stickied_threads[1])
-					# settings.save(reddit)
+					settings = reddit.get_settings()
+					settings.stickies.insert(0, stickied_threads[1])
 				else:
 					log.warning(f"Got {len(stickied_threads)} stickied threads")
 

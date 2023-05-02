@@ -228,9 +228,6 @@ def process_message(message, reddit, events):
 			line_result = "No command found for line"
 		log.info(line_result)
 		line_results.append(line_result)
-		# TODO details url (auto-lookup without extension)
-		# TODO override name
-		# TODO turn on spoilers for match day
 		# TODO set discord channel
 		# TODO mark matchday as dirty
 	return '  \n'.join(line_results)

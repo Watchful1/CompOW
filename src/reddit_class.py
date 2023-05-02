@@ -340,13 +340,13 @@ class Reddit:
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			event_wiki.mod.update(listed=show, permlevel=0)
 
-	def save_settings(self, settings):
+	def save_settings(self, settings, events):
 		if self.debug:
 			log.info(f"Saving settings: {settings}")
 		else:
 			log.debug(f"Saving settings: {settings}")
 			settings_wiki = self.reddit.subreddit(self.subreddit).wiki["events/settings"]
-			settings_wiki.edit(content=string_utils.render_settings_wiki(settings, self.user))
+			settings_wiki.edit(content=string_utils.render_settings_wiki(settings, self.user, events))
 
 	def get_settings(self):
 		if self.settings is None:

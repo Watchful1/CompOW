@@ -51,9 +51,10 @@ if __name__ == "__main__":
 		event_dict = {}
 		parse_messages = utils.past_timestamp(timestamps, "messages", use_debug=False)
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
+		update_listings = utils.past_timestamp(timestamps, "listings", use_debug=False)
 
 		try:
-			if parse_messages or update_events:
+			if parse_messages or update_events: # or update_listings:
 				event_pages = reddit.list_event_pages()
 				for event_page in event_pages:
 					event = reddit.get_event_from_page(event_page)
@@ -62,6 +63,8 @@ if __name__ == "__main__":
 			transient = utils.process_error(f"Error loading pages", err, traceback.format_exc())
 			if not transient:
 				raise
+			time.sleep(30)
+			continue
 
 		try:
 			if parse_messages:
@@ -85,7 +88,20 @@ if __name__ == "__main__":
 			if not transient:
 				raise
 
-		reddit.settings = None
+		# try:
+		# 	if update_listings:
+		# 		reddit.get_settings()
+		#
+		#
+		# 		timestamps["listings"] = event_manager.update_events(reddit, event_dict, flairs)
+		# except Exception as err:
+		# 	transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
+		# 	if not transient:
+		# 		raise
+
+		if reddit.settings is not None:
+			reddit.save_settings(reddit.settings, event_dict.values())
+			reddit.settings = None
 
 		if parse_messages or update_events:
 			for event in event_dict.values():
@@ -101,6 +117,9 @@ if __name__ == "__main__":
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread
 		# TODO watch overwatch api for match completions
+		# TODO notify on upcoming matches for event without discord key and roles
+
+		discord_logging.flush_discord()
 
 		if args.once:
 			break
