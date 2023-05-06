@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 log = discord_logging.get_logger()
 
 import utils
+import string_utils
 from classes.game import Game
 from classes.settings import DirtyMixin
 
@@ -129,7 +130,7 @@ def parse_event(page_url):
 	return games, event_name, streams
 
 
-def update_event(event, approve_complete=False):
+def update_event(event, username=None, approve_complete=False):
 	url = event.url
 	if event.use_pending_changes:
 		url = url + "?stable=0"
@@ -147,9 +148,18 @@ def update_event(event, approve_complete=False):
 				if stream not in streams:
 					streams.append(stream)
 
-	if event.name is not None and event_name != event.name:
-		log.warning(f"Event name changed from `{event.name}` to `{event_name}`")
-	event.name = event_name
+	if event_name != event.name:
+		if event.name is None:
+			event.name = event_name
+			event.cached_name = event_name
+		elif event.cached_name != event_name:
+			event.cached_name = event_name
+			message_link = string_utils.build_message_link(
+				username,
+				f"{event.id}:update settings",
+				f"settings:name:{(event_name.replace(':', '?') if event_name else event_name)}"
+			)
+			log.warning(f"Event name changed from `{event.name}` to `{event_name}` : [update](<{message_link}>)")
 
 	changed = False
 	if len(event.streams) != 0:
@@ -160,7 +170,7 @@ def update_event(event, approve_complete=False):
 				if event.streams[i] != streams[i]:
 					changed = True
 	if changed:
-		log.warning(f"Event {event.get_name()} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
+		log.warning(f"Event {event.name} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
 	event.streams = streams
 
 	for game in games:

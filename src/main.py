@@ -62,6 +62,7 @@ if __name__ == "__main__":
 		except Exception as err:
 			transient = utils.process_error(f"Error loading pages", err, traceback.format_exc())
 			if not transient:
+				discord_logging.flush_discord()
 				raise
 			time.sleep(30)
 			continue
@@ -78,6 +79,7 @@ if __name__ == "__main__":
 		except Exception as err:
 			transient = utils.process_error(f"Error processing messages", err, traceback.format_exc())
 			if not transient:
+				discord_logging.flush_discord()
 				raise
 
 		try:
@@ -86,6 +88,7 @@ if __name__ == "__main__":
 		except Exception as err:
 			transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
 			if not transient:
+				discord_logging.flush_discord()
 				raise
 
 		# try:

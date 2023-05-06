@@ -27,7 +27,7 @@ class Event(DirtyMixin):
 	discord_roles: List[str] = field(default_factory=lambda: ['All-Notify', 'All-Matches', 'here'])
 
 	details_url: str = None
-	override_name: str = None
+	cached_name: str = None
 
 	def is_dirty(self):
 		if self._dirty:
@@ -43,12 +43,7 @@ class Event(DirtyMixin):
 			match_day.clean()
 
 	def wiki_name(self):
-		return "events/"+self.get_name().replace(" ", "-").replace("/", "-").replace(":", "").replace("---", "-").replace("--", "-").lower()
-
-	def get_name(self):
-		if self.override_name is not None:
-			return self.override_name
-		return self.name
+		return "events/"+self.name.replace(" ", "-").replace("/", "-").replace(":", "").replace("---", "-").replace("--", "-").lower()
 
 	def get_match_day(self, match_day_id):
 		for match_day in self.match_days:
@@ -93,7 +88,7 @@ class Event(DirtyMixin):
 			matches_approved += match_day.approve_all_games()
 
 	def log(self):
-		log.info(self.get_name())
+		log.info(self.name)
 		for stream in self.streams:
 			log.info(stream)
 		log.info("")
@@ -105,4 +100,4 @@ class Event(DirtyMixin):
 			log.info("")
 
 	def __str__(self):
-		return f"{self.get_name()} - {len(self.match_days)} days"
+		return f"{self.name} - {len(self.match_days)} days"

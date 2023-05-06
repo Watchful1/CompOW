@@ -51,7 +51,7 @@ def build_message_link(recipient, subject, content=None):
 
 
 def render_event_wiki(event, username):
-	bldr = ["##[", event.get_name(), "](", event.url, ") : ", event.id, "\n\n"]
+	bldr = ["##[", event.name, "](", event.url, ") : ", event.id, "\n\n"]
 
 	settings_fields = [
 		f"post_match_threads:{event.post_match_threads}",
@@ -61,7 +61,7 @@ def render_event_wiki(event, username):
 		f"discord_key:{event.discord_key}",
 		f"discord_minutes_before:{event.discord_minutes_before}",
 		f"discord_roles:{','.join(event.discord_roles)}",
-		f"override_name:{(event.override_name.replace(':', '?') if event.override_name else event.override_name)}",
+		f"name:{(event.name.replace(':', '?') if event.name else event.name)}",
 	]
 
 	bldr.append("Setting | Value\n")
@@ -174,7 +174,7 @@ def render_settings_wiki(settings, username, events):
 	bldr.append("---|---\n")
 	for event in events:
 		bldr.append("[")
-		bldr.append(event.get_name())
+		bldr.append(event.name)
 		bldr.append("](https://www.reddit.com/r/Competitiveoverwatch/wiki/")
 		bldr.append(event.wiki_name())
 		bldr.append(")|")
@@ -205,7 +205,7 @@ def render_reddit_post_match(event, match_day, game, flairs):
 	bldr = []
 
 	bldr.append(">#**")
-	bldr.append(event.get_name())
+	bldr.append(event.name)
 	bldr.append("**\n")
 	bldr.append(">####")
 
@@ -267,9 +267,9 @@ def render_reddit_post_match(event, match_day, game, flairs):
 def render_reddit_post_match_title(event, match_day, game, spoilers=False, match_num=None):
 	if spoilers:
 		if match_num is not None:
-			return f"{event.get_name()} | Match {match_num} | Post-Match Discussion"
+			return f"{event.name} | Match {match_num} | Post-Match Discussion"
 		else:
-			return f"{event.get_name()} | Post-Match Discussion"
+			return f"{event.name} | Post-Match Discussion"
 	else:
 		return f"{game.home.name} vs {game.away.name} | {event.name} | Post-Match Discussion"
 
@@ -286,7 +286,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 	bldr = []
 
 	bldr.append("> ## **")
-	bldr.append(event.get_name())
+	bldr.append(event.name)
 	bldr.append("**\n")
 
 	bldr.append(">####")
@@ -350,7 +350,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append("&tz=UTC)")
 		bldr.append("|")
 
-		bldr.append(game.home.get_name())
+		bldr.append(game.home.name)
 		bldr.append("|")
 
 		bldr.append(flairs.get_flair(game.home.name))
@@ -368,7 +368,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append(flairs.get_flair(game.away.name))
 		bldr.append("|")
 
-		bldr.append(game.away.get_name())
+		bldr.append(game.away.name)
 		bldr.append("||")
 		if game.post_thread_id is not None:
 			bldr.append("[Post Match](")
@@ -391,7 +391,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 
 def render_reddit_event_title(event):
 	bldr = []
-	bldr.append(event.get_name())
+	bldr.append(event.name)
 	# TODO add matchday name
 	return ''.join(bldr)
 
@@ -410,7 +410,7 @@ def get_discord_flair(flairs, name, country):
 def render_discord(event, match_day, flairs, short=False):
 	bldr = []
 	bldr.append("**")
-	bldr.append(event.get_name())
+	bldr.append(event.name)
 	#TODO bldr.append(event.stages_name())
 	bldr.append("**")
 
@@ -443,13 +443,13 @@ def render_discord(event, match_day, flairs, short=False):
 			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 
 			bldr.append(" **")
-			bldr.append(game.home.get_name())
+			bldr.append(game.home.name)
 			bldr.append("**")
 
 			bldr.append(" vs ")
 
 			bldr.append("**")
-			bldr.append(game.away.get_name())
+			bldr.append(game.away.name)
 			bldr.append("** ")
 
 			bldr.append(get_discord_flair(flairs, game.away.name, "TBD"))
@@ -477,13 +477,13 @@ def render_discord(event, match_day, flairs, short=False):
 
 			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 			bldr.append(" **")
-			bldr.append(game.home.get_name())
+			bldr.append(game.home.name)
 			bldr.append("**")
 
 			bldr.append(" vs ")
 
 			bldr.append("**")
-			bldr.append(game.away.get_name())
+			bldr.append(game.away.name)
 			bldr.append("** ")
 			bldr.append(get_discord_flair(flairs, game.away.name, "TBD"))
 

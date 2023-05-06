@@ -13,7 +13,7 @@ from classes.settings import Settings
 def update_events(reddit, events, flairs):
 	active_event = False
 	for event in events.values():
-		liquipedia_parser.update_event(event)
+		liquipedia_parser.update_event(event, reddit.user)
 
 		for match_day in event.match_days:
 			# post initial thread
@@ -21,7 +21,7 @@ def update_events(reddit, events, flairs):
 			if match_day.thread_id is None and \
 					not match_day.is_complete() and \
 					utils.minutes_to_start(match_day.approved_start_datetime) < event.match_thread_minutes_before:
-				log.info(f"Posting match thread for {event.id}:{match_day.id} : {event.get_name()} : starting in {utils.minutes_to_start(match_day.approved_start_datetime)} minutes")
+				log.info(f"Posting match thread for {event.id}:{match_day.id} : {event.name} : starting in {utils.minutes_to_start(match_day.approved_start_datetime)} minutes")
 
 				# TODO: remove prediction thread if posted
 

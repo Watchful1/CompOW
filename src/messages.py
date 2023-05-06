@@ -179,15 +179,15 @@ def update_settings(line, event, reddit):
 	elif key == "discord_roles" and ','.join(event.discord_roles) != value:
 		result = f"discord_roles from {','.join(event.discord_roles)} to {value}"
 		event.discord_roles = value.split(",")
-	elif key == "override_name":
+	elif key == "name":
 		if value == "None":
 			value = None
 		else:
 			value = value.replace("?", ":")
-		if event.override_name != value:
-			result = f"override_name from {event.override_name} to {value}"
+		if event.name != value:
+			result = f"name from {event.name} to {value}"
 			reddit.toggle_page_from_event(event, False)
-			event.override_name = value
+			event.name = value
 			reddit.create_page_from_event(event)
 	if result is not None:
 		return result
