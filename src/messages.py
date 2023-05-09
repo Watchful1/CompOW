@@ -1,3 +1,5 @@
+import sys
+
 import discord_logging
 import re
 
@@ -205,7 +207,10 @@ def process_message(message, reddit, events):
 	line_results = []
 	for line in message.body.splitlines():
 		line = line.strip()
-		if line.startswith("settings"):
+		if line.startswith("kill"):
+			log.warning(f"u/{message.author.name} sent kill message, stopping")
+			sys.exit(1)
+		elif line.startswith("settings"):
 			line_result = update_settings(line, event, reddit)
 		elif line.startswith("approvematch"):
 			line_result = approve_match(line, event)

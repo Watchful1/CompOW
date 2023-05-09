@@ -8,7 +8,18 @@ import random
 log = discord_logging.get_logger()
 
 USER_AGENT = "r/CompetitiveOverwatch bot (by u/Watchful1)"
-AUTHORIZED_USERS = {"Watchful1"}
+AUTHORIZED_USERS = {
+	"merger3",
+	"Watchful1",
+	"blankepitaph",
+	"imKaku",
+	"ModWilliam",
+	"Dobvius",
+	"FelipeDoesStats2",
+	"lolburger13",
+	"TheUltimate721",
+	"UnknownQTY",
+}
 DEBUG_NOW = None
 
 

@@ -6,8 +6,8 @@ log = discord_logging.init_logging(debug=True)
 
 if __name__ == "__main__":
 	urls = [
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=west1",
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=east1",
+		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=west2",
+		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=east2",
 	]
 
 	users = defaultdict(int)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 		if i >= 7:
 			break
 
-	stage = "Spring Stage Week 1"
+	stage = "Spring Stage Week 2"
 
 	if len(winners) > 1:
 		log.info(f"The winners of the Pick'ems for {stage} are {' and '.join(winners)}!")
@@ -50,8 +50,8 @@ if __name__ == "__main__":
 	log.info(
 		f'''{' and '.join(winners)} had {winner_points} points. That is their battlenet tag, so if anyone knows their reddit username or twitter handle, please let them know about this thread.
 
-{' and '.join(winners)} please link your battlenet accounts in the [flair site](https://rcompetitiveoverwatch.com/redditflair), which we'll use as proof. If you play ranked, you won't be able to verify your rank in the flair site, but you only need to click "Verify your rank" and then "Sign in with Blizzard". And then comment below to get your prize. If the winners don't show up in the next few days, we'll go to the second place with is {' and '.join(second)} with {second_points} points.
+{' and '.join(winners)} please link your battlenet accounts in the [flair site](https://rcompetitiveoverwatch.com/redditflair), which we'll use as proof. If you play ranked, you won't be able to verify your rank in the flair site, but you only need to click "Verify your rank" and then "Sign in with Blizzard". And then comment below to get your prize. If the winners don't show up in the next few days, we'll go to the second place which is {' and '.join(second)} with {second_points} points.
 
-We will have a prize for the top scorer EACH WEEK as well as best playoff bracket and best overall at the end of the tournament. You can [join the subreddit leaderboard here](https://pickem.overwatchleague.com/en-us/leaderboard/reddit-cow/2022/kickoff-clash) by clicking "Join a leaderboard" and putting in the code `reddit-cow`.'''
+We will have a prize for the top scorer EACH WEEK as well as best playoff bracket and best overall at the end of the tournament. You can [join the subreddit leaderboard here](https://pickem.overwatchleague.com/en-us/leaderboard/reddit-cow/2023) by clicking "Join a leaderboard" and putting in the code `reddit-cow`.'''
 	)
 

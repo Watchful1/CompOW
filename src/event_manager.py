@@ -30,6 +30,8 @@ def update_events(reddit, events, flairs):
 					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit),
 					flair="match"
 				)
+				log.debug(f"Force pushing event page {event.id}")
+				reddit.update_page_from_event(event, clean=False)
 				reddit.match_thread_settings(thread_id, "new")
 
 				stickied_threads = reddit.get_stickied_threads()
@@ -44,7 +46,7 @@ def update_events(reddit, events, flairs):
 					reddit.sticky_thread(stickied_threads[0])
 					settings = reddit.get_settings()
 					settings.stickies.insert(0, stickied_threads[1])
-				else:
+				elif len(stickied_threads) != 0:
 					log.warning(f"Got {len(stickied_threads)} stickied threads")
 
 				match_day.thread_id = thread_id
@@ -109,6 +111,8 @@ def update_events(reddit, events, flairs):
 						log.warning(traceback.format_exc())
 
 				match_day.discord_posted = True
+				log.debug(f"Force pushing event page {event.id}")
+				reddit.update_page_from_event(event, clean=False)
 
 			# TODO post predictions thread day before event week starts
 			# TODO remove match thread if event complete and longer than set time

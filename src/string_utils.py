@@ -166,7 +166,13 @@ def render_settings_wiki(settings, username, events):
 		f"add event",
 		f"addevent "
 	))
-	bldr.append(")")
+	bldr.append(") : **[Kill bot](")
+	bldr.append(build_message_link(
+		username,
+		f"kill",
+		f"kill"
+	))
+	bldr.append(")**")
 
 	bldr.append("\n\n")
 

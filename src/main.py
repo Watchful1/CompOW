@@ -53,6 +53,8 @@ if __name__ == "__main__":
 		update_events = utils.past_timestamp(timestamps, "events", use_debug=False)
 		update_listings = utils.past_timestamp(timestamps, "listings", use_debug=False)
 
+		transient_error = False
+
 		try:
 			if parse_messages or update_events: # or update_listings:
 				event_pages = reddit.list_event_pages()
@@ -60,15 +62,14 @@ if __name__ == "__main__":
 					event = reddit.get_event_from_page(event_page)
 					event_dict[event.id] = event
 		except Exception as err:
-			transient = utils.process_error(f"Error loading pages", err, traceback.format_exc())
-			if not transient:
-				discord_logging.flush_discord()
+			transient_error = utils.process_error(f"Error loading pages", err, traceback.format_exc())
+			if not transient_error:
 				raise
 			time.sleep(30)
 			continue
 
 		try:
-			if parse_messages:
+			if parse_messages and not transient_error:
 				processed_message = messages.parse_messages(reddit, event_dict)
 				if processed_message or first_loop:
 					timestamps["last_message"] = utils.utcnow()
@@ -77,40 +78,45 @@ if __name__ == "__main__":
 				else:
 					timestamps["messages"] = utils.utcnow(60*2)  # otherwise check every 2 minutes
 		except Exception as err:
-			transient = utils.process_error(f"Error processing messages", err, traceback.format_exc())
-			if not transient:
-				discord_logging.flush_discord()
+			transient_error = utils.process_error(f"Error processing messages", err, traceback.format_exc())
+			if not transient_error:
 				raise
 
 		try:
-			if update_events:
+			if update_events and not transient_error:
 				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs)
 		except Exception as err:
-			transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
-			if not transient:
-				discord_logging.flush_discord()
+			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			if not transient_error:
 				raise
 
-		# try:
-		# 	if update_listings:
-		# 		reddit.get_settings()
-		#
-		#
-		# 		timestamps["listings"] = event_manager.update_events(reddit, event_dict, flairs)
-		# except Exception as err:
-		# 	transient = utils.process_error(f"Error updating events", err, traceback.format_exc())
-		# 	if not transient:
-		# 		raise
+		try:
+			if update_listings and not transient_error:
+				settings = reddit.get_settings()
+				reddit.save_settings(settings, event_dict.values())
+				reddit.settings = None
 
-		if reddit.settings is not None:
-			reddit.save_settings(reddit.settings, event_dict.values())
-			reddit.settings = None
+				timestamps["listings"] = utils.utcnow(offset=60*15)  # update the listings automatically every 15 minutes
+		except Exception as err:
+			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			if not transient_error:
+				raise
 
-		if parse_messages or update_events:
-			for event in event_dict.values():
-				if event.is_dirty():
-					log.debug(f"Updating event page {event.id}")
-					reddit.update_page_from_event(event)
+		try:
+			if not transient_error:
+				if reddit.settings is not None:
+					reddit.save_settings(reddit.settings, event_dict.values())
+					reddit.settings = None
+
+				if parse_messages or update_events:
+					for event in event_dict.values():
+						if event.is_dirty():
+							log.debug(f"Updating event page {event.id}")
+							reddit.update_page_from_event(event)
+		except Exception as err:
+			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			if not transient_error:
+				raise
 
 		# TODO update sidebar
 		# TODO update calendar
@@ -127,4 +133,8 @@ if __name__ == "__main__":
 		if args.once:
 			break
 		first_loop = False
-		time.sleep(15)
+
+		if transient_error:
+			time.sleep(180)
+		else:
+			time.sleep(15)

@@ -323,8 +323,9 @@ class Reddit:
 				reason="Creating new event"
 			)
 
-	def update_page_from_event(self, event):
-		event.clean()
+	def update_page_from_event(self, event, clean=True):
+		if clean:
+			event.clean()
 		if self.debug:
 			log.info(f"Updating page: {event.wiki_name()}")
 		else:
