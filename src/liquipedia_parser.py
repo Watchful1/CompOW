@@ -134,6 +134,7 @@ def update_event(event, username=None, approve_complete=False):
 	url = event.url
 	if event.use_pending_changes:
 		url = url + "?stable=0"
+	log.debug(f"Pulling page from liquipedia: {url}")
 	games, event_name, streams = parse_event(url)
 	if event.details_url is not None:
 		details_streams = parse_details_page(event.details_url)

@@ -30,27 +30,28 @@ def update_events(reddit, events, flairs):
 					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit),
 					flair="match"
 				)
+				match_day.thread_id = thread_id
+				new_thread_posted = True
+
 				log.debug(f"Force pushing event page {event.id}")
 				reddit.update_page_from_event(event, clean=False)
+
 				reddit.match_thread_settings(thread_id, "new")
 
 				stickied_threads = reddit.get_stickied_threads()
 				reddit.sticky_thread(thread_id)
-				if len(stickied_threads) == 1:
-					log.info(f"Stickying first, moving {stickied_threads[0]} down")
-					reddit.unsticky_thread(stickied_threads[0])
-					reddit.sticky_thread(stickied_threads[0])
-				elif len(stickied_threads) == 2:
-					log.info(f"Stickying first, moving {stickied_threads[0]} down, saving {stickied_threads[1]}")
-					reddit.unsticky_thread(stickied_threads[0])
-					reddit.sticky_thread(stickied_threads[0])
-					settings = reddit.get_settings()
-					settings.stickies.insert(0, stickied_threads[1])
-				elif len(stickied_threads) != 0:
-					log.warning(f"Got {len(stickied_threads)} stickied threads")
-
-				match_day.thread_id = thread_id
-				new_thread_posted = True
+				# if len(stickied_threads) == 1:
+				# 	log.info(f"Stickying first, moving {stickied_threads[0]} down")
+				# 	reddit.unsticky_thread(stickied_threads[0])
+				# 	reddit.sticky_thread(stickied_threads[0])
+				# elif len(stickied_threads) == 2:
+				# 	log.info(f"Stickying first, moving {stickied_threads[0]} down, saving {stickied_threads[1]}")
+				# 	reddit.unsticky_thread(stickied_threads[0])
+				# 	reddit.sticky_thread(stickied_threads[0])
+				# 	settings = reddit.get_settings()
+				# 	settings.stickies.insert(0, stickied_threads[1])
+				# elif len(stickied_threads) != 0:
+				# 	log.warning(f"Got {len(stickied_threads)} stickied threads")
 
 			# post match thread if game is done
 			if event.post_match_threads and match_day.thread_id is not None:

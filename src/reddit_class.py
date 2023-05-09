@@ -285,7 +285,7 @@ class Reddit:
 		return wiki_content[datatag_location + len(datatag):-1].replace("%20", " ")
 
 	def get_event_from_page(self, page):
-		#log.debug(f"Loading event page: {page}")
+		log.debug(f"Loading event page: {page}")
 		data = self.get_data_string_from_wiki(page)
 		if data is None:
 			return None
@@ -331,7 +331,12 @@ class Reddit:
 		else:
 			log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
-			event_wiki.edit(content=string_utils.render_event_wiki(event, self.user))
+			old_wiki_content = event_wiki.content_md
+			new_wiki_content = string_utils.render_event_wiki(event, self.user)
+			if old_wiki_content == new_wiki_content:
+				log.warning(f"Tried to update event page, but content was the same: {event.id}")
+			else:
+				event_wiki.edit(content=new_wiki_content)
 
 	def toggle_page_from_event(self, event, show):
 		if self.debug:

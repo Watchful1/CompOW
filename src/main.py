@@ -92,6 +92,7 @@ if __name__ == "__main__":
 
 		try:
 			if update_listings and not transient_error:
+				log.debug("Updating listing pages")
 				settings = reddit.get_settings()
 				reddit.save_settings(settings, event_dict.values())
 				reddit.settings = None
