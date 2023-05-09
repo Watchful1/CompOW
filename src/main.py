@@ -56,7 +56,7 @@ if __name__ == "__main__":
 		transient_error = False
 
 		try:
-			if parse_messages or update_events: # or update_listings:
+			if parse_messages or update_events or update_listings:
 				event_pages = reddit.list_event_pages()
 				for event_page in event_pages:
 					event = reddit.get_event_from_page(event_page)
