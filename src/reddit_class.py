@@ -354,7 +354,12 @@ class Reddit:
 		else:
 			log.debug(f"Saving settings: {settings}")
 			settings_wiki = self.reddit.subreddit(self.subreddit).wiki["events/settings"]
-			settings_wiki.edit(content=string_utils.render_settings_wiki(settings, self.user, events))
+			old_wiki_content = settings_wiki.content_md
+			new_wiki_content = string_utils.render_settings_wiki(settings, self.user, events)
+			if old_wiki_content == new_wiki_content:
+				log.debug(f"No changes in wiki page, not updating")
+			else:
+				settings_wiki.edit(content=new_wiki_content)
 
 	def get_settings(self):
 		if self.settings is None:
