@@ -57,6 +57,14 @@ if __name__ == "__main__":
 
 		try:
 			if parse_messages or update_events or update_listings:
+				reasons = []
+				if parse_messages:
+					reasons.append("parse_messages")
+				if update_events:
+					reasons.append("update_events")
+				if update_listings:
+					reasons.append("update_listings")
+				log.debug(','.join(reasons))
 				event_pages = reddit.list_event_pages()
 				for event_page in event_pages:
 					event = reddit.get_event_from_page(event_page)

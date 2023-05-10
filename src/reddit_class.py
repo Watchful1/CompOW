@@ -292,6 +292,8 @@ class Reddit:
 		try:
 			DirtyMixin.log = False
 			event = jsons.loads(data, cls=Event)
+			if event.wiki_name() != page:
+				log.warning(f"Loaded event from page that doesn't match name: {page} : {event.wiki_name()}")
 			event.clean()
 			DirtyMixin.log = True
 			return event

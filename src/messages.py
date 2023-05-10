@@ -105,7 +105,7 @@ def approve_match(line, event):
 	if not len(parts) >= 2:
 		return f"match id not found: {line}"
 	pending_match_id = parts[1]
-	if len(parts) >= 3:
+	if len(parts) >= 3 and parts[2] != "none":
 		approved_match_id = parts[2]
 	else:
 		approved_match_id = None

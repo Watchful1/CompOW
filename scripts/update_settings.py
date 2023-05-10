@@ -13,6 +13,4 @@ if __name__ == "__main__":
 		event = reddit.get_event_from_page(event_page)
 		events.append(event)
 
-	settings = reddit.get_settings()
-	settings.stickies = []
-	reddit.save_settings(settings, events)
+

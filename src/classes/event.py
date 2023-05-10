@@ -51,11 +51,15 @@ class Event(DirtyMixin):
 				return match_day
 		return None
 
-	def get_approved_games(self):
+	def get_games(self, approved=True, pending=False):
 		games = []
 		for match_day in self.match_days:
-			for game in match_day.approved_games:
-				games.append(game)
+			if approved:
+				for game in match_day.approved_games:
+					games.append(game)
+			if pending:
+				for game in match_day.pending_games:
+					games.append(game)
 		games.sort(key=lambda game: game.date_time)
 		return games
 

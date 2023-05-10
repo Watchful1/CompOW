@@ -50,6 +50,26 @@ def build_message_link(recipient, subject, content=None):
 	return base + '&'.join(bldr)
 
 
+def make_time_string(date_time):
+	current_time = utils.utcnow()
+	if current_time > date_time:
+		return '**LIVE**'
+	time_diff = (date_time - current_time).total_seconds()
+
+	m, s = divmod(time_diff, 60)
+	h, m = divmod(m, 60)
+	d, h = divmod(h, 24)
+
+	if d > 99:
+		return ">99d"
+	elif d > 0:
+		return str(int(d)) + 'd'
+	elif h > 0:
+		return str(int(h)) + 'h'
+	else:
+		return str(int(m)) + 'm'
+
+
 def render_event_wiki(event, username):
 	bldr = ["##[", event.name, "](", event.url, ") : ", event.id, "\n\n"]
 
@@ -139,7 +159,7 @@ def render_event_wiki(event, username):
 				bldr.append(build_message_link(
 					username,
 					f"{event.id}:approve match",
-					f"approvematch:{match_day.pending_games[i].id}"
+					f"approvematch:{match_day.pending_games[i].id}:none"
 				))
 				bldr.append(")")
 			bldr.append("\n")
@@ -176,23 +196,39 @@ def render_settings_wiki(settings, username, events):
 
 	bldr.append("\n\n")
 
-	bldr.append("Event | Next match\n")
-	bldr.append("---|---\n")
+	bldr.append("Event | Next approved match | Next pending match\n")
+	bldr.append("---|---|---\n")
 	for event in events:
 		bldr.append("[")
 		bldr.append(event.name)
 		bldr.append("](https://www.reddit.com/r/Competitiveoverwatch/wiki/")
 		bldr.append(event.wiki_name())
 		bldr.append(")|")
-		found_pending_matches = False
-		for game in event.get_approved_games():
+		found_upcoming_matches = False
+		for game in event.get_games(approved=True):
 			if game.complete:
 				continue
-			found_pending_matches = True
+			found_upcoming_matches = True
 			bldr.append(str(game.date_time))
+			bldr.append(" (")
+			bldr.append(make_time_string(game.date_time))
+			bldr.append(")")
 			break
-		if not found_pending_matches:
+		if not found_upcoming_matches:
 			bldr.append("No approved matches")
+		bldr.append("|")
+		found_upcoming_matches = False
+		for game in event.get_games(approved=False, pending=True):
+			if game.complete:
+				continue
+			found_upcoming_matches = True
+			bldr.append(str(game.date_time))
+			bldr.append(" (")
+			bldr.append(make_time_string(game.date_time))
+			bldr.append(")")
+			break
+		if not found_upcoming_matches:
+			bldr.append("No pending matches")
 
 		bldr.append("\n")
 
