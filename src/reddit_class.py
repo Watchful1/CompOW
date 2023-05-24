@@ -10,6 +10,7 @@ import jsons
 log = discord_logging.get_logger()
 
 import utils
+import counters
 import string_utils
 from classes.event import Event
 from classes.settings import Settings, DirtyMixin
@@ -40,6 +41,7 @@ class Reddit:
 		return self.webhook_cache[key]
 
 	def submit_self_post(self, title, text, chat_post=False, flair=None):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
@@ -62,6 +64,7 @@ class Reddit:
 			return None
 
 	def edit_thread(self, thread_id, text):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Body: {text}")
@@ -76,6 +79,7 @@ class Reddit:
 			return False
 
 	def reply_thread(self, thread_id, text):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Text: {text}")
@@ -91,6 +95,7 @@ class Reddit:
 			return None
 
 	def get_stickied_threads(self):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			stickied = []
 			for submission in self.reddit.subreddit(self.subreddit).hot(limit=2):
@@ -104,6 +109,7 @@ class Reddit:
 			return []
 
 	def sticky_thread(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=True)
@@ -116,6 +122,7 @@ class Reddit:
 			return None
 
 	def unsticky_thread(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=False)
@@ -128,6 +135,7 @@ class Reddit:
 			return None
 
 	def spoiler_thread(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.spoiler()
@@ -139,6 +147,7 @@ class Reddit:
 			return None
 
 	def set_suggested_sort(self, thread_id, sort):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.suggested_sort(sort=sort)
@@ -150,6 +159,7 @@ class Reddit:
 			return None
 
 	def disable_inbox_replies(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).disable_inbox_replies()
@@ -167,6 +177,7 @@ class Reddit:
 			else:
 				if flair_name in self.flair_cache:
 					return self.flair_cache[flair_name]
+				counters.queries.labels(site="reddit").inc()
 				for flair in self.reddit.subreddit(self.subreddit).flair.link_templates.user_selectable():
 					if flair_name in flair['flair_text'].lower():
 						log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
@@ -180,6 +191,7 @@ class Reddit:
 			return None
 
 	def set_flair(self, thread_id, flair_template_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).flair.select(flair_template_id)
@@ -191,6 +203,7 @@ class Reddit:
 			return None
 
 	def approve(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.approve()
@@ -202,6 +215,7 @@ class Reddit:
 			return None
 
 	def distinguish_comment(self, comment_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			log.debug(f"Distinguishing comment: {comment_id}")
 			if not self.debug:
@@ -213,6 +227,7 @@ class Reddit:
 			return None
 
 	def lock(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.lock()
@@ -235,6 +250,7 @@ class Reddit:
 		self.approve(thread_id)
 
 	def get_unread(self):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			return self.reddit.inbox.unread()
 		except Exception as err:
@@ -243,6 +259,7 @@ class Reddit:
 			return []
 
 	def reply_message(self, message, content):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Reply: {content}")
@@ -254,6 +271,7 @@ class Reddit:
 			log.warning(traceback.format_exc())
 
 	def mark_read(self, message):
+		counters.queries.labels(site="reddit").inc()
 		if not self.debug:
 			message.mark_read()
 
@@ -261,6 +279,7 @@ class Reddit:
 		return isinstance(item, praw.models.Message)
 
 	def get_thread_body(self, thread_id):
+		counters.queries.labels(site="reddit").inc()
 		try:
 			submission = self.reddit.submission(id=thread_id)
 			return submission.selftext
@@ -270,6 +289,7 @@ class Reddit:
 			return None
 
 	def list_event_pages(self):
+		counters.queries.labels(site="reddit").inc()
 		event_pages = []
 		for page in self.reddit.subreddit(self.subreddit).wiki:
 			if page.name.startswith("events/") and page.name != "events/settings":
@@ -277,6 +297,7 @@ class Reddit:
 		return event_pages
 
 	def get_data_string_from_wiki(self, page):
+		counters.queries.labels(site="reddit").inc()
 		datatag = "[](#datatag"
 		wiki_content = self.reddit.subreddit(self.subreddit).wiki[page].content_md
 		datatag_location = wiki_content.find(datatag)
@@ -305,6 +326,7 @@ class Reddit:
 	def create_page_from_event(self, event):
 		wiki_page = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 		try:
+			counters.queries.labels(site="reddit").inc()
 			wiki_page._fetch()
 			if wiki_page.mod.settings()['listed']:
 				log.info(f"Wiki page already exists when creating, calling update instead")
@@ -326,6 +348,7 @@ class Reddit:
 			)
 
 	def update_page_from_event(self, event, clean=True):
+		counters.queries.labels(site="reddit").inc()
 		if clean:
 			event.clean()
 		if self.debug:
@@ -341,6 +364,7 @@ class Reddit:
 				event_wiki.edit(content=new_wiki_content)
 
 	def toggle_page_from_event(self, event, show):
+		counters.queries.labels(site="reddit").inc()
 		if self.debug:
 			log.info(f"{('Showing' if show else 'Hiding')} page: {event.wiki_name()}")
 		else:
@@ -349,6 +373,7 @@ class Reddit:
 			event_wiki.mod.update(listed=show, permlevel=0)
 
 	def save_settings(self, settings, events):
+		counters.queries.labels(site="reddit").inc()
 		if self.debug:
 			log.info(f"Saving settings: {settings}")
 		else:
@@ -363,6 +388,7 @@ class Reddit:
 
 	def get_settings(self):
 		if self.settings is None:
+			counters.queries.labels(site="reddit").inc()
 			try:
 				data = self.get_data_string_from_wiki("events/settings")
 				self.settings = jsons.loads(data, cls=Settings)

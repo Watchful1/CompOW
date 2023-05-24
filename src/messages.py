@@ -233,6 +233,7 @@ def process_message(message, reddit, events):
 			line_result = "No command found for line"
 		log.info(line_result)
 		line_results.append(line_result)
+		reddit.get_settings()  # fetch the settings to force an update on the summary wiki
 		# TODO set discord channel
 		# TODO mark matchday as dirty
 	return '  \n'.join(line_results)

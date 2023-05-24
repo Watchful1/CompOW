@@ -1,10 +1,11 @@
 from typing import List
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 import discord_logging
 
 log = discord_logging.get_logger()
 
-from utils import get_random_id
+from utils import get_random_id, minutes_to_start, utcnow
 from classes.matchday import MatchDay
 from classes.settings import DirtyMixin
 
@@ -28,6 +29,17 @@ class Event(DirtyMixin):
 
 	details_url: str = None
 	cached_name: str = None
+	last_parsed: datetime = None
+
+	def should_parse(self):
+		if self.last_parsed is None:
+			return True
+		next_game = self.get_next_game(approved=True, pending=True)
+		if next_game is not None and minutes_to_start(next_game.date_time) < (4 * 60):  # if less than 4 hours to game start, scan faster
+			return True
+		if utcnow(offset=-20 * 60) > self.last_parsed:  # otherwise only scan every 20 minutes
+			return True
+		return False
 
 	def is_dirty(self):
 		if self._dirty:
@@ -49,6 +61,12 @@ class Event(DirtyMixin):
 		for match_day in self.match_days:
 			if match_day.id == match_day_id:
 				return match_day
+		return None
+
+	def get_next_game(self, approved=True, pending=False):
+		for game in self.get_games(approved, pending):
+			if not game.complete:
+				return game
 		return None
 
 	def get_games(self, approved=True, pending=False):

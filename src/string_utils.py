@@ -204,30 +204,22 @@ def render_settings_wiki(settings, username, events):
 		bldr.append("](https://www.reddit.com/r/Competitiveoverwatch/wiki/")
 		bldr.append(event.wiki_name())
 		bldr.append(")|")
-		found_upcoming_matches = False
-		for game in event.get_games(approved=True):
-			if game.complete:
-				continue
-			found_upcoming_matches = True
-			bldr.append(str(game.date_time))
+		next_approved_game = event.get_next_game(approved=True)
+		if next_approved_game is not None:
+			bldr.append(str(next_approved_game.date_time))
 			bldr.append(" (")
-			bldr.append(make_time_string(game.date_time))
+			bldr.append(make_time_string(next_approved_game.date_time))
 			bldr.append(")")
-			break
-		if not found_upcoming_matches:
+		else:
 			bldr.append("No approved matches")
 		bldr.append("|")
-		found_upcoming_matches = False
-		for game in event.get_games(approved=False, pending=True):
-			if game.complete:
-				continue
-			found_upcoming_matches = True
-			bldr.append(str(game.date_time))
+		next_pending_game = event.get_next_game(approved=False, pending=True)
+		if next_pending_game is not None:
+			bldr.append(str(next_pending_game.date_time))
 			bldr.append(" (")
-			bldr.append(make_time_string(game.date_time))
+			bldr.append(make_time_string(next_pending_game.date_time))
 			bldr.append(")")
-			break
-		if not found_upcoming_matches:
+		else:
 			bldr.append("No pending matches")
 
 		bldr.append("\n")
@@ -392,7 +384,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append("&tz=UTC)")
 		bldr.append("|")
 
-		bldr.append(game.home.name)
+		bldr.append(game.home.get_name())
 		bldr.append("|")
 
 		bldr.append(flairs.get_flair(game.home.name))
@@ -410,7 +402,7 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 		bldr.append(flairs.get_flair(game.away.name))
 		bldr.append("|")
 
-		bldr.append(game.away.name)
+		bldr.append(game.away.get_name())
 		bldr.append("||")
 		if game.post_thread_id is not None:
 			bldr.append("[Post Match](")
@@ -519,13 +511,13 @@ def render_discord(event, match_day, flairs, short=False):
 
 			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 			bldr.append(" **")
-			bldr.append(game.home.name)
+			bldr.append(game.home.get_name())
 			bldr.append("**")
 
 			bldr.append(" vs ")
 
 			bldr.append("**")
-			bldr.append(game.away.name)
+			bldr.append(game.away.get_name())
 			bldr.append("** ")
 			bldr.append(get_discord_flair(flairs, game.away.name, "TBD"))
 

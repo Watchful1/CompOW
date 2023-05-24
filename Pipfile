@@ -10,6 +10,7 @@ praw = "*"
 pytz = "*"
 discord-logging = {git = "https://github.com/Watchful1/DiscordLogging.git"}
 jsons = "*"
+prometheus-client = "*"
 
 [dev-packages]
 pytest = "*"

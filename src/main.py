@@ -1,5 +1,4 @@
 import time
-
 import discord_logging
 import logging.handlers
 import argparse
@@ -13,8 +12,7 @@ import event_manager
 import messages
 import utils
 from reddit_class import Reddit
-from classes.settings import Settings
-
+import counters
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Reddit liquipedia match thread bot")
@@ -66,6 +64,7 @@ if __name__ == "__main__":
 					reasons.append("update_listings")
 				log.debug(','.join(reasons))
 				event_pages = reddit.list_event_pages()
+				counters.events.set(len(event_pages))
 				for event_page in event_pages:
 					event = reddit.get_event_from_page(event_page)
 					event_dict[event.id] = event
@@ -78,6 +77,7 @@ if __name__ == "__main__":
 
 		try:
 			if parse_messages and not transient_error:
+				counters.process.labels(type="messages").inc()
 				processed_message = messages.parse_messages(reddit, event_dict)
 				if processed_message or first_loop:
 					timestamps["last_message"] = utils.utcnow()
@@ -92,7 +92,8 @@ if __name__ == "__main__":
 
 		try:
 			if update_events and not transient_error:
-				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs)
+				counters.process.labels(type="events").inc()
+				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs, first_loop)
 		except Exception as err:
 			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
 			if not transient_error:
@@ -100,6 +101,7 @@ if __name__ == "__main__":
 
 		try:
 			if update_listings and not transient_error:
+				counters.process.labels(type="listing").inc()
 				log.debug("Updating listing pages")
 				settings = reddit.get_settings()
 				reddit.save_settings(settings, event_dict.values())

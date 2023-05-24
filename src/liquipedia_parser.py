@@ -9,11 +9,13 @@ log = discord_logging.get_logger()
 
 import utils
 import string_utils
+import counters
 from classes.game import Game
 from classes.settings import DirtyMixin
 
 
 def get_page_text(page_url):
+	counters.queries.labels(site="liquipedia").inc()
 	try:
 		return requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5).text
 	except Exception as err:
@@ -178,3 +180,4 @@ def update_event(event, username=None, approve_complete=False):
 		event.add_game(game)
 
 	event.sort_matches(approve_complete)
+	event.last_parsed = utils.utcnow()

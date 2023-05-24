@@ -1,14 +1,15 @@
 import discord_logging
+import logging.handlers
 
-log = discord_logging.init_logging()
+log = discord_logging.init_logging(add_trace=True)
 
 import liquipedia_parser
-from classes import Event
 from reddit_class import Reddit
 
 
 if __name__ == "__main__":
-	event_wiki = "events/overwatch-league-2023---pro-am-group-stage"
+	discord_logging.set_level(logging.TRACE)
+	event_wiki = "events/overwatch-contenders-2023-summer-series-asia-pacific"
 
 	reddit = Reddit("OWMatchThreads", "competitiveoverwatch")
 	event = reddit.get_event_from_page(event_wiki)

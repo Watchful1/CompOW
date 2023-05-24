@@ -6,8 +6,8 @@ log = discord_logging.init_logging(debug=True)
 
 if __name__ == "__main__":
 	urls = [
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=west2",
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=east2",
+		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=west4",
+		#"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=east3",
 	]
 
 	users = defaultdict(int)
@@ -40,12 +40,12 @@ if __name__ == "__main__":
 		if i >= 7:
 			break
 
-	stage = "Spring Stage Week 2"
+	stage = "Spring Stage Week 4"
 
 	if len(winners) > 1:
-		log.info(f"The winners of the Pick'ems for {stage} are {' and '.join(winners)}!")
+		log.info(f"The winners of the Pick'ems for {stage} are {' and '.join(winners)}! Get your predictions in now!")
 	else:
-		log.info(f"The winner of the Pick'ems for {stage} is {' and '.join(winners)}!")
+		log.info(f"The winner of the Pick'ems for {stage} is {' and '.join(winners)}! Get your predictions in now!")
 
 	log.info(
 		f'''{' and '.join(winners)} had {winner_points} points. That is their battlenet tag, so if anyone knows their reddit username or twitter handle, please let them know about this thread.
