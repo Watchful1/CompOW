@@ -33,6 +33,7 @@ if __name__ == "__main__":
 		discord_logging.set_level(logging.TRACE)
 
 	discord_logging.init_discord_logging(args.user, logging.WARNING, 1)
+	counters.init(8006)
 
 	if args.run_timestamp:
 		utils.DEBUG_NOW = args.run_timestamp
