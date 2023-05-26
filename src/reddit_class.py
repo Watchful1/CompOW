@@ -41,7 +41,6 @@ class Reddit:
 		return self.webhook_cache[key]
 
 	def submit_self_post(self, title, text, chat_post=False, flair=None):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Title: {title}")
@@ -56,30 +55,32 @@ class Reddit:
 				else:
 					thread = self.reddit.subreddit(self.subreddit).submit(title=title, selftext=text, flair_id=flair_id)
 				thread_id = thread.id
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Posted thread to r/{self.subreddit} - {thread_id}")
 			return thread_id
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to post thread to r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def edit_thread(self, thread_id, text):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Body: {text}")
 			else:
 				submission = self.reddit.submission(id=thread_id)
 				submission.edit(text)
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Edited thread {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to edit thread {thread_id}")
 			log.warning(traceback.format_exc())
 			return False
 
 	def reply_thread(self, thread_id, text):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Text: {text}")
@@ -87,85 +88,93 @@ class Reddit:
 			else:
 				submission = self.reddit.submission(id=thread_id)
 				comment_id = submission.reply(text).id
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Replied to thread {thread_id}")
 			return comment_id
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to reply to thread {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def get_stickied_threads(self):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			stickied = []
 			for submission in self.reddit.subreddit(self.subreddit).hot(limit=2):
 				if submission.stickied:
 					stickied.append(submission.id)
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Found stickies in r/{self.subreddit} - {str(stickied)}")
 			return stickied
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to find bottom sticky in r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return []
 
 	def sticky_thread(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=True)
 				time.sleep(3)  # stickying is weird, let's sleep a bit to let things settle down
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Stickied {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to sticky {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def unsticky_thread(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.sticky(state=False)
 				time.sleep(3)  # stickying is weird, let's sleep a bit to let things settle down
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Unstickied {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to unsticky {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def spoiler_thread(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.spoiler()
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Spoilered {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to spoiler {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def set_suggested_sort(self, thread_id, sort):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.suggested_sort(sort=sort)
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Setting suggested sort to {sort} for {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to set suggested for {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def disable_inbox_replies(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).disable_inbox_replies()
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Disabling inbox replies for {thread_id}")
 			return True
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to disable inbox replies for {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
@@ -177,63 +186,68 @@ class Reddit:
 			else:
 				if flair_name in self.flair_cache:
 					return self.flair_cache[flair_name]
-				counters.queries.labels(site="reddit").inc()
 				for flair in self.reddit.subreddit(self.subreddit).flair.link_templates.user_selectable():
 					if flair_name in flair['flair_text'].lower():
 						log.debug(f"Returning flair id for flair name: {flair_name} : {flair['flair_template_id']}")
 						self.flair_cache[flair_name] = flair['flair_template_id']
 						return flair['flair_template_id']
+				counters.queries.labels(site="reddit", response="success").inc()
 				log.debug(f"Couldn't find template for flair: {flair_name}")
 				return None
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to find template for flair in r/{self.subreddit}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def set_flair(self, thread_id, flair_template_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).flair.select(flair_template_id)
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Setting flair for: {thread_id} : {flair_template_id}")
 			return None
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to set flair for: {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def approve(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.approve()
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Approving thread: {thread_id}")
 			return None
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to approve thread: {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def distinguish_comment(self, comment_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			log.debug(f"Distinguishing comment: {comment_id}")
 			if not self.debug:
 				self.reddit.comment(comment_id).mod.distinguish(how='yes')
+			counters.queries.labels(site="reddit", response="success").inc()
 			return None
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to distinguish comment: {comment_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def lock(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if not self.debug:
 				self.reddit.submission(thread_id).mod.lock()
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Locking thread: {thread_id}")
 			return None
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to lock thread: {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
@@ -250,56 +264,60 @@ class Reddit:
 		self.approve(thread_id)
 
 	def get_unread(self):
-		counters.queries.labels(site="reddit").inc()
 		try:
-			return self.reddit.inbox.unread()
+			unread = self.reddit.inbox.unread()
+			counters.queries.labels(site="reddit", response="success").inc()
+			return unread
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to fetch messages")
 			log.warning(traceback.format_exc())
 			return []
 
 	def reply_message(self, message, content):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			if self.debug:
 				log.info(f"Reply: {content}")
 			else:
 				message.reply(content)
+			counters.queries.labels(site="reddit", response="success").inc()
 			log.debug(f"Replied to message {message.id}")
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to reply to message {message.id}")
 			log.warning(traceback.format_exc())
 
 	def mark_read(self, message):
-		counters.queries.labels(site="reddit").inc()
 		if not self.debug:
 			message.mark_read()
+		counters.queries.labels(site="reddit", response="success").inc()
 
 	def is_message(self, item):
 		return isinstance(item, praw.models.Message)
 
 	def get_thread_body(self, thread_id):
-		counters.queries.labels(site="reddit").inc()
 		try:
 			submission = self.reddit.submission(id=thread_id)
+			counters.queries.labels(site="reddit", response="success").inc()
 			return submission.selftext
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to fetch thread {thread_id}")
 			log.warning(traceback.format_exc())
 			return None
 
 	def list_event_pages(self):
-		counters.queries.labels(site="reddit").inc()
 		event_pages = []
 		for page in self.reddit.subreddit(self.subreddit).wiki:
 			if page.name.startswith("events/") and page.name != "events/settings":
 				event_pages.append(page.name)
+		counters.queries.labels(site="reddit", response="success").inc()
 		return event_pages
 
 	def get_data_string_from_wiki(self, page):
-		counters.queries.labels(site="reddit").inc()
 		datatag = "[](#datatag"
 		wiki_content = self.reddit.subreddit(self.subreddit).wiki[page].content_md
+		counters.queries.labels(site="reddit", response="success").inc()
 		datatag_location = wiki_content.find(datatag)
 		if datatag_location == -1:
 			return None
@@ -319,6 +337,7 @@ class Reddit:
 			DirtyMixin.log = True
 			return event
 		except Exception as err:
+			counters.queries.labels(site="reddit", response="error").inc()
 			log.info(err)
 			log.info(traceback.format_exc())
 			return None
@@ -326,8 +345,8 @@ class Reddit:
 	def create_page_from_event(self, event):
 		wiki_page = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 		try:
-			counters.queries.labels(site="reddit").inc()
 			wiki_page._fetch()
+			counters.queries.labels(site="reddit", response="success").inc()
 			if wiki_page.mod.settings()['listed']:
 				log.info(f"Wiki page already exists when creating, calling update instead")
 				self.update_page_from_event(event)
@@ -335,6 +354,7 @@ class Reddit:
 				log.info(f"Wiki page exists, but is not listed")
 				self.toggle_page_from_event(event, True)
 		except prawcore.exceptions.NotFound:
+			counters.queries.labels(site="reddit", response="error").inc()
 			pass
 
 		if self.debug:
@@ -346,9 +366,9 @@ class Reddit:
 				content=string_utils.render_event_wiki(event, self.user),
 				reason="Creating new event"
 			)
+			counters.queries.labels(site="reddit", response="success").inc()
 
 	def update_page_from_event(self, event, clean=True):
-		counters.queries.labels(site="reddit").inc()
 		if clean:
 			event.clean()
 		if self.debug:
@@ -357,38 +377,40 @@ class Reddit:
 			log.debug(f"Updating page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			old_wiki_content = event_wiki.content_md
+			counters.queries.labels(site="reddit", response="success").inc()
 			new_wiki_content = string_utils.render_event_wiki(event, self.user)
 			if old_wiki_content == new_wiki_content:
 				log.warning(f"Tried to update event page, but content was the same: {event.id}")
 			else:
 				event_wiki.edit(content=new_wiki_content)
+				counters.queries.labels(site="reddit", response="success").inc()
 
 	def toggle_page_from_event(self, event, show):
-		counters.queries.labels(site="reddit").inc()
 		if self.debug:
 			log.info(f"{('Showing' if show else 'Hiding')} page: {event.wiki_name()}")
 		else:
 			log.debug(f"{('Showing' if show else 'Hiding')} page: {event.wiki_name()}")
 			event_wiki = self.reddit.subreddit(self.subreddit).wiki[event.wiki_name()]
 			event_wiki.mod.update(listed=show, permlevel=0)
+			counters.queries.labels(site="reddit", response="success").inc()
 
 	def save_settings(self, settings, events):
-		counters.queries.labels(site="reddit").inc()
 		if self.debug:
 			log.info(f"Saving settings: {settings}")
 		else:
 			log.debug(f"Saving settings: {settings}")
 			settings_wiki = self.reddit.subreddit(self.subreddit).wiki["events/settings"]
 			old_wiki_content = settings_wiki.content_md
+			counters.queries.labels(site="reddit", response="success").inc()
 			new_wiki_content = string_utils.render_settings_wiki(settings, self.user, events)
 			if old_wiki_content == new_wiki_content:
 				log.debug(f"No changes in wiki page, not updating")
 			else:
 				settings_wiki.edit(content=new_wiki_content)
+				counters.queries.labels(site="reddit", response="success").inc()
 
 	def get_settings(self):
 		if self.settings is None:
-			counters.queries.labels(site="reddit").inc()
 			try:
 				data = self.get_data_string_from_wiki("events/settings")
 				self.settings = jsons.loads(data, cls=Settings)

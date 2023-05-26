@@ -250,7 +250,7 @@ def parse_messages(reddit, events):
 			else:
 				result_message = process_message(message, reddit, events)
 				reddit.reply_message(message, result_message)
+				processed_message = True
 		reddit.mark_read(message)
-		processed_message = True
 
 	return processed_message

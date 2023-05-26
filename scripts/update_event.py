@@ -9,7 +9,7 @@ from reddit_class import Reddit
 
 if __name__ == "__main__":
 	discord_logging.set_level(logging.TRACE)
-	event_wiki = "events/overwatch-contenders-2023-summer-series-asia-pacific"
+	event_wiki = "events/overwatch-contenders-2023-summer-series-korea-regular-season"
 
 	reddit = Reddit("OWMatchThreads", "competitiveoverwatch")
 	event = reddit.get_event_from_page(event_wiki)

@@ -15,10 +15,16 @@ from classes.settings import DirtyMixin
 
 
 def get_page_text(page_url):
-	counters.queries.labels(site="liquipedia").inc()
 	try:
-		return requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5).text
+		result = requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5)
+		counters.queries.labels(site="liquipedia", response=str(result.status_code)).inc()
+		return result.text
+	except requests.ReadTimeout as err:
+		counters.queries.labels(site="liquipedia", response="timeout").inc()
+		log.info(f"ReadTimeout fetching match page: {err} : {page_url}")
+		raise
 	except Exception as err:
+		counters.queries.labels(site="liquipedia", response="err").inc()
 		log.warning(f"Unable to fetch match page: {err} : {page_url}")
 		raise
 
