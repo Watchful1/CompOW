@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
 				timestamps["listings"] = utils.utcnow(offset=60*15)  # update the listings automatically every 15 minutes
 		except Exception as err:
-			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			transient_error = utils.process_error(f"Error updating listings", err, traceback.format_exc())
 			if not transient_error:
 				raise
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 							log.debug(f"Updating event page {event.id}")
 							reddit.update_page_from_event(event)
 		except Exception as err:
-			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
+			transient_error = utils.process_error(f"Error saving settings/events", err, traceback.format_exc())
 			if not transient_error:
 				raise
 

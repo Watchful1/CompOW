@@ -22,7 +22,6 @@ def get_page_text(page_url):
 	except requests.ReadTimeout as err:
 		counters.queries.labels(site="liquipedia", response="timeout").inc()
 		log.info(f"ReadTimeout fetching match page: {err} : {page_url}")
-		raise
 	except Exception as err:
 		counters.queries.labels(site="liquipedia", response="err").inc()
 		log.warning(f"Unable to fetch match page: {err} : {page_url}")
