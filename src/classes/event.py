@@ -30,6 +30,7 @@ class Event(DirtyMixin):
 	details_url: str = None
 	cached_name: str = None
 	last_parsed: datetime = None
+	last_pinged: datetime = None
 
 	def should_parse(self):
 		if self.last_parsed is None:

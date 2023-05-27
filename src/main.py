@@ -9,6 +9,7 @@ log = discord_logging.init_logging(add_trace=True)
 
 import flair_manager
 import event_manager
+import listings
 import messages
 import utils
 from reddit_class import Reddit
@@ -104,6 +105,8 @@ if __name__ == "__main__":
 			if update_listings and not transient_error:
 				counters.process.labels(type="listing").inc()
 				log.debug("Updating listing pages")
+				listings.ping_pending(event_dict.values())
+
 				settings = reddit.get_settings()
 				reddit.save_settings(settings, event_dict.values())
 				reddit.settings = None
@@ -132,9 +135,7 @@ if __name__ == "__main__":
 
 		# TODO update sidebar
 		# TODO update calendar
-		# TODO post in discord when there's pending matches
 		# TODO create an archive page of events
-		# TODO add metrics
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread
 		# TODO watch overwatch api for match completions
