@@ -21,6 +21,7 @@ AUTHORIZED_USERS = {
 	"UnknownQTY",
 }
 DEBUG_NOW = None
+DEFAULT_ROLES = ['All-Notify', 'All-Matches', 'here']
 
 
 def process_error(message, exception, traceback):

@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import discord_logging
 
+import utils
+
 log = discord_logging.get_logger()
 
 from utils import get_random_id, minutes_to_start, utcnow
@@ -25,7 +27,7 @@ class Event(DirtyMixin):
 
 	discord_key: str = None
 	discord_minutes_before: int = 15
-	discord_roles: List[str] = field(default_factory=lambda: ['All-Notify', 'All-Matches', 'here'])
+	discord_roles: List[str] = field(default_factory=lambda: utils.DEFAULT_ROLES.copy())
 
 	details_url: str = None
 	cached_name: str = None
