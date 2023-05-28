@@ -21,9 +21,9 @@ class MatchDay(DirtyMixin):
 	last_datetime: datetime = None
 
 	thread_id: str = None
+	thread_removed: bool = False
 
 	predictions_thread: str = None
-	match_thread: str = None
 	discord_posted: bool = False
 	spoiler_prevention: bool = False
 

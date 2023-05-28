@@ -425,3 +425,13 @@ class Reddit:
 		else:
 			return self.settings
 
+	def fill_empty_stickies(self):
+		settings = self.get_settings()
+		if len(settings.stickies):
+			stickied_threads = self.get_stickied_threads()
+			if len(stickied_threads) < 2:
+				first_saved = settings.stickies.pop(0)
+				self.sticky_thread(first_saved)
+			if len(stickied_threads) < 1 and len(settings.stickies):
+				first_saved = settings.stickies.pop(0)
+				self.sticky_thread(first_saved)

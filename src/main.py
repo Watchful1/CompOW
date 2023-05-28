@@ -135,11 +135,9 @@ if __name__ == "__main__":
 
 		# TODO update sidebar
 		# TODO update calendar
-		# TODO create an archive page of events
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread
 		# TODO watch overwatch api for match completions
-		# TODO notify on upcoming matches for event without discord key and roles
 
 		discord_logging.flush_discord()
 

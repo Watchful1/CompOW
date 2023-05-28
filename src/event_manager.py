@@ -116,6 +116,15 @@ def update_events(reddit, events, flairs, force_parse=False):
 				log.debug(f"Force pushing event page {event.id}")
 				reddit.update_page_from_event(event, clean=False)
 
+			if match_day.thread_id is not None and \
+					not match_day.thread_removed and \
+					match_day.is_complete() and \
+					event.leave_thread_minutes_after test:
+				log.info(f"Match day complete, unstickying {match_day.thread_id}: {match_day.id}")
+				reddit.unsticky_thread(match_day.thread_id)
+				match_day.thread_removed = True
+				reddit.fill_empty_stickies()
+
 			# TODO post predictions thread day before event week starts
 			# TODO remove match thread if event complete and longer than set time
 
