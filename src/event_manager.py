@@ -1,6 +1,7 @@
 import discord_logging
 import traceback
 import requests
+from datetime import timedelta
 
 log = discord_logging.get_logger()
 
@@ -118,15 +119,18 @@ def update_events(reddit, events, flairs, force_parse=False):
 
 			if match_day.thread_id is not None and \
 					not match_day.thread_removed and \
-					match_day.is_complete() and \
-					event.leave_thread_minutes_after test:
-				log.info(f"Match day complete, unstickying {match_day.thread_id}: {match_day.id}")
-				reddit.unsticky_thread(match_day.thread_id)
-				match_day.thread_removed = True
-				reddit.fill_empty_stickies()
+					match_day.is_complete():
+				if match_day.thread_complete_time is None and \
+						event.leave_thread_minutes_after is not None:
+					match_day.thread_complete_time = utils.utcnow()
+				if event.leave_thread_minutes_after is None or \
+						(match_day.thread_complete_time + timedelta(minutes=event.leave_thread_minutes_after)) < utils.utcnow():
+					log.info(f"Match day complete, unstickying {match_day.thread_id}: {match_day.id}")
+					reddit.unsticky_thread(match_day.thread_id)
+					match_day.thread_removed = True
+					reddit.fill_empty_stickies()
 
 			# TODO post predictions thread day before event week starts
-			# TODO remove match thread if event complete and longer than set time
 
 			# check if match day is active or close so we can scan faster
 			if not match_day.is_complete() and \
