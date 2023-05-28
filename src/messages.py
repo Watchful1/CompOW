@@ -234,8 +234,6 @@ def process_message(message, reddit, events):
 		log.info(line_result)
 		line_results.append(line_result)
 		reddit.get_settings()  # fetch the settings to force an update on the summary wiki
-		# TODO set discord channel
-		# TODO mark matchday as dirty
 	return '  \n'.join(line_results)
 
 

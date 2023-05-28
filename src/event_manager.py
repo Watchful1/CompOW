@@ -25,8 +25,6 @@ def update_events(reddit, events, flairs, force_parse=False):
 					utils.minutes_to_start(match_day.approved_start_datetime) < event.match_thread_minutes_before:
 				log.info(f"Posting match thread for {event.id}:{match_day.id} : {event.name} : starting in {utils.minutes_to_start(match_day.approved_start_datetime):.2f} minutes")
 
-				# TODO: remove prediction thread if posted
-
 				thread_id = reddit.submit_self_post(
 					string_utils.render_reddit_event_title(event),
 					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit),
@@ -42,29 +40,23 @@ def update_events(reddit, events, flairs, force_parse=False):
 
 				stickied_threads = reddit.get_stickied_threads()
 				reddit.sticky_thread(thread_id)
-				# if len(stickied_threads) == 1:
-				# 	log.info(f"Stickying first, moving {stickied_threads[0]} down")
-				# 	reddit.unsticky_thread(stickied_threads[0])
-				# 	reddit.sticky_thread(stickied_threads[0])
-				# elif len(stickied_threads) == 2:
-				# 	log.info(f"Stickying first, moving {stickied_threads[0]} down, saving {stickied_threads[1]}")
-				# 	reddit.unsticky_thread(stickied_threads[0])
-				# 	reddit.sticky_thread(stickied_threads[0])
-				# 	settings = reddit.get_settings()
-				# 	settings.stickies.insert(0, stickied_threads[1])
-				# elif len(stickied_threads) != 0:
-				# 	log.warning(f"Got {len(stickied_threads)} stickied threads")
+				if len(stickied_threads) == 1:
+					log.info(f"Stickying first, moving {stickied_threads[0]} down")
+					reddit.unsticky_thread(stickied_threads[0])
+					reddit.sticky_thread(stickied_threads[0])
+				elif len(stickied_threads) == 2:
+					log.info(f"Stickying first, moving {stickied_threads[0]} down, saving {stickied_threads[1]}")
+					reddit.unsticky_thread(stickied_threads[0])
+					reddit.sticky_thread(stickied_threads[0])
+					settings = reddit.get_settings()
+					settings.stickies.insert(0, stickied_threads[1])
+				elif len(stickied_threads) != 0:
+					log.warning(f"Got {len(stickied_threads)} stickied threads")
 
 			# post match thread if game is done
 			if event.post_match_threads and match_day.thread_id is not None:
 				for i, game in enumerate(match_day.approved_games):
 					if game.post_thread_id is None:
-						# owl_complete = False
-						# if match.owl_complete is not None and \
-						# 		match.owl_complete + timedelta(minutes=2) < static.utcnow() < match.owl_complete + timedelta(minutes=5):
-						# 	log.warning(f"Overwatch api says match is complete, but over.gg doesn't {match}")
-						# 	owl_complete = True
-
 						if game.complete:
 							log.info(f"Match complete, posting post match thread: {event.id}:{match_day.id}:{game.id}")
 
@@ -129,8 +121,6 @@ def update_events(reddit, events, flairs, force_parse=False):
 					reddit.unsticky_thread(match_day.thread_id)
 					match_day.thread_removed = True
 					reddit.fill_empty_stickies()
-
-			# TODO post predictions thread day before event week starts
 
 			# check if match day is active or close so we can scan faster
 			if not match_day.is_complete() and \

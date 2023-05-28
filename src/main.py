@@ -43,8 +43,6 @@ if __name__ == "__main__":
 	# TODO cache flairs locally
 	flairs = flair_manager.FlairManager()
 
-	# overwatch_api = overwatch_api_parser.OverwatchAPI()
-
 	timestamps = {}
 	first_loop = True
 	while True:
@@ -137,7 +135,6 @@ if __name__ == "__main__":
 		# TODO update calendar
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread
-		# TODO watch overwatch api for match completions
 
 		discord_logging.flush_discord()
 
