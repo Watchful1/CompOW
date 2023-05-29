@@ -14,7 +14,12 @@ class Team(DirtyMixin):
 
 	def set_score(self, score):
 		if score is not None:
-			self.score = int(score)
+			if score.lower() == "w":
+				self.score = 3
+			elif score.lower() == "l":
+				self.score = 0
+			else:
+				self.score = int(score)
 
 	def get_name(self):
 		if self.name is None:
