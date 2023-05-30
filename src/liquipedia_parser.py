@@ -22,6 +22,7 @@ def get_page_text(page_url):
 	except requests.ReadTimeout as err:
 		counters.queries.labels(site="liquipedia", response="timeout").inc()
 		log.info(f"ReadTimeout fetching match page: {err} : {page_url}")
+		return None
 	except Exception as err:
 		counters.queries.labels(site="liquipedia", response="err").inc()
 		log.warning(f"Unable to fetch match page: {err} : {page_url}")
@@ -65,6 +66,8 @@ def extract_details(tree):
 
 def parse_details_page(page_url):
 	page_string = get_page_text(page_url)
+	if page_string is None:
+		return []
 	tree = etree.fromstring(page_string, etree.HTMLParser())
 
 	streams = extract_details(tree)
@@ -75,6 +78,8 @@ def parse_details_page(page_url):
 def parse_event(page_url):
 	# TODO parse out the match day and bracket levels
 	page_string = get_page_text(page_url)
+	if page_string is None:
+		return None, None, None
 	tree = etree.fromstring(page_string, etree.HTMLParser())
 
 	title_node = tree.xpath("//div[@id='main-content']/h1[@class='firstHeading']/span/text()")
@@ -143,6 +148,8 @@ def update_event(event, username=None, approve_complete=False):
 		url = url + "?stable=0"
 	log.debug(f"Pulling page from liquipedia: {url}")
 	games, event_name, streams = parse_event(url)
+	if games is None:
+		return
 	if event.details_url is not None:
 		details_streams = parse_details_page(event.details_url)
 		for stream in details_streams:
