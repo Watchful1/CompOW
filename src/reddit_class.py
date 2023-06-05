@@ -6,6 +6,7 @@ import sys
 import time
 import discord_logging
 import jsons
+import re
 
 log = discord_logging.get_logger()
 
@@ -424,6 +425,21 @@ class Reddit:
 			return Settings()
 		else:
 			return self.settings
+
+	def update_sidebar(self, event_string):
+		if self.debug:
+			log.info(f"Updating sidebar")
+		else:
+			log.debug(f"Updating sidebar")
+			sidebar_wiki = self.reddit.subreddit(self.subreddit).wiki['config/sidebar']
+			old_wiki_content = sidebar_wiki.content_md
+			counters.queries.labels(site="reddit", response="success").inc()
+			new_wiki_content = re.sub(r"(\[\]\(#mtstart\)\r?\n)(.*)(\[\]\(#mtend\))", r"\1" + event_string + r"\3", old_wiki_content, flags=re.M | re.DOTALL)
+			if old_wiki_content == new_wiki_content:
+				log.debug(f"Tried to update sidebar, but content was the same")
+			else:
+				sidebar_wiki.edit(content=new_wiki_content)
+				counters.queries.labels(site="reddit", response="success").inc()
 
 	def fill_empty_stickies(self):
 		settings = self.get_settings()
