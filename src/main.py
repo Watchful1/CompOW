@@ -104,6 +104,7 @@ if __name__ == "__main__":
 				counters.process.labels(type="listing").inc()
 				log.debug("Updating listing pages")
 				listings.ping_pending(event_dict.values())
+				listings.update_listings(reddit, event_dict.values(), flairs)
 
 				settings = reddit.get_settings()
 				reddit.save_settings(settings, event_dict.values())
@@ -131,7 +132,6 @@ if __name__ == "__main__":
 			if not transient_error:
 				raise
 
-		# TODO update sidebar
 		# TODO update calendar
 		# TODO parse vod and auto-update post match thread
 		# TODO parse maps for post match thread

@@ -53,7 +53,7 @@ class FlairManager:
 	def strip_name(name):
 		return ''.join(x for x in name.lower() if x.isalnum())
 
-	def get_flair(self, name):
+	def get_flair(self, name, default=""):
 		if name is None or name == "TBD":
 			return ""
 		stripped_name = FlairManager.strip_name(name)
@@ -64,7 +64,7 @@ class FlairManager:
 			if stripped_name not in self.missing_flairs:
 				self.missing_flairs.add(stripped_name)
 				log.warning(f"Could not find flair: {stripped_name}")
-			return ""
+			return default
 
 	def update_flairs(self):
 		log.info(f"Updating flair list from site")
