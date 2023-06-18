@@ -24,6 +24,7 @@ cow_roles = {
 	'SAContenders': '<@&481315668721926144>',
 	'CNContenders': '<@&481315825802936320>',
 	'AUContenders': '<@&481315928865505280>',
+	'OWWC': '<@&481316090270711820>',
 	'All-Matches': '<@&517000657111220229>',
 	'All-Notify': '<@&481316252661579786>',
 	'here': '@here',
@@ -470,9 +471,9 @@ def render_discord(event, match_day, flairs, short=False):
 
 	for i, game in enumerate(match_day.approved_games):
 		if short:
-			bldr.append("*")
-			bldr.append(pytz.utc.localize(game.date_time).astimezone(pytz.timezone("US/Pacific")).strftime("%I:%M %p %Z"))
-			bldr.append("* ")
+			bldr.append("*<t:")
+			bldr.append(str(int(game.date_time.timestamp())))
+			bldr.append(":f>* ")
 
 			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 
@@ -492,22 +493,12 @@ def render_discord(event, match_day, flairs, short=False):
 		else:
 			bldr.append("**__Match ")
 			bldr.append(str(i + 1))
-			bldr.append("__** - *")
-
-			timezones = [
-				pytz.timezone("US/Pacific"),
-				pytz.timezone("US/Eastern"),
-				pytz.timezone("Europe/Paris"),
-				pytz.timezone("Australia/Sydney"),
-			]
-
-			time_names = []
-			for timezone in timezones:
-				time_names.append(game.date_time.astimezone(timezone).strftime("%I:%M %p %Z"))
-
-			bldr.append(' / '.join(time_names))
-
-			bldr.append("*\n")
+			bldr.append("__** - <t:")
+			game_timestamp = str(int(game.date_time.timestamp()))
+			bldr.append(game_timestamp)
+			bldr.append(":f> - <t:")
+			bldr.append(game_timestamp)
+			bldr.append(":R>\n")
 
 			bldr.append(get_discord_flair(flairs, game.home.name, "TBD"))
 			bldr.append(" **")
