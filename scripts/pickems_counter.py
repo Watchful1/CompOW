@@ -6,9 +6,8 @@ log = discord_logging.init_logging(debug=True)
 
 if __name__ == "__main__":
 	urls = [
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=spring-ea",
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=spring-eb",
-		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage&event=spring-w",
+		#"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=midseason-madness",
+		"https://pickem.overwatchleague.com/api/leaderboards?slug=reddit-cow&season=2023&stage=spring-stage",
 	]
 
 	users = defaultdict(int)
@@ -41,7 +40,7 @@ if __name__ == "__main__":
 		if i >= 7:
 			break
 
-	stage = "Spring Stage Knockouts"
+	stage = "Midseason Madness"
 
 	if len(winners) > 1:
 		log.info(f"The winners of the Pick'ems for {stage} are {' and '.join(winners)}! Get your predictions in now!")

@@ -435,10 +435,13 @@ class Reddit:
 			old_wiki_content = sidebar_wiki.content_md
 			counters.queries.labels(site="reddit", response="success").inc()
 			new_wiki_content = re.sub(r"(\[\]\(#mtstart\)\r?\n)(.*)(\[\]\(#mtend\))", r"\1" + event_string + r"\3", old_wiki_content, flags=re.M | re.DOTALL)
+
 			if old_wiki_content == new_wiki_content:
 				log.debug(f"Tried to update sidebar, but content was the same")
+				log.info(f"Sidebar matched: {len(event_string)} : {len(old_wiki_content)} : {len(new_wiki_content)}")
 			else:
 				sidebar_wiki.edit(content=new_wiki_content)
+				log.info(f"Sidebar updated: {len(event_string)} : {len(old_wiki_content)} : {len(new_wiki_content)}")
 				counters.queries.labels(site="reddit", response="success").inc()
 
 	def fill_empty_stickies(self):
