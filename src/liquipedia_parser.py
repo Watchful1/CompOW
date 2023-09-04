@@ -132,7 +132,8 @@ def parse_event(page_url):
 			try:
 				game.date_time = datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=pytz.utc)
 			except ValueError:
-				log.info(f"Invalid timestamp: {timestamp}")
+				log.debug(f"Invalid timestamp: {timestamp}")
+				continue
 
 		if game.home.name == "BYE" or game.away.name == "BYE":
 			continue
