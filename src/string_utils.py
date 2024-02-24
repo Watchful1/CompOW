@@ -27,6 +27,7 @@ cow_roles = {
 	'OWWC': '<@&481316090270711820>',
 	'All-Matches': '<@&517000657111220229>',
 	'All-Notify': '<@&481316252661579786>',
+	'OWCS-Notify': '<@&481314680665538569>',
 	'here': '@here',
 	'everyone': '@everyone'
 }
