@@ -129,7 +129,11 @@ def parse_event(page_url):
 		timestamp = get_text_from_paths(node,
 			[".//span[@class='timer-object']/@data-timestamp"])
 		if timestamp:
-			game.date_time = datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=pytz.utc)
+			try:
+				game.date_time = datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=pytz.utc)
+			except ValueError:
+				log.debug(f"Invalid timestamp: {timestamp}")
+				continue
 
 		if game.home.name == "BYE" or game.away.name == "BYE":
 			continue
