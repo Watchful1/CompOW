@@ -131,7 +131,15 @@ def render_event_wiki(event, username):
 				f"{event.id}:approve matchday",
 				f"approveday:{match_day.id}"
 			))
-			bldr.append(")  ")
+			bldr.append(") : ")
+		if len(match_day.approved_games):
+			bldr.append("[Delete matches](")
+			bldr.append(build_message_link(
+				username,
+				f"{event.id}:delete matchday",
+				f"deleteday:{match_day.id}"
+			))
+			bldr.append(") : ")
 		if not match_day.is_complete():
 			bldr.append(f"[{('Disable' if match_day.spoiler_prevention else 'Enable')} spoilers](")
 			bldr.append(build_message_link(

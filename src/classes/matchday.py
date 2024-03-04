@@ -123,6 +123,14 @@ class MatchDay(DirtyMixin):
 		self.sort_games()
 		return games_approved
 
+	def delete_all_games(self):
+		games_deleted = len(self.approved_games)
+		self.approved_games = []
+		if games_deleted:
+			self._dirty = True
+		log.info(f"Deleted {games_deleted} games for {self}")
+		return games_deleted
+
 	def is_complete(self):
 		complete = True
 		if len(self.approved_games):

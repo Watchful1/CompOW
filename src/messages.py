@@ -140,6 +140,25 @@ def delete_match(line, event):
 		return f"deletion failed in match day: {event.id}:{match_day.id} : {match_id}"
 
 
+def delete_match_day(line, event):
+	log.debug(f"Deleting match day from message: {event}")
+	if event is None:
+		return "Event not found"
+
+	parts = line.split(":")
+	if not len(parts) >= 2:
+		return f"match day id not found: {line}"
+	match_day_id = parts[1]
+
+	match_day = event.get_match_day(match_day_id)
+	if match_day is None:
+		return f"Match day not found: {match_day_id}"
+
+	games_deleted = match_day.delete_all_games()
+
+	return f"{games_deleted} games deleted in match day: {event.id}:{match_day_id}"
+
+
 def update_settings(line, event, reddit):
 	log.debug(f"Updating settings from message: {event}")
 	if event is None:
@@ -220,6 +239,8 @@ def process_message(message, reddit, events):
 			line_result = approve_event(line, event)
 		elif line.startswith("deletematch"):
 			line_result = delete_match(line, event)
+		elif line.startswith("deleteday"):
+			line_result = delete_match_day(line, event)
 		elif line.startswith("deleteevent"):
 			line_result = delete_event(message.body, event, reddit, events)
 		elif line.startswith("addevent"):
