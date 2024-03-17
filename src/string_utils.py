@@ -223,7 +223,7 @@ def render_settings_wiki(settings, username, events):
 		else:
 			bldr.append("No approved matches")
 		bldr.append("|")
-		next_pending_game = event.get_next_game(approved=False, pending=True)
+		next_pending_game = event.get_next_game(approved=False, pending=True, complete=False)
 		if next_pending_game is not None:
 			bldr.append(str(next_pending_game.date_time))
 			bldr.append(" (")
