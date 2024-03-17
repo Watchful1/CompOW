@@ -66,8 +66,10 @@ class Event(DirtyMixin):
 				return match_day
 		return None
 
-	def get_next_game(self, approved=True, pending=False):
+	def get_next_game(self, approved=True, pending=False, complete=True):
 		for game in self.get_games(approved, pending):
+			if not complete:
+				return game
 			if not game.complete:
 				return game
 		return None

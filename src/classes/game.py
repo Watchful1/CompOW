@@ -5,7 +5,7 @@ import discord_logging
 
 log = discord_logging.get_logger()
 
-from utils import get_random_id
+from utils import get_random_id, timestamp_within
 from classes.team import Team
 from classes.settings import DirtyMixin
 
@@ -40,6 +40,11 @@ class Game(DirtyMixin):
 		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
 			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
 			self.date_time == game.date_time
+
+	def matches_approx(self, game):
+		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
+			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
+			timestamp_within(self.date_time, game.date_time, timedelta(minutes=45))
 
 	def merge(self, game):
 		if self.home != game.home:

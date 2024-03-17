@@ -72,6 +72,13 @@ def past_timestamp(timestamp_dict, key, use_debug=True):
 	return utcnow(use_debug) >= timestamp_dict[key]
 
 
+def timestamp_within(first_datetime, second_datetime, delta):
+	if first_datetime is not None and second_datetime is not None and \
+			abs((first_datetime - second_datetime).total_seconds()) < delta.total_seconds():
+		return True
+	return False
+
+
 def minutes_to_start(start):
 	if start is None:
 		return 99999
