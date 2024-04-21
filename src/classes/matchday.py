@@ -38,12 +38,12 @@ class MatchDay(DirtyMixin):
 		if self.last_datetime is None or game.date_time > self.last_datetime:
 			self.last_datetime = game.date_time
 		for approved_game in self.approved_games:
-			if approved_game.matches(game):
+			if approved_game.matches_approx(game):
 				game._dirty = True
 				approved_game.merge(game)
 				return True
-			if approved_game.matches_approx(game):
-				log.warning(f"Game add matched approx but not exact: {game} : {approved_game}")
+			# if approved_game.matches_approx(game):
+			# 	log.warning(f"Game add matched approx but not exact: {game} : {approved_game}")
 		for pending_game in self.pending_games:
 			if pending_game.matches(game):
 				game._dirty = True
