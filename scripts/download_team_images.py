@@ -1,3 +1,5 @@
+import os
+
 import discord_logging
 from lxml import etree
 import requests
@@ -17,23 +19,24 @@ def get_text_from_paths(base_node, paths):
 
 
 if __name__ == "__main__":
-	page_url = "https://liquipedia.net/overwatch/Overwatch_Contenders/2023/Summer_Series/Australia"
-	category = "AU"
+	page_url = "https://liquipedia.net/overwatch/Overwatch_Champions_Series/2024/Asia/Stage_1/Main_Event"
+	category = "ASIA"
 
 	categories = {
 		"OWL": "Overwatch League Teams",
 		"OWWC": "Overwatch World Cup",
-		"NA": "Overwatch Contenders NA",
-		"EU": "Overwatch Contenders EU",
-		"KR": "Overwatch Contenders KR",
-		"CN": "Overwatch Contenders CN",
-		"AU": "Overwatch Contenders AU",
-		"SEA": "Overwatch Contenders SEA",
+		"NA": "OWCS NA",
+		"EU": "OWCS EU",
+		"ASIA": "OWCS Asia",
 		"College": "Collegiate",
 		"Legacy": "Legacy Team Flairs",
 	}
 	category_name = categories[category]
 	output_folder = r"C:\Users\greg\Downloads\flairs"
+	if not os.path.exists(output_folder):
+		os.makedirs(output_folder)
+	# new_flair_base_url = "http://localhost:5000/flairsheets/new?"
+	# edit_flair_base_url = "http://localhost:5000/flairsheets/edit/"
 	new_flair_base_url = "https://rcompetitiveoverwatch.com/flairsheets/new?"
 	edit_flair_base_url = "https://rcompetitiveoverwatch.com/flairsheets/edit/"
 
@@ -63,11 +66,13 @@ if __name__ == "__main__":
 		}
 		liquipedia_flairs[flair["short_name"]] = flair
 
-		log.info(f"{team_name}")
+		log.info(f"Found team on liquipedia: {team_name}")
 
 		img_data = requests.get(f"https://liquipedia.net{team_image}").content
 		with open(f'{output_folder}/{flair["short_name"]}.png', 'wb') as handler:
 			handler.write(img_data)
+
+	log.info(f"---------------------------------------------")
 
 	for flair_short_name, flair in liquipedia_flairs.items():
 		if flair['short_name'] not in category_existing_flairs:
@@ -82,6 +87,9 @@ if __name__ == "__main__":
 
 			else:
 				log.info(f"{flair['name']} wrong category {all_flairs[flair['short_name']]['category']} to {flair['category']}: {edit_flair_base_url}{all_flairs[flair['short_name']]['id']}")
+
+		else:
+			log.info(f"{flair['name']} correct, check image: {edit_flair_base_url}{all_flairs[flair['short_name']]['id']}")
 
 	for flair_short_name, flair in category_existing_flairs.items():
 		if flair_short_name not in liquipedia_flairs:

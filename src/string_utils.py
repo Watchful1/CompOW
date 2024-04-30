@@ -326,7 +326,7 @@ def thread_link(subreddit, thread_id):
 	return f"https://www.reddit.com/r/{subreddit}/comments/{thread_id}/"
 
 
-def render_reddit_event(match_day, event, flairs, subreddit):
+def render_reddit_event(match_day, event, flairs, subreddit, username):
 	bldr = []
 
 	bldr.append("> ## **")
@@ -426,6 +426,20 @@ def render_reddit_event(match_day, event, flairs, subreddit):
 
 		bldr.append("|")
 		bldr.append("\n")
+
+	if event.post_match_threads:
+		link = build_message_link(
+			username,
+			f"{event.id}:enable spoilers",
+			f"enablespoilers:{match_day.id}:{not match_day.spoiler_prevention}"
+		)
+		bldr.append(")\n\n")
+		if match_day.spoiler_prevention:
+			bldr.append(f"Teams will be SHOWN in post match thread titles. If this is wrong, ping an active moderator and they can ")
+			bldr.append(f"[click here to hide them]({link}).\n\n")
+		else:
+			bldr.append(f"Teams will be HIDDEN in post match thread titles. If this is wrong, ping an active moderator and they can ")
+			bldr.append(f"[click here to show them]({link}).\n\n")
 
 	bldr.append(f"\nThis thread pulls match data from [this liquipedia page]({event.url}). If the thread is out of data, you can help ")
 	bldr.append(f"by updating that page. If something is wrong or missing please ping u/Watchful1 in the comments.")

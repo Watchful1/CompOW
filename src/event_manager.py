@@ -27,7 +27,7 @@ def update_events(reddit, events, flairs, force_parse=False):
 
 				thread_id = reddit.submit_self_post(
 					string_utils.render_reddit_event_title(event),
-					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit),
+					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit, reddit.user),
 					flair="match"
 				)
 				match_day.thread_id = thread_id
@@ -85,7 +85,7 @@ def update_events(reddit, events, flairs, force_parse=False):
 
 				reddit.edit_thread(
 					match_day.thread_id,
-					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit)
+					string_utils.render_reddit_event(match_day, event, flairs, reddit.subreddit, reddit.user)
 				)
 
 			# post discord announcement
