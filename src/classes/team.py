@@ -18,6 +18,8 @@ class Team(DirtyMixin):
 				self.score = 3
 			elif score.lower() == "l":
 				self.score = 0
+			elif score.lower() == "ff":
+				self.score = 0
 			else:
 				self.score = int(score)
 

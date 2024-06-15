@@ -140,7 +140,13 @@ def parse_event(page_url):
 
 		games.append(game)
 
-	games.sort(key=lambda game: game.date_time)
+	try:
+		games.sort(key=lambda game: game.date_time)
+	except TypeError:
+		log.warning(f"Unable to sort games due to no datetime")
+		for game in games:
+			log.warning(f"{game}")
+		raise
 	DirtyMixin.log = True
 
 	return games, event_name, streams
