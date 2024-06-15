@@ -135,7 +135,7 @@ def parse_event(page_url):
 				log.debug(f"Invalid timestamp: {timestamp}")
 				continue
 
-		if game.home.name == "BYE" or game.away.name == "BYE":
+		if game.home.name == "BYE" or game.away.name == "BYE" or game.date_time is None:
 			continue
 
 		games.append(game)
