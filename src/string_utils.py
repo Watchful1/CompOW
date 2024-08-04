@@ -200,9 +200,7 @@ def render_settings_wiki(settings, username, events):
 	bldr.append(")**")
 
 	bldr.append("\n\n")
-	for role in cow_roles.keys():
-		bldr.append(role)
-		bldr.append(" - ")
+	bldr.append("|".join(cow_roles.keys()))
 
 	bldr.append("\n\n")
 
