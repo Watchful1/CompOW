@@ -13,21 +13,16 @@ from classes.settings import Settings
 
 
 cow_roles = {
-	'OWL-Notify': '<@&481314680665538569>',
-	'OWL-News': '<@&517000617290367016>',
+	'OWCSNotify': '<@&481314680665538569>',
+	'OWCSAPAC': '<@&481315112993554433>',
+	'OWCSNA': '<@&481315228529721344>',
+	'OWCSEU': '<@&481315364345479169>',
+	'OWCSCN': '<@&481315825802936320>',
 	'Game-News': '<@&517000502924279808>',
 	'Community-News': '<@&517000366735228929>',
-	'KRContenders': '<@&481315112993554433>',
-	'NAContenders': '<@&481315228529721344>',
-	'PAContenders': '<@&481315465340387328>',
-	'EUContenders': '<@&481315364345479169>',
-	'SAContenders': '<@&481315668721926144>',
-	'CNContenders': '<@&481315825802936320>',
-	'AUContenders': '<@&481315928865505280>',
 	'OWWC': '<@&481316090270711820>',
 	'All-Matches': '<@&517000657111220229>',
 	'All-Notify': '<@&481316252661579786>',
-	'OWCS-Notify': '<@&481314680665538569>',
 	'here': '@here',
 	'everyone': '@everyone'
 }
@@ -203,6 +198,13 @@ def render_settings_wiki(settings, username, events):
 		f"kill"
 	))
 	bldr.append(")**")
+
+	bldr.append("\n\n")
+	bldr.append("Ping role\n")
+	bldr.append("---\n")
+	for role in cow_roles.keys():
+		bldr.append(role)
+		bldr.append("\n")
 
 	bldr.append("\n\n")
 

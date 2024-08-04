@@ -25,7 +25,7 @@ class Event(DirtyMixin):
 	leave_thread_minutes_after: int = None
 	use_pending_changes: bool = False
 
-	discord_key: str = None
+	discord_key: str = "cow"
 	discord_minutes_before: int = 15
 	discord_roles: List[str] = field(default_factory=lambda: utils.DEFAULT_ROLES.copy())
 

@@ -19,10 +19,10 @@ def get_text_from_paths(base_node, paths):
 
 
 if __name__ == "__main__":
-	page_url = "https://liquipedia.net/overwatch/Overwatch_Champions_Series/2024/Asia/Stage_1/Main_Event"
-	category = "ASIA"
+	page_url = "https://liquipedia.net/overwatch/Esports_World_Cup/2024"
+	categories = ["ASIA","NA","EU"]
 
-	categories = {
+	category_mapping = {
 		"OWL": "Overwatch League Teams",
 		"OWWC": "Overwatch World Cup",
 		"NA": "OWCS NA",
@@ -31,7 +31,9 @@ if __name__ == "__main__":
 		"College": "Collegiate",
 		"Legacy": "Legacy Team Flairs",
 	}
-	category_name = categories[category]
+	category_names = []
+	for category in categories:
+		category_names.append(category_mapping[category])
 	output_folder = r"C:\Users\greg\Downloads\flairs"
 	if not os.path.exists(output_folder):
 		os.makedirs(output_folder)
@@ -43,11 +45,15 @@ if __name__ == "__main__":
 	flairs_response = requests.get(url="http://rcompetitiveoverwatch.com/static/data/flairs.json",	headers={'User-Agent': "team_parser"}, timeout=5)
 	json_data = json.loads(flairs_response.text)
 	category_existing_flairs = {}
+	category_existing_flairs_names = {}
 	all_flairs = {}
+	all_flairs_names = {}
 	for flair_short_name, flair in json_data.items():
 		all_flairs[flair['short_name']] = flair
-		if flair['category'] == category_name:
+		all_flairs_names[flair['name']] = flair
+		if flair['category'] in category_names:
 			category_existing_flairs[flair['short_name']] = flair
+			category_existing_flairs_names[flair['name']] = flair
 
 	page_result = requests.get(page_url, headers={'User-Agent': "team_parser"}, timeout=5)
 	tree = etree.fromstring(page_result.text, etree.HTMLParser())
@@ -60,10 +66,11 @@ if __name__ == "__main__":
 		if team_name is None or "default_lightmode" in team_image:
 			continue
 		flair = {
-			"short_name": team_name.lower().replace(' ', '-'),
+			"short_name": team_name.lower().replace(' ', '-').replace('.', '-'),
 			"name": team_name,
-			"category": category_name,
 		}
+		if len(category_names) == 1:
+			flair["category"] = category_names[0]
 		liquipedia_flairs[flair["short_name"]] = flair
 
 		log.info(f"Found team on liquipedia: {team_name}")
@@ -75,22 +82,28 @@ if __name__ == "__main__":
 	log.info(f"---------------------------------------------")
 
 	for flair_short_name, flair in liquipedia_flairs.items():
-		if flair['short_name'] not in category_existing_flairs:
-			if flair['short_name'] not in all_flairs:
+		reddit_flair = category_existing_flairs.get(flair['short_name']) or category_existing_flairs_names.get(flair['name'])
+		if not reddit_flair:
+			reddit_flair = all_flairs.get(flair['short_name']) or all_flairs_names.get(flair['name'])
+			if not reddit_flair:
 				new_flair_url = \
 					f"{new_flair_base_url}" \
 					f"short_name={flair['short_name']}&" \
 					f"flairsheet=teams&" \
-					f"name={(flair['name'].replace(' ', '%20'))}&" \
-					f"category={(flair['category'].replace(' ', '%20'))}"
+					f"name={(flair['name'].replace(' ', '%20'))}" \
+					f"{('&category='+(flair['category'].replace(' ', '%20')) if 'category' in flair else '')}"
 				log.info(f"{flair['name']} doesn't exist: {new_flair_url}")
 
+			elif 'category' in flair:
+				log.info(f"{flair['name']} wrong category {reddit_flair['category']} to {flair['category']}: {edit_flair_base_url}{reddit_flair['id']}")
+
 			else:
-				log.info(f"{flair['name']} wrong category {all_flairs[flair['short_name']]['category']} to {flair['category']}: {edit_flair_base_url}{all_flairs[flair['short_name']]['id']}")
+				log.info(f"{flair['name']} in category {reddit_flair['category']}: {edit_flair_base_url}{reddit_flair['id']}")
 
 		else:
-			log.info(f"{flair['name']} correct, check image: {edit_flair_base_url}{all_flairs[flair['short_name']]['id']}")
+			log.info(f"{flair['name']} correct, check image: {edit_flair_base_url}{reddit_flair['id']}")
 
-	for flair_short_name, flair in category_existing_flairs.items():
-		if flair_short_name not in liquipedia_flairs:
-			log.info(f"{flair['name']} on flair site but not liquipedia: {edit_flair_base_url}{flair['id']}")
+	if len(category_names) == 1:
+		for flair_short_name, flair in category_existing_flairs.items():
+			if flair_short_name not in liquipedia_flairs:
+				log.info(f"{flair['name']} on flair site but not liquipedia: {edit_flair_base_url}{flair['id']}")
