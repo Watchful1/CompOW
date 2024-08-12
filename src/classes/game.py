@@ -44,7 +44,7 @@ class Game(DirtyMixin):
 	def matches_approx(self, game):
 		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
 			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
-			timestamp_within(self.date_time, game.date_time, timedelta(minutes=45))
+			timestamp_within(self.date_time, game.date_time, timedelta(minutes=90))
 
 	def merge(self, game):
 		if self.home != game.home:
