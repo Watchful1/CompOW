@@ -432,7 +432,7 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 			f"enablespoilers:{match_day.id}:{not match_day.spoiler_prevention}"
 		)
 		bldr.append(")\n\n")
-		if match_day.spoiler_prevention:
+		if not match_day.spoiler_prevention:
 			bldr.append(f"Teams will be SHOWN in post match thread titles. If this is wrong, ping an active moderator and they can ")
 			bldr.append(f"[click here to hide them]({link}).\n\n")
 		else:

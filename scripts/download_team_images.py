@@ -19,8 +19,8 @@ def get_text_from_paths(base_node, paths):
 
 
 if __name__ == "__main__":
-	page_url = "https://liquipedia.net/overwatch/Esports_World_Cup/2024"
-	categories = ["ASIA","NA","EU"]
+	page_url = "https://liquipedia.net/overwatch/Overwatch_Collegiate_Championship/2024"
+	categories = ["College"]
 
 	category_mapping = {
 		"OWL": "Overwatch League Teams",
