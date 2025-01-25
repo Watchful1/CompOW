@@ -50,7 +50,11 @@ def extract_details(tree):
 		if found_links:
 			hrefs = div.xpath(".//a[@class='external text']/@href")
 			for href in hrefs:
-				if "youtube.com" in href or "twitch.tv" in href:
+				if ("youtube.com" in href or
+					"twitch.tv" in href or
+					"afreecatv.com" in href or
+					"sooplive.co.kr" in href
+				):
 					streams.append(href)
 			break
 
