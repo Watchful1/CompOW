@@ -535,10 +535,11 @@ def render_discord(event, match_day, flairs, short=False):
 
 			bldr.append("\n\n")
 
-	bldr.append(":tv:")
-	bldr.append("<")
-	bldr.append(event.streams[0])
-	bldr.append(">\n")
+	if len(event.streams):
+		bldr.append(":tv:")
+		bldr.append("<")
+		bldr.append(event.streams[0])
+		bldr.append(">\n")
 
 	# bldr.append(":information_source:")
 	# bldr.append("<")
