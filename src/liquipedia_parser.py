@@ -18,7 +18,11 @@ def get_page_text(page_url):
 	try:
 		result = requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5)
 		counters.queries.labels(site="liquipedia", response=str(result.status_code)).inc()
-		return result.text
+		if not result.ok:
+			log.info(f"{result.status_code} fetching match page: {page_url}")
+			return None
+		else:
+			return result.text
 	except requests.ReadTimeout as err:
 		counters.queries.labels(site="liquipedia", response="timeout").inc()
 		log.info(f"ReadTimeout fetching match page: {err} : {page_url}")
