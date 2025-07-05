@@ -11,6 +11,7 @@ pytz = "*"
 discord-logging = {git = "https://github.com/Watchful1/DiscordLogging.git"}
 jsons = "*"
 prometheus-client = "*"
+fake-useragent = "*"
 
 [dev-packages]
 pytest = "*"

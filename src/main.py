@@ -26,6 +26,7 @@ if __name__ == "__main__":
 	parser.add_argument('--verbose', '-v', help="Increase the log level", action='count', default=0)
 	parser.add_argument("--debug", help="Set the log level to debug", action='store_const', const=True, default=False)
 	parser.add_argument("--run_timestamp", help="Set the current time to this value for debugging (23-01-01 14:36)", type=lambda s: datetime.strptime(s, '%y-%m-%d %H:%M'))
+	parser.add_argument("--use_proxy", help="Use a proxy", action='store_const', const=True, default=False)
 	args = parser.parse_args()
 
 	if args.verbose == 1:
@@ -38,6 +39,17 @@ if __name__ == "__main__":
 
 	if args.run_timestamp:
 		utils.DEBUG_NOW = args.run_timestamp
+
+	proxy_creds = None
+	if args.use_proxy:
+		try:
+			praw_config = discord_logging.get_config()
+			proxy_username = discord_logging.get_config_var(praw_config, "OWMatchThreads", "proxy_username")
+			proxy_password = discord_logging.get_config_var(praw_config, "OWMatchThreads", "proxy_password")
+			proxy_creds = {"username": proxy_username, "password": proxy_password}
+			log.info(f"Proxy loaded")
+		except ValueError as err:
+			log.info(f"Proxy not loaded: {err}")
 
 	reddit = Reddit(args.user, args.subreddit, args.no_post)
 	# TODO cache flairs locally
@@ -93,7 +105,7 @@ if __name__ == "__main__":
 		try:
 			if update_events and not transient_error:
 				counters.process.labels(type="events").inc()
-				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs, first_loop)
+				timestamps["events"] = event_manager.update_events(reddit, event_dict, flairs, first_loop, proxy_creds)
 		except Exception as err:
 			transient_error = utils.process_error(f"Error updating events", err, traceback.format_exc())
 			if not transient_error:

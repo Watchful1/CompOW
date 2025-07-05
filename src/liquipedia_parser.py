@@ -3,6 +3,7 @@ from lxml import etree
 import requests
 import discord_logging
 import pytz
+from fake_useragent import UserAgent
 from datetime import datetime, timedelta
 
 log = discord_logging.get_logger()
@@ -14,12 +15,17 @@ from classes.game import Game
 from classes.settings import DirtyMixin
 
 
-def get_page_text(page_url):
+def get_page_text(page_url, proxy_creds=None):
 	try:
-		result = requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5)
+		if proxy_creds is not None:
+			proxy_url = f'http://customer-{proxy_creds["username"]}-cc-US:{proxy_creds["password"]}@pr.oxylabs.io:7777'
+			proxies = {"https": proxy_url, "http": proxy_url}
+			result = requests.get(page_url, headers={'User-Agent': UserAgent().chrome}, proxies=proxies, timeout=5)
+		else:
+			result = requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5)
 		counters.queries.labels(site="liquipedia", response=str(result.status_code)).inc()
 		if not result.ok:
-			log.info(f"{result.status_code} fetching match page: {page_url}")
+			log.warning(f"{result.status_code} fetching match page: {page_url}")
 			return None
 		else:
 			return result.text
@@ -72,8 +78,8 @@ def extract_details(tree):
 	return streams
 
 
-def parse_details_page(page_url):
-	page_string = get_page_text(page_url)
+def parse_details_page(page_url, proxy_creds=None):
+	page_string = get_page_text(page_url, proxy_creds=proxy_creds)
 	if page_string is None:
 		return []
 	tree = etree.fromstring(page_string, etree.HTMLParser())
@@ -83,9 +89,9 @@ def parse_details_page(page_url):
 	return streams
 
 
-def parse_event(page_url):
+def parse_event(page_url, proxy_creds=None):
 	# TODO parse out the match day and bracket levels
-	page_string = get_page_text(page_url)
+	page_string = get_page_text(page_url, proxy_creds=proxy_creds)
 	if page_string is None:
 		return None, None, None
 	tree = etree.fromstring(page_string, etree.HTMLParser())
@@ -160,23 +166,23 @@ def parse_event(page_url):
 	return games, event_name, streams
 
 
-def update_event(event, username=None, approve_complete=False):
+def update_event(event, username=None, approve_complete=False, proxy_creds=None):
 	url = event.url
 	if event.use_pending_changes:
 		url = url + "?stable=0"
 	log.debug(f"Pulling page from liquipedia: {url}")
-	games, event_name, streams = parse_event(url)
+	games, event_name, streams = parse_event(url, proxy_creds=proxy_creds)
 	if games is None:
 		return
 	if event.details_url is not None:
-		details_streams = parse_details_page(event.details_url)
+		details_streams = parse_details_page(event.details_url, proxy_creds=proxy_creds)
 		for stream in details_streams:
 			if stream not in streams:
 				streams.append(stream)
 	elif not len(streams):
 		last_slash = event.url.rfind('/')
 		if last_slash > 0:
-			details_streams = parse_details_page(event.url[:last_slash])
+			details_streams = parse_details_page(event.url[:last_slash], proxy_creds=proxy_creds)
 			for stream in details_streams:
 				if stream not in streams:
 					streams.append(stream)

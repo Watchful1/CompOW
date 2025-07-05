@@ -11,11 +11,11 @@ import string_utils
 from classes.settings import Settings
 
 
-def update_events(reddit, events, flairs, force_parse=False):
+def update_events(reddit, events, flairs, force_parse=False, proxy_creds=None):
 	active_event = False
 	for event in events.values():
 		if force_parse or event.should_parse():
-			liquipedia_parser.update_event(event, reddit.user)
+			liquipedia_parser.update_event(event, reddit.user, proxy_creds=proxy_creds)
 
 		for match_day in event.match_days:
 			# post initial thread
