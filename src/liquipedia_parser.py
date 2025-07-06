@@ -1,3 +1,4 @@
+import time
 import traceback
 from lxml import etree
 import requests
@@ -15,11 +16,13 @@ from classes.game import Game
 from classes.settings import DirtyMixin
 
 
-def get_page_text(page_url, proxy_creds=None):
+def get_page_text(page_url, proxy_creds=None, retries=0):
 	try:
 		if proxy_creds is not None:
 			proxy_url = f'http://customer-{proxy_creds["username"]}-cc-US:{proxy_creds["password"]}@pr.oxylabs.io:7777'
 			proxies = {"https": proxy_url, "http": proxy_url}
+
+
 			result = requests.get(page_url, headers={'User-Agent': UserAgent().chrome}, proxies=proxies, timeout=5)
 		else:
 			result = requests.get(page_url, headers={'User-Agent': utils.USER_AGENT}, timeout=5)
@@ -35,8 +38,13 @@ def get_page_text(page_url, proxy_creds=None):
 		return None
 	except Exception as err:
 		counters.queries.labels(site="liquipedia", response="err").inc()
-		log.warning(f"Unable to fetch match page: {err} : {page_url}")
-		raise
+		if retries < 5:
+			log.info(f"{retries} fetching match page, sleeping 30 seconds: {err} : {page_url}")
+			time.sleep(30)
+			return get_page_text(page_url, proxy_creds, retries + 1)
+		else:
+			log.warning(f"Unable to fetch match page after {retries} retries: {err} : {page_url}")
+			raise
 
 
 def get_text_from_paths(base_node, paths):
