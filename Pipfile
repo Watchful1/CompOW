@@ -12,6 +12,8 @@ discord-logging = {git = "https://github.com/Watchful1/DiscordLogging.git"}
 jsons = "*"
 prometheus-client = "*"
 fake-useragent = "*"
+wikitextparser = "*"
+mwparserfromhell = "*"
 
 [dev-packages]
 pytest = "*"

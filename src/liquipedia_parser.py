@@ -97,6 +97,15 @@ def parse_details_page(page_url, proxy_creds=None):
 	return streams
 
 
+def parse_event_markdown(page_url, proxy_creds=None):
+	page_string = get_page_text(page_url, proxy_creds=proxy_creds)
+	if page_string is None:
+		return None, None, None
+
+	return page_string
+
+
+
 def parse_event(page_url, proxy_creds=None):
 	# TODO parse out the match day and bracket levels
 	page_string = get_page_text(page_url, proxy_creds=proxy_creds)
@@ -114,7 +123,9 @@ def parse_event(page_url, proxy_creds=None):
 	DirtyMixin.log = False
 	games = []
 
-	game_nodes = tree.xpath("//div[@class='brkts-popup brkts-match-info-popup']")
+	game_nodes = tree.xpath("//div[contains(@class, 'brkts-matchlist-match')]")
+	if not len(game_nodes):
+		game_nodes = tree.xpath("//div[@class='brkts-popup brkts-match-info-popup']")
 	if not len(game_nodes):
 		game_nodes = tree.xpath("//tr[@class='match-row']")
 	for node in game_nodes:
