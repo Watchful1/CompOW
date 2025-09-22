@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime, timezone, timedelta
 
 import discord_logging
 from lxml import etree
@@ -22,6 +23,111 @@ def is_match(node):
 	return False
 
 
+def param_from_template_name(template, name):
+	param = template.get(name)
+	if param is None:
+		return None
+	templates = param.value.filter_templates()
+	if len(templates) == 0:
+		return None
+	single_template = templates[0]
+	if len(single_template.params) == 0:
+		return None
+	return single_template.get(1).value.strip()
+
+
+timezones = {
+	"ACST": [9, 30],
+	"ACDT": [10, 30],
+	"ADT": [-3, 0],
+	"AEDT": [11, 0],
+	"AEST": [10, 0],
+	"AKST": [-9, 0],
+	"AKDT": [-8, 0],
+	"ALMT": [5, 0],
+	"AMT": [4, 0],
+	"AQTT": [5, 0],
+	"ART": [-3, 0],
+	"AST": [3, 0],
+	"AZT": [4, 0],
+	"BOT": [-4, 0],
+	"BRST": [-2, 0],
+	"BRT": [-3, 0],
+	"BNT": [8, 0],
+	"BST": [1, 0],
+	"CAT": [2, 0],
+	"CEST": [2, 0],
+	"CET": [1, 0],
+	"COT": [-5, 0],
+	"CLST": [-3, 0],
+	"CLT": [-4, 0],
+	"CST": [8, 0],
+	"CDT": [-5, 0],
+	"CT": [-6, 0],
+	"EAT": [3, 0],
+	"ECT": [-5, 0],
+	"EDT": [-4, 0],
+	"EEST": [3, 0],
+	"EET": [2, 0],
+	"EST": [-5, 0],
+	"GET": [4, 0],
+	"GMT": [0, 0],
+	"GST": [4, 0],
+	"HKT": [8, 0],
+	"IDT": [3, 0],
+	"IRDT": [4, 30],
+	"IRST": [3, 30],
+	"IST": [5, 30],
+	"JST": [9, 0],
+	"KGT": [6, 0],
+	"KST": [9, 0],
+	"MDT": [-6, 0],
+	"MMT": [6, 30],
+	"MSK": [3, 0],
+	"MST": [-7, 0],
+	"MUT": [4, 0],
+	"MVT": [5, 0],
+	"MYT": [8, 0],
+	"NPT": [5, 45],
+	"NZDT": [13, 0],
+	"NZST": [12, 0],
+	"PDT": [-7, 0],
+	"PET": [-5, 0],
+	"PHST": [8, 0],
+	"PHT": [8, 0],
+	"PKT": [5, 0],
+	"PST": [-8, 0],
+	"PYT": [-4, 0],
+	"SAST": [2, 0],
+	"SGT": [8, 0],
+	"THA": [7, 0],
+	"ICT": [7, 0],
+	"TJT": [5, 0],
+	"TMT": [5, 0],
+	"TRT": [3, 0],
+	"TST": [8, 0],
+	"ULAT": [8, 0],
+	"UTC": [0, 0],
+	"UZT": [5, 0],
+	"VET": [-4, 0],
+	"VLAT": [10, 0],
+	"WAT": [1, 0],
+	"WEST": [1, 0],
+	"WET": [0, 0],
+	"WIB": [7, 0],
+	"WITA": [8, 0],
+}
+
+
+def get_timezone(timezone_name):
+	if timezone_name not in timezones:
+		log.info(f"Timezone not found: {timezone_name}")
+		return None
+
+	timezone_hours, timezone_minutes = timezones.get(timezone_name)
+	return timezone(-timedelta(hours=timezone_hours, minutes=timezone_minutes))
+
+
 if __name__ == "__main__":
 	#url = "https://liquipedia.net/overwatch/api.php?action=query&meta=siteinfo&titles=Overwatch_Champions_Series/2025/NA/Stage_3/Regular_Season&exportnowrap=true&format=json"
 	url = "https://liquipedia.net/overwatch/api.php?action=parse&meta=siteinfo&titles=Overwatch_Champions_Series/2025/NA/Stage_3/Regular_Season&exportnowrap=true&format=json"
@@ -37,24 +143,60 @@ if __name__ == "__main__":
 
 	wikicode = mwparserfromhell.parse(page_content)
 
-	for node in wikicode.ifilter(recursive=False):
-		if is_match(node):
-			pass
+	templates = wikicode.filter_templates()
+	for template in templates:
+		if template.name.strip() == "Match":
+			log.info(template)
+			team1_name = param_from_template_name(template, "opponent1")
+			log.info(team1_name)
+			team2_name = param_from_template_name(template, "opponent2")
+			log.info(team2_name)
 
-		# for node2 in node.ifilter(recursive=False):
-		# 	if is_match(node2):
-		# 		pass
-		# 	for node3 in node2.ifilter(recursive=False):
-		# 		if is_match(node3):
-		# 			pass
-		# if 'name' in node and str(node.name) == "Matchlist":
-		# 	log.info(f"name: {node.name}")
-		# log.info(node)
-		# log.info("-"*60)
+			date_code = template.get("date").value
+			date_str = date_code.nodes[0].strip()
+			date_timezone = date_code.nodes[1].name
+			date_timezone = date_timezone.split("/")[1]
 
-	sys.exit()
+			timezone_obj = get_timezone(date_timezone)
+			timezone_datetime = datetime.strptime(date_str, "%Y-%m-%d - %H:%M").replace(tzinfo=timezone_obj)
 
-	parsed = wtp.parse(page_content)
+			game_datetime = timezone_datetime.astimezone(get_timezone("UTC"))
+			log.info(game_datetime)
+
+			team1_wins, team2_wins, total_maps = 0, 0, 0
+			for map_num in range(1, 15):
+				if not template.has(f"map{map_num}"):
+					break
+				total_maps += 1
+				map_code = template.get(f"map{map_num}").value
+				map_template = map_code.filter_templates()[0]
+				map_winner = map_template.get("winner").value.strip()
+				if map_winner:
+					if map_winner == "1":
+						team1_wins += 1
+					elif map_winner == "2":
+						team2_wins += 1
+					else:
+						log.info(f"something went wrong: {map_winner}")
+
+			game_complete = False
+			if team1_wins > total_maps / 2 or team2_wins > total_maps / 2:
+				if team1_wins > team2_wins:
+					game_complete = True
+					log.info(f"{team1_name} wins {team1_wins} to {team2_wins}")
+				elif team1_wins < team2_wins:
+					game_complete = True
+					log.info(f"{team2_name} wins {team2_wins} to {team1_wins}")
+				else:
+					log.info(f"Something's wrong. Wins greater than half maps, but still tied")
+			elif team1_wins + team2_wins > 0:
+				log.info(f"Game in progress")
+			elif team1_wins + team2_wins == 0:
+				log.info(f"Game not started")
+			else:
+				log.info(f"Something went wrong determining winner")
+
+
 
 	sys.exit()
 
