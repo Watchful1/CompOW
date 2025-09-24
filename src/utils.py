@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import pytz
 import discord_logging
 import prawcore
@@ -22,6 +22,87 @@ AUTHORIZED_USERS = {
 }
 DEBUG_NOW = None
 DEFAULT_ROLES = ['All-Notify', 'All-Matches']
+TIMEZONES = {
+	"ACST": [9, 30],
+	"ACDT": [10, 30],
+	"ADT": [-3, 0],
+	"AEDT": [11, 0],
+	"AEST": [10, 0],
+	"AKST": [-9, 0],
+	"AKDT": [-8, 0],
+	"ALMT": [5, 0],
+	"AMT": [4, 0],
+	"AQTT": [5, 0],
+	"ART": [-3, 0],
+	"AST": [3, 0],
+	"AZT": [4, 0],
+	"BOT": [-4, 0],
+	"BRST": [-2, 0],
+	"BRT": [-3, 0],
+	"BNT": [8, 0],
+	"BST": [1, 0],
+	"CAT": [2, 0],
+	"CEST": [2, 0],
+	"CET": [1, 0],
+	"COT": [-5, 0],
+	"CLST": [-3, 0],
+	"CLT": [-4, 0],
+	"CST": [8, 0],
+	"CDT": [-5, 0],
+	"CT": [-6, 0],
+	"EAT": [3, 0],
+	"ECT": [-5, 0],
+	"EDT": [-4, 0],
+	"EEST": [3, 0],
+	"EET": [2, 0],
+	"EST": [-5, 0],
+	"GET": [4, 0],
+	"GMT": [0, 0],
+	"GST": [4, 0],
+	"HKT": [8, 0],
+	"IDT": [3, 0],
+	"IRDT": [4, 30],
+	"IRST": [3, 30],
+	"IST": [5, 30],
+	"JST": [9, 0],
+	"KGT": [6, 0],
+	"KST": [9, 0],
+	"MDT": [-6, 0],
+	"MMT": [6, 30],
+	"MSK": [3, 0],
+	"MST": [-7, 0],
+	"MUT": [4, 0],
+	"MVT": [5, 0],
+	"MYT": [8, 0],
+	"NPT": [5, 45],
+	"NZDT": [13, 0],
+	"NZST": [12, 0],
+	"PDT": [-7, 0],
+	"PET": [-5, 0],
+	"PHST": [8, 0],
+	"PHT": [8, 0],
+	"PKT": [5, 0],
+	"PST": [-8, 0],
+	"PYT": [-4, 0],
+	"SAST": [2, 0],
+	"SGT": [8, 0],
+	"THA": [7, 0],
+	"ICT": [7, 0],
+	"TJT": [5, 0],
+	"TMT": [5, 0],
+	"TRT": [3, 0],
+	"TST": [8, 0],
+	"ULAT": [8, 0],
+	"UTC": [0, 0],
+	"UZT": [5, 0],
+	"VET": [-4, 0],
+	"VLAT": [10, 0],
+	"WAT": [1, 0],
+	"WEST": [1, 0],
+	"WET": [0, 0],
+	"WIB": [7, 0],
+	"WITA": [8, 0],
+}
 
 
 def process_error(message, exception, traceback):
@@ -39,6 +120,15 @@ def process_error(message, exception, traceback):
 		log.warning(traceback)
 
 	return is_transient
+
+
+def get_timezone(timezone_name):
+	if timezone_name not in TIMEZONES:
+		log.info(f"Timezone not found: {timezone_name}")
+		return None
+
+	timezone_hours, timezone_minutes = TIMEZONES.get(timezone_name)
+	return timezone(-timedelta(hours=timezone_hours, minutes=timezone_minutes))
 
 
 def base36encode(integer: int) -> str:

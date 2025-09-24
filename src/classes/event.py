@@ -14,7 +14,7 @@ from classes.settings import DirtyMixin
 
 @dataclass
 class Event(DirtyMixin):
-	url: str = None
+	title: str = None
 	id: str = field(default_factory=get_random_id)
 	name: str = None
 	streams: List[str] = field(default_factory=list)
@@ -23,26 +23,16 @@ class Event(DirtyMixin):
 	post_match_threads: bool = False
 	match_thread_minutes_before: int = 15
 	leave_thread_minutes_after: int = None
-	use_pending_changes: bool = False
+	#use_pending_changes: bool = False
 
 	discord_key: str = "cow"
 	discord_minutes_before: int = 15
 	discord_roles: List[str] = field(default_factory=lambda: utils.DEFAULT_ROLES.copy())
 
-	details_url: str = None
+	details_title: str = None
 	cached_name: str = None
-	last_parsed: datetime = None
+	last_revid: datetime = None
 	last_pinged: datetime = None
-
-	def should_parse(self):
-		if self.last_parsed is None:
-			return True
-		next_game = self.get_next_game(approved=True, pending=True)
-		if next_game is not None and minutes_to_start(next_game.date_time) < (4 * 60):  # if less than 4 hours to game start, scan faster
-			return True
-		if utcnow(offset=-20 * 60) > self.last_parsed:  # otherwise only scan every 20 minutes
-			return True
-		return False
 
 	def is_dirty(self):
 		if self._dirty:
@@ -58,7 +48,7 @@ class Event(DirtyMixin):
 			match_day.clean()
 
 	def wiki_name(self):
-		return "events/"+self.name.replace(" ", "-").replace("/", "-").replace(":", "").replace("---", "-").replace("--", "-").lower()
+		return "events/"+self.title
 
 	def get_match_day(self, match_day_id):
 		for match_day in self.match_days:

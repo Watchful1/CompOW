@@ -74,7 +74,7 @@ def render_event_wiki(event, username):
 		f"post_match_threads:{event.post_match_threads}",
 		f"match_thread_minutes_before:{event.match_thread_minutes_before}",
 		f"leave_thread_minutes_after:{event.leave_thread_minutes_after}",
-		f"use_pending_changes:{event.use_pending_changes}",
+		#f"use_pending_changes:{event.use_pending_changes}",
 		f"discord_key:{event.discord_key}",
 		f"discord_minutes_before:{event.discord_minutes_before}",
 		f"discord_roles:{','.join(event.discord_roles)}",

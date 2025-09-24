@@ -188,9 +188,9 @@ def update_settings(line, event, reddit):
 	elif key == "leave_thread_minutes_after" and int_val is not None and event.leave_thread_minutes_after != int_val:
 		result = f"leave_thread_minutes_after from {event.leave_thread_minutes_after} to {int_val}"
 		event.leave_thread_minutes_after = int_val
-	elif key == "use_pending_changes" and bool_val is not None and event.use_pending_changes is not bool_val:
-		result = f"use_pending_changes from {event.use_pending_changes} to {bool_val}"
-		event.use_pending_changes = bool_val
+	# elif key == "use_pending_changes" and bool_val is not None and event.use_pending_changes is not bool_val:
+	# 	result = f"use_pending_changes from {event.use_pending_changes} to {bool_val}"
+	# 	event.use_pending_changes = bool_val
 	elif key == "discord_key" and event.discord_key != value:
 		result = f"discord_key from {event.discord_key} to {value}"
 		event.discord_key = value
