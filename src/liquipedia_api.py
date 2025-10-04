@@ -251,7 +251,7 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			continue
 
 		if found_event.last_revid == api_page_latest_rev:
-			log.info(f"{api_page_title}: revid didnt change")
+			log.debug(f"{api_page_title}: revid didnt change")
 			continue
 
 		log.info(f"{api_page_title}: {found_event.last_revid} to {api_page_latest_rev}")
