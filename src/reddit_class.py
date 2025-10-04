@@ -358,13 +358,17 @@ class Reddit:
 			counters.queries.labels(site="reddit", response="error").inc()
 			pass
 
+		page_content = string_utils.render_event_wiki(event, self.user)
+		log.trace(page_content)
+		page_title = event.wiki_name()
+		log.trace(page_title)
 		if self.debug:
 			log.info(f"Creating page: {event.wiki_name()}")
 		else:
 			log.debug(f"Creating page: {event.wiki_name()}")
 			self.reddit.subreddit(self.subreddit).wiki.create(
-				name=event.wiki_name(),
-				content=string_utils.render_event_wiki(event, self.user),
+				name=page_title,
+				content=page_content,
 				reason="Creating new event"
 			)
 			counters.queries.labels(site="reddit", response="success").inc()

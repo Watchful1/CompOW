@@ -31,7 +31,7 @@ class Event(DirtyMixin):
 
 	details_title: str = None
 	cached_name: str = None
-	last_revid: datetime = None
+	last_revid: str = None
 	last_pinged: datetime = None
 
 	def is_dirty(self):
@@ -42,13 +42,16 @@ class Event(DirtyMixin):
 				return True
 		return False
 
+	def get_url(self):
+		return "https://liquipedia.net/overwatch/" + self.title
+
 	def clean(self):
 		self._dirty = False
 		for match_day in self.match_days:
 			match_day.clean()
 
 	def wiki_name(self):
-		return "events/"+self.title
+		return "events/"+self.title.replace(" ", "-").replace("/", "-").replace(":", "").replace("---", "-").replace("--", "-").lower()
 
 	def get_match_day(self, match_day_id):
 		for match_day in self.match_days:

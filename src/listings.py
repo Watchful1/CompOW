@@ -16,7 +16,7 @@ def update_sidebar(reddit, all_game_pairs, flairs):
 		if game.complete:
 			continue
 		bldr.append(
-			f">[]({event.url})\n"
+			f">[]({event.get_url()})\n"
 			f">###{event.name}\n"
 			f">###{string_utils.make_time_string(game.date_time)}\n"
 			f">###{game.home.name}\n"

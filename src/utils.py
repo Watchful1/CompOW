@@ -128,7 +128,7 @@ def get_timezone(timezone_name):
 		return None
 
 	timezone_hours, timezone_minutes = TIMEZONES.get(timezone_name)
-	return timezone(-timedelta(hours=timezone_hours, minutes=timezone_minutes))
+	return timezone(timedelta(hours=timezone_hours, minutes=timezone_minutes))
 
 
 def base36encode(integer: int) -> str:

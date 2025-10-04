@@ -25,6 +25,11 @@ stream_providers = {
 }
 
 
+def parse_details_page(details_title, proxy_creds=None):
+	games, event_name, streams, rev_id = parse_event(details_title, proxy_creds=proxy_creds, parse_matches=False)
+	return streams
+
+
 def call_api(page_url, proxy_creds=None, retries=0):
 	log.debug(f"Calling api url: {page_url}")
 	try:
@@ -69,11 +74,16 @@ def param_from_template_name(template, name):
 	return single_template.get(1).value.strip()
 
 
-def parse_event(page_title, proxy_creds=None):
-	base_url = "https://liquipedia.net/overwatch/api.php?action=query&prop=revisions&rvprop=content|timestamp|ids&titles={}&format=json&rvslots=main"
-	api_result = call_api(base_url.format(page_title), proxy_creds)
+def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=True, print_templates=False):
+	rev_id = "none"
+	if page_content is None:
+		base_url = "https://liquipedia.net/overwatch/api.php?action=query&prop=revisions&rvprop=content|timestamp|ids&titles={}&format=json&rvslots=main"
+		api_result = call_api(base_url.format(page_title), proxy_creds)
 
-	page_content = api_result["query"]["pages"][0]["revisions"][0]["slots"]["main"]["*"]
+		first_page = next(iter(api_result["query"]["pages"].values()))
+
+		page_content = first_page["revisions"][0]["slots"]["main"]["*"]
+		rev_id = str(first_page["revisions"][0]["revid"])
 
 	wikicode = mwparserfromhell.parse(page_content)
 
@@ -86,17 +96,19 @@ def parse_event(page_title, proxy_creds=None):
 			event_name = template_name[len("DISPLAYTITLE")+1:]
 			log.debug(event_name)
 		elif template_name == "Infobox league":
-			log.info(template)
+			if print_templates:
+				log.debug(template)
 			for param_name in stream_providers.keys():
-				param = template.get(param_name)
-				if param is None:
+				if not template.has(param_name):
 					continue
+				param = template.get(param_name)
 				stream = f"{stream_providers[param_name]}{param.value.strip()}"
 				streams.append(stream)
-				log.info(stream)
-		elif template_name == "Match":
+				log.debug(stream)
+		elif parse_matches and template_name == "Match":
 			game = Game()
-			log.debug(template)
+			if print_templates:
+				log.debug(template)
 			game.home.name = param_from_template_name(template, "opponent1")
 			log.debug(game.home.name)
 			game.away.name = param_from_template_name(template, "opponent2")
@@ -111,8 +123,8 @@ def parse_event(page_title, proxy_creds=None):
 				timezone_obj = utils.get_timezone(date_timezone)
 				timezone_datetime = datetime.strptime(date_str, "%Y-%m-%d - %H:%M").replace(tzinfo=timezone_obj)
 
-				game_datetime = timezone_datetime.astimezone(utils.get_timezone("UTC"))
-				log.debug(game_datetime)
+				game.date_time = timezone_datetime.astimezone(utils.get_timezone("UTC"))
+				log.debug(game.date_time)
 			else:
 				log.debug("Game has no date")
 
@@ -131,8 +143,8 @@ def parse_event(page_title, proxy_creds=None):
 						team2_wins += 1
 					else:
 						log.warning(f"something went wrong: {map_winner}")
-			game.home.set_score(team1_wins)
-			game.away.set_score(team2_wins)
+			game.home.score = team1_wins
+			game.away.score = team2_wins
 
 			if team1_wins > total_maps / 2 or team2_wins > total_maps / 2:
 				if team1_wins > team2_wins:
@@ -149,6 +161,10 @@ def parse_event(page_title, proxy_creds=None):
 				log.debug(f"Game not started")
 			else:
 				log.warning(f"Something went wrong determining winner")
+
+			if game.home.name in ["BYE", ""] or game.away.name in ["BYE", ""] or game.date_time is None:
+				continue
+
 			games.append(game)
 
 	try:
@@ -160,23 +176,69 @@ def parse_event(page_title, proxy_creds=None):
 		raise
 	DirtyMixin.log = True
 
-	return games, event_name, streams
+	return games, event_name, streams, rev_id
 
 
 def update_event(event, username=None, approve_complete=False, proxy_creds=None):
-	parse_event(event.title, proxy_creds)
+	log.debug(f"Updating event: {event.title}")
+	games, event_name, streams, rev_id = parse_event(event.title, proxy_creds=proxy_creds)
+	if games is None:
+		return
+	if event.details_title is not None:
+		details_streams = parse_details_page(event.details_title, proxy_creds=proxy_creds)
+		for stream in details_streams:
+			if stream not in streams:
+				streams.append(stream)
+	elif not len(streams):
+		last_slash = event.title.rfind('/')
+		if last_slash > 0:
+			details_streams = parse_details_page(event.title[:last_slash], proxy_creds=proxy_creds)
+			for stream in details_streams:
+				if stream not in streams:
+					streams.append(stream)
+
+	if event_name != event.name:
+		if event.name is None:
+			event.name = event_name
+			event.cached_name = event_name
+		elif event.cached_name != event_name:
+			event.cached_name = event_name
+			message_link = string_utils.build_message_link(
+				username,
+				f"{event.id}:update settings",
+				f"settings:name:{(event_name.replace(':', '?') if event_name else event_name)}"
+			)
+			log.warning(f"Event name changed from `{event.name}` to `{event_name}` : [update](<{message_link}>)")
+
+	changed = False
+	if len(event.streams) != 0:
+		if len(event.streams) != len(streams):
+			changed = True
+		else:
+			for i in range(len(streams)):
+				if event.streams[i] != streams[i]:
+					changed = True
+	if changed:
+		log.warning(f"Event {event.name} streams changed from `{'`, `'.join(event.streams)}` to `{'`, `'.join(streams)}`")
+	event.streams = streams
+
+	for game in games:
+		event.add_game(game)
+
+	event.sort_matches(approve_complete)
+	event.last_revid = rev_id
 
 
-def update_events(events_list, proxy_creds=None):
+def update_events(events_list, username=None, approve_complete=False, proxy_creds=None):
 	titles = []
 	for event in events_list:
 		titles.append(event.title)
 
 	base_url = "https://liquipedia.net/overwatch/api.php?action=query&prop=revisions&rvprop=timestamp|ids|flagged&titles={}&format=json&rvslots=main"
 	api_result = call_api(base_url.format("|".join(titles)), proxy_creds)
-	for api_page in api_result.json()["query"]["pages"].values():
-		api_page_title = api_page["title"]
-		api_page_latest_rev = api_page["revisions"][0]["revid"]
+	for api_page in api_result["query"]["pages"].values():
+		api_page_title = api_page["title"].replace(" ", "_")
+		api_page_latest_rev = str(api_page["revisions"][0]["revid"])
 
 		# there will never be very many events, so this is simpler than the other options
 		found_event = None
@@ -193,6 +255,7 @@ def update_events(events_list, proxy_creds=None):
 			continue
 
 		log.info(f"{api_page_title}: {found_event.last_revid} to {api_page_latest_rev}")
+		update_event(found_event, username, approve_complete, proxy_creds)
 
 
 

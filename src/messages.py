@@ -6,7 +6,7 @@ import re
 log = discord_logging.get_logger()
 
 import utils
-import liquipedia_parser
+import liquipedia_api
 from classes.event import Event
 from classes.settings import DirtyMixin
 
@@ -17,12 +17,14 @@ def add_event(line, reddit, events):
 	if len(words) < 2:
 		return "No link found in message"
 	page_url = words[1]
-	if "liquipedia.net" not in page_url:
+	if "https://liquipedia.net/overwatch/" not in page_url:
 		return f"Not a liquipedia url: {page_url}"
 
-	event = Event(url=page_url)
+	title = page_url[len("https://liquipedia.net/overwatch/"):]
+
+	event = Event(title=title)
 	DirtyMixin.log = False
-	liquipedia_parser.update_event(event, approve_complete=True)
+	liquipedia_api.update_event(event, approve_complete=True)
 	DirtyMixin.log = True
 	reddit.create_page_from_event(event)
 	events[event.id] = event

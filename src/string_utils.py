@@ -68,7 +68,7 @@ def make_time_string(date_time):
 
 
 def render_event_wiki(event, username):
-	bldr = ["##[", event.name, "](", event.url, ") : ", event.id, "\n\n"]
+	bldr = ["##[", event.name, "](", event.get_url(), ") : ", event.id, "\n\n"]
 
 	settings_fields = [
 		f"post_match_threads:{event.post_match_threads}",
@@ -439,7 +439,7 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 			bldr.append(f"Teams will be HIDDEN in post match thread titles. If this is wrong, ping an active moderator and they can ")
 			bldr.append(f"[click here to show them]({link}).\n\n")
 
-	bldr.append(f"\nThis thread pulls match data from [this liquipedia page]({event.url}). If the thread is out of data, you can help ")
+	bldr.append(f"\nThis thread pulls match data from [this liquipedia page]({event.get_url()}). If the thread is out of data, you can help ")
 	bldr.append(f"by updating that page. If something is wrong or missing please ping u/Watchful1 in the comments.")
 
 	return ''.join(bldr)
