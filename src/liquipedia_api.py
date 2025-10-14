@@ -71,7 +71,10 @@ def param_from_template_name(template, name):
 	single_template = templates[0]
 	if len(single_template.params) == 0:
 		return None
-	return single_template.get(1).value.strip()
+	param_value = single_template.get(1).value.strip()
+	if param_value == "":
+		return None
+	return param_value
 
 
 def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=True, print_templates=False):
@@ -250,10 +253,8 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			log.warning(f"Event title from api not found in list: {api_page_title}")
 			continue
 
-		override_events = [
-			"",
-		]
-		if found_event.last_revid == api_page_latest_rev and api_page_title not in override_events:
+		override_event = "China"
+		if found_event.last_revid == api_page_latest_rev and (override_event == "" or override_event not in api_page_title):
 			log.debug(f"{api_page_title}: revid didnt change")
 			continue
 
