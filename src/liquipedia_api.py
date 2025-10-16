@@ -146,24 +146,25 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 						team2_wins += 1
 					else:
 						log.warning(f"something went wrong: {map_winner}")
-			game.home.score = team1_wins
-			game.away.score = team2_wins
+			if team1_wins + team2_wins > 0:
+				game.home.score = team1_wins
+				game.away.score = team2_wins
 
-			if team1_wins > total_maps / 2 or team2_wins > total_maps / 2:
-				if team1_wins > team2_wins:
-					game.complete = True
-					log.debug(f"{game.home.name} wins {team1_wins} to {team2_wins}")
-				elif team1_wins < team2_wins:
-					game.complete = True
-					log.debug(f"{game.away.name} wins {team2_wins} to {team1_wins}")
+				if team1_wins > total_maps / 2 or team2_wins > total_maps / 2:
+					if team1_wins > team2_wins:
+						game.complete = True
+						log.debug(f"{game.home.name} wins {team1_wins} to {team2_wins}")
+					elif team1_wins < team2_wins:
+						game.complete = True
+						log.debug(f"{game.away.name} wins {team2_wins} to {team1_wins}")
+					else:
+						log.debug(f"Something's wrong. Wins greater than half maps, but still tied")
+				elif team1_wins + team2_wins > 0:
+					log.debug(f"Game in progress")
+				elif team1_wins + team2_wins == 0:
+					log.debug(f"Game not started")
 				else:
-					log.debug(f"Something's wrong. Wins greater than half maps, but still tied")
-			elif team1_wins + team2_wins > 0:
-				log.debug(f"Game in progress")
-			elif team1_wins + team2_wins == 0:
-				log.debug(f"Game not started")
-			else:
-				log.warning(f"Something went wrong determining winner")
+					log.warning(f"Something went wrong determining winner")
 
 			if game.home.name == "BYE" or game.away.name == "BYE" or game.date_time is None:
 				continue
@@ -253,7 +254,7 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			log.warning(f"Event title from api not found in list: {api_page_title}")
 			continue
 
-		override_event = "China"
+		override_event = ""
 		if found_event.last_revid == api_page_latest_rev and (override_event == "" or override_event not in api_page_title):
 			log.debug(f"{api_page_title}: revid didnt change")
 			continue
