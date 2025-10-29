@@ -30,6 +30,27 @@ def parse_details_page(details_title, proxy_creds=None):
 	return streams
 
 
+def parse_date_string(date_string, timezone_obj):
+	format_strings = [
+		"%Y-%m-%d - %H:%M",
+		"%b %d, %Y - %H:%M",
+	]
+
+	parsed_datetime = None
+	for format_string in format_strings:
+		try:
+			parsed_datetime = datetime.strptime(date_string, format_string)
+			break
+		except ValueError:
+			continue
+
+	if parsed_datetime is None:
+		return None
+
+	return parsed_datetime.replace(tzinfo=timezone_obj)
+
+
+
 def call_api(page_url, proxy_creds=None, retries=0):
 	log.debug(f"Calling api url: {page_url}")
 	try:
@@ -124,7 +145,7 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 				date_timezone = date_timezone.split("/")[1]
 
 				timezone_obj = utils.get_timezone(date_timezone)
-				timezone_datetime = datetime.strptime(date_str, "%Y-%m-%d - %H:%M").replace(tzinfo=timezone_obj)
+				timezone_datetime = parse_date_string(date_str, timezone_obj)
 
 				game.date_time = timezone_datetime.astimezone(utils.get_timezone("UTC"))
 				log.debug(game.date_time)
