@@ -34,6 +34,7 @@ def parse_date_string(date_string, timezone_obj):
 	format_strings = [
 		"%Y-%m-%d - %H:%M",
 		"%b %d, %Y - %H:%M",
+		"%B %d, %Y - %H:%M",
 	]
 
 	parsed_datetime = None
@@ -275,7 +276,7 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			log.warning(f"Event title from api not found in list: {api_page_title}")
 			continue
 
-		override_event = ""
+		override_event = "Finals"
 		if found_event.last_revid == api_page_latest_rev and (override_event == "" or override_event not in api_page_title):
 			log.debug(f"{api_page_title}: revid didnt change")
 			continue
