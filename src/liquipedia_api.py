@@ -255,6 +255,9 @@ def update_event(event, username=None, approve_complete=False, proxy_creds=None)
 
 
 def update_events(events_list, username=None, approve_complete=False, proxy_creds=None):
+	if not len(events_list):
+		return
+
 	titles = []
 	for event in events_list:
 		titles.append(event.title)
