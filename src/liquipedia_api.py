@@ -34,6 +34,7 @@ def parse_date_string(date_string, timezone_obj):
 	format_strings = [
 		"%Y-%m-%d - %H:%M",
 		"%b %d, %Y - %H:%M",
+		"%B %d, %Y - %H:%M",
 	]
 
 	parsed_datetime = None
