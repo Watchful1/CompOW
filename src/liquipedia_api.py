@@ -166,10 +166,10 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 						team1_wins += 1
 					elif map_winner == "2":
 						team2_wins += 1
-					elif map_winner == "draw":
+					elif map_winner == "draw" or map_winner == "0":
 						total_maps -= 1
 					else:
-						log.warning(f"something went wrong: {map_winner}")
+						log.warning(f"something went wrong determining winner: {map_winner}")
 			if team1_wins + team2_wins > 0:
 				game.home.score = team1_wins
 				game.away.score = team2_wins
@@ -281,7 +281,7 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			log.warning(f"Event title from api not found in list: {api_page_title}")
 			continue
 
-		override_event = ""
+		override_event = ""#"NA/Stage_1"
 		if found_event.last_revid == api_page_latest_rev and (override_event == "" or override_event not in api_page_title):
 			log.debug(f"{api_page_title}: revid didnt change")
 			continue
