@@ -14,7 +14,7 @@ from classes.settings import Settings
 def update_events(reddit, events, flairs, force_parse=False, proxy_creds=None):
 	try:
 		liquipedia_api.update_events(events.values(), reddit.user, proxy_creds=proxy_creds)
-	except TypeError as err:
+	except (TypeError, KeyError) as err:
 		log.warning(f"Error updating events: {err}")
 		log.warning(traceback.format_exc())
 		return utils.utcnow(offset=60 * 5)
