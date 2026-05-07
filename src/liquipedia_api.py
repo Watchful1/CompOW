@@ -170,6 +170,16 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 						total_maps -= 1
 					else:
 						log.warning(f"something went wrong determining winner: {map_winner}")
+			if total_maps == 0 and template.has("opponent1") and template.has("opponent2"):
+				opp1_templates = template.get("opponent1").value.filter_templates()
+				opp2_templates = template.get("opponent2").value.filter_templates()
+				if opp1_templates and opp1_templates[0].has("score") and opp2_templates and opp2_templates[0].has("score"):
+					opp1_score = opp1_templates[0].get("score").value.strip().upper()
+					opp2_score = opp2_templates[0].get("score").value.strip().upper()
+					if opp1_score == "W" and opp2_score == "FF":
+						team1_wins, total_maps = 3, 3
+					elif opp1_score == "FF" and opp2_score == "W":
+						team2_wins, total_maps = 3, 3
 			if team1_wins + team2_wins > 0:
 				game.home.score = team1_wins
 				game.away.score = team2_wins
