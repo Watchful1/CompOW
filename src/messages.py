@@ -250,8 +250,9 @@ def process_message(message, reddit, events):
 		elif line.startswith("enablespoilers"):
 			line_result = enable_spoilers_match_day(line, event)
 		elif line.startswith("renderwiki"):
+			liquipedia_api.update_events([event], override_event=event.title)
 			event._dirty = True
-			line_result = "rebuilt wiki page"
+			line_result = "rebuilt wiki page and re-fetched from liquipedia"
 		else:
 			line_result = "No command found for line"
 		log.info(line_result)

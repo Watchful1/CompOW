@@ -267,7 +267,7 @@ def update_event(event, username=None, approve_complete=False, proxy_creds=None)
 	event.last_revid = rev_id
 
 
-def update_events(events_list, username=None, approve_complete=False, proxy_creds=None):
+def update_events(events_list, username=None, approve_complete=False, proxy_creds=None, override_event=""):
 	if not len(events_list):
 		return
 
@@ -291,7 +291,7 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 			log.warning(f"Event title from api not found in list: {api_page_title}")
 			continue
 
-		override_event = ""#"NA/Stage_1"
+		override_event = override_event or ""  #"Asia"  # uncomment to force locally
 		if found_event.last_revid == api_page_latest_rev and (override_event == "" or override_event not in api_page_title):
 			log.debug(f"{api_page_title}: revid didnt change")
 			continue
