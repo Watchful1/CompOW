@@ -127,6 +127,8 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 				if not template.has(param_name):
 					continue
 				param = template.get(param_name)
+				if not param.value.strip():
+					continue
 				stream = f"{stream_providers[param_name]}{param.value.strip()}"
 				streams.append(stream)
 				log.debug(stream)
