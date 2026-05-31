@@ -331,11 +331,7 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 	bldr.append(event.name)
 	bldr.append("**\n")
 
-	bldr.append(">####")
-	# TODO
-	bldr.append("_")
-
-	bldr.append("\n>\n")
+	bldr.append(">\n")
 
 	bldr.append(">> *Streams*  \n")
 	streamBldr = []
@@ -376,7 +372,7 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 	bldr.append(">---\n")
 	bldr.append(">---\n")
 	bldr.append(">\n")
-	bldr.append(">####Schedule\n")
+	bldr.append(">#### Schedule\n")
 	bldr.append(">\n")
 	bldr.append(">>| |  |   |   |   |  | |   |\n")
 	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
@@ -431,7 +427,7 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 			f"{event.id}:enable spoilers",
 			f"enablespoilers:{match_day.id}:{not match_day.spoiler_prevention}"
 		)
-		bldr.append(")\n\n")
+		bldr.append("\n\n")
 		if not match_day.spoiler_prevention:
 			bldr.append(f"Teams will be SHOWN in post match thread titles. If this is wrong, ping an active moderator and they can ")
 			bldr.append(f"[click here to hide them]({link}).\n\n")
