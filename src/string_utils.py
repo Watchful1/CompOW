@@ -249,12 +249,11 @@ def render_reddit_post_match(event, match_day, game, flairs):
 	bldr.append(">#**")
 	bldr.append(event.name)
 	bldr.append("**\n")
-	bldr.append(">####")
 
-	bldr.append("\n>\n")
+	bldr.append(">\n")
 
 	bldr.append(">---\n")
-	bldr.append("|Team 1| |Score| |Team 2|\n")
+	bldr.append("|Home|Flag|Score|Flag|Away|\n")
 	bldr.append("|-:|-|:-:|-|:-|\n")
 
 	bldr.append("|")
