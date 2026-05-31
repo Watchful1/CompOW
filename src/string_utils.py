@@ -374,9 +374,8 @@ def render_reddit_event(match_day, event, flairs, subreddit, username):
 	bldr.append(">\n")
 	bldr.append(">#### Schedule\n")
 	bldr.append(">\n")
-	bldr.append(">>| |  |   |   |   |  | |   |\n")
+	bldr.append(">>|Time|Home|Flag|Score|Flag|Away| - |Match Page|\n")
 	bldr.append(">>|-|-:|:-:|:-:|:-:|:-|-|:-:|\n")
-	bldr.append(">>|Time|Team 1||||Team 2||Match Page|\n")
 	for game in match_day.approved_games:
 		bldr.append(">>|")
 
