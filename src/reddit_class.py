@@ -63,6 +63,8 @@ class Reddit:
 			counters.queries.labels(site="reddit", response="error").inc()
 			log.warning(f"Unable to post thread to r/{self.subreddit}")
 			log.warning(traceback.format_exc())
+			log.warning(f"Title: {title}")
+			log.warning(f"Body:\n{text}")
 			return None
 
 	def edit_thread(self, thread_id, text):
