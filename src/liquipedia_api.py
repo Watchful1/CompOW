@@ -33,6 +33,7 @@ def parse_details_page(details_title, proxy_creds=None):
 def parse_date_string(date_string, timezone_obj):
 	format_strings = [
 		"%Y-%m-%d - %H:%M",
+		"%Y-%m-%d %H:%M",
 		"%b %d, %Y - %H:%M",
 		"%B %d, %Y - %H:%M",
 	]
@@ -46,6 +47,7 @@ def parse_date_string(date_string, timezone_obj):
 			continue
 
 	if parsed_datetime is None:
+		log.warning(f"Could not parse date string: {date_string!r}")
 		return None
 
 	return parsed_datetime.replace(tzinfo=timezone_obj)
@@ -150,8 +152,11 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 				timezone_obj = utils.get_timezone(date_timezone)
 				timezone_datetime = parse_date_string(date_str, timezone_obj)
 
-				game.date_time = timezone_datetime.astimezone(utils.get_timezone("UTC"))
-				log.debug(game.date_time)
+				if timezone_datetime is None:
+					log.warning(f"Game has unparseable date, skipping: {game}")
+				else:
+					game.date_time = timezone_datetime.astimezone(utils.get_timezone("UTC"))
+					log.debug(game.date_time)
 			else:
 				log.debug("Game has no date")
 
