@@ -36,15 +36,15 @@ class Game(DirtyMixin):
 			return "In-progress"
 		return "Not-started"
 
+	def _names_match(self, game):
+		return (self.home.normalized_name() == game.home.normalized_name() or (self.home.name is None and game.home.name is not None)) and \
+			(self.away.normalized_name() == game.away.normalized_name() or (self.away.name is None and game.away.name is not None))
+
 	def matches(self, game):
-		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
-			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
-			self.date_time == game.date_time
+		return self._names_match(game) and self.date_time == game.date_time
 
 	def matches_approx(self, game):
-		return (self.home.name == game.home.name or (self.home.name is None and game.home.name is not None)) and \
-			(self.away.name == game.away.name or (self.away.name is None and game.away.name is not None)) and \
-			timestamp_within(self.date_time, game.date_time, timedelta(minutes=90))
+		return self._names_match(game) and timestamp_within(self.date_time, game.date_time, timedelta(minutes=90))
 
 	def merge(self, game):
 		if self.home != game.home:

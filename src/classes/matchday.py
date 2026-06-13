@@ -77,6 +77,11 @@ class MatchDay(DirtyMixin):
 				if target_id is not None:
 					for approved_game in self.approved_games:
 						if approved_game.id == target_id:
+							log.warning(
+								f"MANUAL_MERGE: matching missed this pair. "
+								f"pending=[home={pending_game.home.name!r}, away={pending_game.away.name!r}, time={pending_game.date_time}] "
+								f"approved=[home={approved_game.home.name!r}, away={approved_game.away.name!r}, time={approved_game.date_time}]"
+							)
 							approved_game.merge(pending_game)
 							log.info(f"Merged game {pending_game} into {approved_game}")
 							target_found = True

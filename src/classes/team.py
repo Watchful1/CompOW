@@ -28,6 +28,11 @@ class Team(DirtyMixin):
 			return "TBD"
 		return self.name
 
+	def normalized_name(self):
+		if self.name is None:
+			return None
+		return " ".join(self.name.casefold().split())
+
 	def __eq__(self, other):
 		if not isinstance(other, Team):
 			return False
