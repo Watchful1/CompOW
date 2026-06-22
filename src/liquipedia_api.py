@@ -27,7 +27,7 @@ stream_providers = {
 
 def parse_details_page(details_title, proxy_creds=None):
 	games, event_name, streams, rev_id = parse_event(details_title, proxy_creds=proxy_creds, parse_matches=False)
-	return streams
+	return streams if streams is not None else []
 
 
 def parse_date_string(date_string, timezone_obj):
@@ -106,6 +106,9 @@ def parse_event(page_title, proxy_creds=None, page_content=None, parse_matches=T
 	if page_content is None:
 		base_url = "https://liquipedia.net/overwatch/api.php?action=query&prop=revisions&rvprop=content|timestamp|ids&titles={}&format=json&rvslots=main"
 		api_result = call_api(base_url.format(page_title), proxy_creds)
+		if api_result is None:
+			log.warning(f"Could not fetch event page from liquipedia: {page_title}")
+			return None, None, None, None
 
 		first_page = next(iter(api_result["query"]["pages"].values()))
 
@@ -284,6 +287,9 @@ def update_events(events_list, username=None, approve_complete=False, proxy_cred
 
 	base_url = "https://liquipedia.net/overwatch/api.php?action=query&prop=revisions&rvprop=timestamp|ids|flagged&titles={}&format=json&rvslots=main"
 	api_result = call_api(base_url.format("|".join(titles)), proxy_creds)
+	if api_result is None:
+		log.warning(f"Could not fetch event revisions from liquipedia, skipping update")
+		return
 	for api_page in api_result["query"]["pages"].values():
 		api_page_title = api_page["title"].replace(" ", "_")
 		api_page_latest_rev = str(api_page["revisions"][0]["revid"])
